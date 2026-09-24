@@ -1,0 +1,678 @@
+{
+  "pages/about/founder": {
+    "requestedSize": {
+      "width": 400,
+      "height": 400,
+      "fit": "cover"
+    },
+    "orientations": "square",
+    "graphicalStyles": "photography",
+    "minimumSize": "large",
+    "mediaType": "image",
+    "currentUrl": "https://img1.wsimg.com/isteam/getty/1175416689",
+    "searchQuery": "young mother smiling holding newborn baby warm natural light",
+    "alternatives": [
+      "https://img1.wsimg.com/isteam/getty/1439349552",
+      "https://img1.wsimg.com/isteam/getty/1427327390"
+    ],
+    "userModified": false,
+    "createdAt": "2026-09-17T07:07:38.691Z",
+    "lastUpdated": "2026-09-17T07:07:38.691Z",
+    "gettyId": "1175416689",
+    "alternativeGettyIds": [
+      "1439349552",
+      "1427327390"
+    ]
+  },
+  "pages/about/hero": {
+    "requestedSize": {
+      "width": 1400,
+      "height": 600,
+      "fit": "cover"
+    },
+    "orientations": "horizontal",
+    "graphicalStyles": "photography",
+    "minimumSize": "large",
+    "mediaType": "image",
+    "currentUrl": "https://img1.wsimg.com/isteam/getty/1293401162",
+    "searchQuery": "happy baby wearing soft colorful clothes mother holding infant",
+    "alternatives": [
+      "https://img1.wsimg.com/isteam/getty/507093387",
+      "https://img1.wsimg.com/isteam/getty/1373627044"
+    ],
+    "userModified": false,
+    "createdAt": "2026-09-17T07:07:40.183Z",
+    "lastUpdated": "2026-09-17T07:07:40.183Z",
+    "gettyId": "1293401162",
+    "alternativeGettyIds": [
+      "507093387",
+      "1373627044"
+    ]
+  },
+  "products/baby-romper-1": {
+    "mediaType": "image",
+    "currentUrl": "/airo-assets/uploads/products-baby-romper-1-c82cb500.jpg",
+    "searchQuery": "toddlers wearing colorful play rompers",
+    "alternatives": [],
+    "userModified": true,
+    "createdAt": "2026-09-17T07:23:24.241Z",
+    "lastUpdated": "2026-09-17T07:23:24.241Z",
+    "uploadSources": {
+      "/airo-assets/uploads/products-baby-romper-1-c82cb500.jpg": "k65s0lrwil_1789629768976_file_rK3_L0oJH_.jpeg"
+    },
+    "uploadContentHash": "a53e9cac15a0c84c92015d0b066714ccc19f0c9a73abb701b4feaa1de8fa9117",
+    "caption": "toddlers wearing colorful play rompers"
+  },
+  "products/baby-sleepwear-1": {
+    "mediaType": "image",
+    "currentUrl": "/airo-assets/uploads/products-baby-sleepwear-1-611b75a6.jpg",
+    "searchQuery": "baby wearing turquoise hooded onesie playgrounds",
+    "alternatives": [],
+    "userModified": true,
+    "createdAt": "2026-09-17T07:23:24.785Z",
+    "lastUpdated": "2026-09-17T07:23:24.785Z",
+    "uploadSources": {
+      "/airo-assets/uploads/products-baby-sleepwear-1-611b75a6.jpg": "k65s0lrwil_1789629768325_file_7SxFvfBnKe.jpeg"
+    },
+    "uploadContentHash": "baa440a234ea152f0c4457aca172c13935fac4a4a0633e895c263e00d2a28b60",
+    "caption": "baby wearing turquoise hooded onesie playgrounds"
+  },
+  "products/baby-onesie-1": {
+    "mediaType": "image",
+    "currentUrl": "/airo-assets/uploads/products-baby-onesie-1-9ad33815.jpg",
+    "searchQuery": "toddler clothing collection soft cotton rompers",
+    "alternatives": [],
+    "userModified": true,
+    "createdAt": "2026-09-17T07:23:25.253Z",
+    "lastUpdated": "2026-09-17T07:23:25.253Z",
+    "uploadSources": {
+      "/airo-assets/uploads/products-baby-onesie-1-9ad33815.jpg": "k65s0lrwil_1789629768978_file_908DScePej.jpeg"
+    },
+    "uploadContentHash": "7cb305f022a065cb9c156c00e616b68f580cea4344d1b31c6082ba6a0858a8b3",
+    "caption": "toddler clothing collection soft cotton rompers"
+  },
+  "products/baby-set-1": {
+    "mediaType": "image",
+    "currentUrl": "/airo-assets/uploads/products-baby-set-1-d9f25405.jpg",
+    "searchQuery": "toddler girl smiling garden with teddy bear",
+    "alternatives": [],
+    "userModified": true,
+    "createdAt": "2026-09-17T07:23:25.622Z",
+    "lastUpdated": "2026-09-17T07:23:25.622Z",
+    "uploadSources": {
+      "/airo-assets/uploads/products-baby-set-1-d9f25405.jpg": "k65s0lrwil_1789629768326_file_8sp31rWmbA.jpeg"
+    },
+    "uploadContentHash": "141cbd340d6a2c9d67e22b2367d53a794c8b909c92be14f542203b2219182e74",
+    "caption": "toddler girl smiling garden with teddy bear"
+  },
+  "products/baby-set-2": {
+    "requestedSize": {
+      "width": 600,
+      "height": 600,
+      "fit": "cover"
+    },
+    "orientations": "square",
+    "graphicalStyles": "photography",
+    "minimumSize": "large",
+    "mediaType": "image",
+    "currentUrl": "https://img1.wsimg.com/isteam/getty/1062732860",
+    "searchQuery": "toddler outfit set top pants baby fashion",
+    "alternatives": [
+      "https://img1.wsimg.com/isteam/getty/1725524424",
+      "https://img1.wsimg.com/isteam/getty/1467678651"
+    ],
+    "userModified": false,
+    "createdAt": "2026-09-17T07:23:34.552Z",
+    "lastUpdated": "2026-09-17T07:23:34.552Z",
+    "gettyId": "1062732860",
+    "alternativeGettyIds": [
+      "1725524424",
+      "1467678651"
+    ]
+  },
+  "products/baby-onesie-2": {
+    "requestedSize": {
+      "width": 600,
+      "height": 600,
+      "fit": "cover"
+    },
+    "orientations": "square",
+    "graphicalStyles": "photography",
+    "minimumSize": "large",
+    "mediaType": "image",
+    "currentUrl": "https://img1.wsimg.com/isteam/getty/2272425504",
+    "searchQuery": "baby onesie white soft cotton infant clothing",
+    "alternatives": [
+      "https://img1.wsimg.com/isteam/getty/1440870757",
+      "https://img1.wsimg.com/isteam/getty/2183482644"
+    ],
+    "userModified": false,
+    "createdAt": "2026-09-17T07:23:35.508Z",
+    "lastUpdated": "2026-09-17T07:23:35.508Z",
+    "gettyId": "2272425504",
+    "alternativeGettyIds": [
+      "1440870757",
+      "2183482644"
+    ]
+  },
+  "products/baby-sleepwear-2": {
+    "requestedSize": {
+      "width": 600,
+      "height": 600,
+      "fit": "cover"
+    },
+    "orientations": "square",
+    "graphicalStyles": "photography",
+    "minimumSize": "large",
+    "mediaType": "image",
+    "currentUrl": "https://img1.wsimg.com/isteam/getty/1135364598",
+    "searchQuery": "baby sleepsuit pajamas soft cozy toddler",
+    "alternatives": [
+      "https://img1.wsimg.com/isteam/getty/1440870757",
+      "https://img1.wsimg.com/isteam/getty/1458066415"
+    ],
+    "userModified": false,
+    "createdAt": "2026-09-17T07:23:38.231Z",
+    "lastUpdated": "2026-09-17T07:23:38.231Z",
+    "gettyId": "1135364598",
+    "alternativeGettyIds": [
+      "1440870757",
+      "1458066415"
+    ]
+  },
+  "products/baby-romper-2": {
+    "requestedSize": {
+      "width": 600,
+      "height": 600,
+      "fit": "cover"
+    },
+    "orientations": "square",
+    "graphicalStyles": "photography",
+    "minimumSize": "large",
+    "mediaType": "image",
+    "currentUrl": "/airo-assets/uploads/products-baby-romper-2-9a1a30a7.jpg",
+    "searchQuery": "smiling baby in red outfit playground",
+    "alternatives": [
+      "https://img1.wsimg.com/isteam/getty/1328402289",
+      "https://img1.wsimg.com/isteam/getty/1477344282",
+      "https://img1.wsimg.com/isteam/getty/2156515722"
+    ],
+    "userModified": true,
+    "createdAt": "2026-09-17T07:23:39.634Z",
+    "lastUpdated": "2026-09-17T18:31:36.586Z",
+    "alternativeGettyIds": [
+      "1328402289",
+      "1477344282",
+      "2156515722"
+    ],
+    "uploadSources": {
+      "/airo-assets/uploads/products-baby-romper-2-9a1a30a7.jpg": "k65s0lrwil_1789669827140_file_Myc8OSbyPD.jpeg"
+    },
+    "uploadContentHash": "fabc7a5835d7856b77099147875db00818f0a3a6ee8bbf4c313e778b206ac4f2",
+    "caption": "smiling baby in red outfit playground"
+  },
+  "products/baby-pants-1": {
+    "requestedSize": {
+      "width": 600,
+      "height": 600,
+      "fit": "cover"
+    },
+    "orientations": "square",
+    "graphicalStyles": "photography",
+    "minimumSize": "large",
+    "mediaType": "image",
+    "currentUrl": "https://img1.wsimg.com/isteam/getty/1440870757",
+    "searchQuery": "baby pants leggings soft cotton toddler comfortable",
+    "alternatives": [
+      "https://img1.wsimg.com/isteam/getty/2272425504",
+      "https://img1.wsimg.com/isteam/getty/1135364598"
+    ],
+    "userModified": false,
+    "createdAt": "2026-09-17T07:23:55.018Z",
+    "lastUpdated": "2026-09-17T07:23:55.018Z",
+    "gettyId": "1440870757",
+    "alternativeGettyIds": [
+      "2272425504",
+      "1135364598"
+    ]
+  },
+  "products/baby-dress-1": {
+    "requestedSize": {
+      "width": 600,
+      "height": 600,
+      "fit": "cover"
+    },
+    "orientations": "square",
+    "graphicalStyles": "photography",
+    "minimumSize": "large",
+    "mediaType": "image",
+    "currentUrl": "https://img1.wsimg.com/isteam/getty/1178909198",
+    "searchQuery": "baby girl dress floral soft fabric toddler",
+    "alternatives": [
+      "https://img1.wsimg.com/isteam/getty/1221358316",
+      "https://img1.wsimg.com/isteam/getty/1177328584"
+    ],
+    "userModified": false,
+    "createdAt": "2026-09-17T07:23:55.361Z",
+    "lastUpdated": "2026-09-17T07:23:55.361Z",
+    "gettyId": "1178909198",
+    "alternativeGettyIds": [
+      "1221358316",
+      "1177328584"
+    ]
+  },
+  "products/baby-bodysuit-1": {
+    "requestedSize": {
+      "width": 600,
+      "height": 600,
+      "fit": "cover"
+    },
+    "orientations": "square",
+    "graphicalStyles": "photography",
+    "minimumSize": "large",
+    "mediaType": "image",
+    "currentUrl": "https://img1.wsimg.com/isteam/getty/700290566",
+    "searchQuery": "baby bodysuit striped colorful newborn clothing flat lay",
+    "alternatives": [
+      "https://img1.wsimg.com/isteam/getty/1440870757",
+      "https://img1.wsimg.com/isteam/getty/1391333731"
+    ],
+    "userModified": false,
+    "createdAt": "2026-09-17T07:23:57.480Z",
+    "lastUpdated": "2026-09-17T07:23:57.480Z",
+    "gettyId": "700290566",
+    "alternativeGettyIds": [
+      "1440870757",
+      "1391333731"
+    ]
+  },
+  "products/baby-jacket-1": {
+    "requestedSize": {
+      "width": 600,
+      "height": 600,
+      "fit": "cover"
+    },
+    "orientations": "square",
+    "graphicalStyles": "photography",
+    "minimumSize": "large",
+    "mediaType": "image",
+    "currentUrl": "https://img1.wsimg.com/isteam/getty/1447523916",
+    "searchQuery": "baby jacket hoodie warm soft infant outerwear",
+    "alternatives": [
+      "https://img1.wsimg.com/isteam/getty/621494700",
+      "https://img1.wsimg.com/isteam/getty/1462385085"
+    ],
+    "userModified": false,
+    "createdAt": "2026-09-17T07:23:58.839Z",
+    "lastUpdated": "2026-09-17T07:23:58.839Z",
+    "gettyId": "1447523916",
+    "alternativeGettyIds": [
+      "621494700",
+      "1462385085"
+    ]
+  },
+  "products/baby-dress-2": {
+    "mediaType": "image",
+    "currentUrl": "/airo-assets/uploads/products-baby-dress-2-776f03e7.jpg",
+    "searchQuery": "happy toddler boy in blue nursery room",
+    "alternatives": [],
+    "userModified": true,
+    "createdAt": "2026-09-17T07:25:59.266Z",
+    "lastUpdated": "2026-09-17T07:25:59.266Z",
+    "uploadSources": {
+      "/airo-assets/uploads/products-baby-dress-2-776f03e7.jpg": "k65s0lrwil_1789629768327_file_bWlQvs7oRl.jpeg"
+    },
+    "uploadContentHash": "56b435e35bbbbf48b3230607d768910a0661da2d5bd97779490988a07e2ad5ae",
+    "caption": "happy toddler boy in blue nursery room"
+  },
+  "products/baby-jacket-2": {
+    "mediaType": "image",
+    "currentUrl": "/airo-assets/uploads/products-baby-jacket-2-b15674fd.jpg",
+    "searchQuery": "toddlers wearing colorful play rompers smiling",
+    "alternatives": [],
+    "userModified": true,
+    "createdAt": "2026-09-17T07:26:03.049Z",
+    "lastUpdated": "2026-09-17T07:26:03.049Z",
+    "uploadSources": {
+      "/airo-assets/uploads/products-baby-jacket-2-b15674fd.jpg": "k65s0lrwil_1789629768328_file_YBFCC-BXzh.jpeg"
+    },
+    "uploadContentHash": "df9aa4ce57cd6cbdfdb02278ee43c8011df31a6ba243cb69ffbbcbb1a00d9d8d",
+    "caption": "toddlers wearing colorful play rompers smiling"
+  },
+  "products/baby-set-3": {
+    "mediaType": "image",
+    "currentUrl": "/airo-assets/uploads/products-baby-set-3-0a8ec510.jpg",
+    "searchQuery": "happy toddler sitting playroom floor",
+    "alternatives": [],
+    "userModified": true,
+    "createdAt": "2026-09-17T07:26:06.498Z",
+    "lastUpdated": "2026-09-17T07:26:06.498Z",
+    "uploadSources": {
+      "/airo-assets/uploads/products-baby-set-3-0a8ec510.jpg": "k65s0lrwil_1789629651444_file_dT0gH7GFR2.jpeg"
+    },
+    "uploadContentHash": "046e0f563b6f5187ace11ea49f08b49d0f729caecf80ce496297d937eea4354b",
+    "caption": "happy toddler sitting playroom floor"
+  },
+  "products/baby-bodysuit-2": {
+    "mediaType": "image",
+    "currentUrl": "/airo-assets/uploads/products-baby-bodysuit-2-fd3b4958.jpg",
+    "searchQuery": "packaged black track pants with shipping labels",
+    "alternatives": [],
+    "userModified": true,
+    "createdAt": "2026-09-17T07:26:10.596Z",
+    "lastUpdated": "2026-09-17T07:26:10.596Z",
+    "uploadSources": {
+      "/airo-assets/uploads/products-baby-bodysuit-2-fd3b4958.jpg": "k65s0lrwil_1789629639384_file_KtEvKBtob2.jpeg"
+    },
+    "uploadContentHash": "c4424d5f4c116afc4203208c8d2f72489b5dcb6b8ebc0cc577f283ccc0dfb0e0",
+    "caption": "packaged black track pants with shipping labels"
+  },
+  "pages/home/hero": {
+    "requestedSize": {
+      "width": 1400,
+      "height": 700,
+      "fit": "cover"
+    },
+    "orientations": "horizontal",
+    "graphicalStyles": "photography",
+    "minimumSize": "large",
+    "mediaType": "image",
+    "currentUrl": "https://img1.wsimg.com/isteam/getty/2251463015",
+    "searchQuery": "happy baby toddler playing soft colorful clothes warm natural light",
+    "alternatives": [
+      "https://img1.wsimg.com/isteam/getty/2253456540",
+      "https://img1.wsimg.com/isteam/getty/2251462966",
+      "https://img1.wsimg.com/isteam/getty/1147401623",
+      "https://img1.wsimg.com/isteam/getty/1077783040"
+    ],
+    "userModified": false,
+    "createdAt": "2026-09-17T07:29:58.792Z",
+    "lastUpdated": "2026-09-17T07:29:58.792Z",
+    "gettyId": "2251463015",
+    "alternativeGettyIds": [
+      "2253456540",
+      "2251462966",
+      "1147401623",
+      "1077783040"
+    ]
+  },
+  "logo/horizontal": {
+    "mediaType": "logo",
+    "currentUrl": "https://isteam.wsimg.com/genai-assistant/logoagent/customer/58491cbc-adec-419c-831d-2d6a61de7e26/session/ec2f670a-6b29-44c4-be5d-49a3dcde0187/horizontal-transparent-8c84ee48-c38c-4e8a-b444-aafef6755122/logo-logo.png",
+    "searchQuery": "An elegant monogram logo for Bsbasil — intertwined \"BS\" letterforms in a refined",
+    "alternatives": [],
+    "solidUrlMap": {
+      "https://isteam.wsimg.com/genai-assistant/logoagent/customer/58491cbc-adec-419c-831d-2d6a61de7e26/session/ec2f670a-6b29-44c4-be5d-49a3dcde0187/horizontal-transparent-8c84ee48-c38c-4e8a-b444-aafef6755122/logo-logo.png": "https://isteam.wsimg.com/genai-assistant/logoagent/customer/58491cbc-adec-419c-831d-2d6a61de7e26/session/ec2f670a-6b29-44c4-be5d-49a3dcde0187/horizontal-original-8c84ee48-c38c-4e8a-b444-aafef6755122/logo-logo.png"
+    },
+    "mockupUrlMap": {
+      "https://isteam.wsimg.com/genai-assistant/logoagent/customer/58491cbc-adec-419c-831d-2d6a61de7e26/session/ec2f670a-6b29-44c4-be5d-49a3dcde0187/horizontal-transparent-8c84ee48-c38c-4e8a-b444-aafef6755122/logo-logo.png": "https://isteam.wsimg.com/genai-assistant/logoagent/customer/58491cbc-adec-419c-831d-2d6a61de7e26/session/ec2f670a-6b29-44c4-be5d-49a3dcde0187/horizontal-transparent-8c84ee48-c38c-4e8a-b444-aafef6755122/logo-logo.png"
+    },
+    "landscapeMockupUrlMap": {},
+    "logoSourceMap": {
+      "https://isteam.wsimg.com/genai-assistant/logoagent/customer/58491cbc-adec-419c-831d-2d6a61de7e26/session/ec2f670a-6b29-44c4-be5d-49a3dcde0187/horizontal-transparent-8c84ee48-c38c-4e8a-b444-aafef6755122/logo-logo.png": {
+        "sessionId": "ec2f670a-6b29-44c4-be5d-49a3dcde0187",
+        "logoId": "8c84ee48-c38c-4e8a-b444-aafef6755122",
+        "groupId": "1a33beee-501c-4554-af62-56aef305d28f"
+      }
+    },
+    "productMockupsMap": {
+      "https://isteam.wsimg.com/genai-assistant/logoagent/customer/58491cbc-adec-419c-831d-2d6a61de7e26/session/ec2f670a-6b29-44c4-be5d-49a3dcde0187/horizontal-transparent-8c84ee48-c38c-4e8a-b444-aafef6755122/logo-logo.png": [
+        {
+          "type": "mug",
+          "label": "Mug",
+          "url": "https://isteam.wsimg.com/genai-assistant/logoagent/customer/58491cbc-adec-419c-831d-2d6a61de7e26/session/ec2f670a-6b29-44c4-be5d-49a3dcde0187/horizontal-mockup-mug-8c84ee48-c38c-4e8a-b444-aafef6755122/logo-logo.png"
+        },
+        {
+          "type": "card",
+          "label": "Business Card",
+          "url": "https://isteam.wsimg.com/genai-assistant/logoagent/customer/58491cbc-adec-419c-831d-2d6a61de7e26/session/ec2f670a-6b29-44c4-be5d-49a3dcde0187/horizontal-mockup-card-8c84ee48-c38c-4e8a-b444-aafef6755122/logo-logo.png"
+        },
+        {
+          "type": "tshirt",
+          "label": "T-Shirt",
+          "url": "https://isteam.wsimg.com/genai-assistant/logoagent/customer/58491cbc-adec-419c-831d-2d6a61de7e26/session/ec2f670a-6b29-44c4-be5d-49a3dcde0187/horizontal-mockup-tshirt-8c84ee48-c38c-4e8a-b444-aafef6755122/logo-logo.png"
+        },
+        {
+          "type": "box",
+          "label": "Packaging",
+          "url": "https://isteam.wsimg.com/genai-assistant/logoagent/customer/58491cbc-adec-419c-831d-2d6a61de7e26/session/ec2f670a-6b29-44c4-be5d-49a3dcde0187/horizontal-mockup-box-8c84ee48-c38c-4e8a-b444-aafef6755122/logo-logo.png"
+        }
+      ]
+    },
+    "productMockups": [
+      {
+        "type": "mug",
+        "label": "Mug",
+        "url": "https://isteam.wsimg.com/genai-assistant/logoagent/customer/58491cbc-adec-419c-831d-2d6a61de7e26/session/ec2f670a-6b29-44c4-be5d-49a3dcde0187/horizontal-mockup-mug-8c84ee48-c38c-4e8a-b444-aafef6755122/logo-logo.png"
+      },
+      {
+        "type": "card",
+        "label": "Business Card",
+        "url": "https://isteam.wsimg.com/genai-assistant/logoagent/customer/58491cbc-adec-419c-831d-2d6a61de7e26/session/ec2f670a-6b29-44c4-be5d-49a3dcde0187/horizontal-mockup-card-8c84ee48-c38c-4e8a-b444-aafef6755122/logo-logo.png"
+      },
+      {
+        "type": "tshirt",
+        "label": "T-Shirt",
+        "url": "https://isteam.wsimg.com/genai-assistant/logoagent/customer/58491cbc-adec-419c-831d-2d6a61de7e26/session/ec2f670a-6b29-44c4-be5d-49a3dcde0187/horizontal-mockup-tshirt-8c84ee48-c38c-4e8a-b444-aafef6755122/logo-logo.png"
+      },
+      {
+        "type": "box",
+        "label": "Packaging",
+        "url": "https://isteam.wsimg.com/genai-assistant/logoagent/customer/58491cbc-adec-419c-831d-2d6a61de7e26/session/ec2f670a-6b29-44c4-be5d-49a3dcde0187/horizontal-mockup-box-8c84ee48-c38c-4e8a-b444-aafef6755122/logo-logo.png"
+      }
+    ],
+    "userModified": false,
+    "createdAt": "2026-09-17T18:15:57.636Z",
+    "lastUpdated": "2026-09-17T18:16:27.123Z",
+    "surfaceMode": "light",
+    "generatedForSurfaceColor": "#FFFAF7",
+    "lightSurfaceUrl": "https://isteam.wsimg.com/genai-assistant/logoagent/customer/58491cbc-adec-419c-831d-2d6a61de7e26/session/ec2f670a-6b29-44c4-be5d-49a3dcde0187/horizontal-transparent-8c84ee48-c38c-4e8a-b444-aafef6755122/logo-logo.png",
+    "logoGroupId": "1a33beee-501c-4554-af62-56aef305d28f"
+  },
+  "logo/favicon": {
+    "mediaType": "logo",
+    "currentUrl": "https://isteam.wsimg.com/genai-assistant/logoagent/customer/58491cbc-adec-419c-831d-2d6a61de7e26/session/a09c58ce-0ac5-4743-bd09-4f10d94d9ebf/favicon-transparent-32a05f3b-f76c-4d2a-9f18-aabb134530a1/logo-logo.png",
+    "searchQuery": "favicon",
+    "alternatives": [],
+    "logoSourceMap": {
+      "https://isteam.wsimg.com/genai-assistant/logoagent/customer/58491cbc-adec-419c-831d-2d6a61de7e26/session/a09c58ce-0ac5-4743-bd09-4f10d94d9ebf/favicon-transparent-32a05f3b-f76c-4d2a-9f18-aabb134530a1/logo-logo.png": {
+        "sessionId": "a09c58ce-0ac5-4743-bd09-4f10d94d9ebf",
+        "logoId": "32a05f3b-f76c-4d2a-9f18-aabb134530a1",
+        "groupId": "1a33beee-501c-4554-af62-56aef305d28f"
+      }
+    },
+    "logoGroupId": "1a33beee-501c-4554-af62-56aef305d28f",
+    "solidUrlMap": {
+      "https://isteam.wsimg.com/genai-assistant/logoagent/customer/58491cbc-adec-419c-831d-2d6a61de7e26/session/a09c58ce-0ac5-4743-bd09-4f10d94d9ebf/favicon-transparent-32a05f3b-f76c-4d2a-9f18-aabb134530a1/logo-logo.png": "https://isteam.wsimg.com/genai-assistant/logoagent/customer/58491cbc-adec-419c-831d-2d6a61de7e26/session/a09c58ce-0ac5-4743-bd09-4f10d94d9ebf/favicon-original-32a05f3b-f76c-4d2a-9f18-aabb134530a1/logo-logo.png"
+    },
+    "userModified": false,
+    "createdAt": "2026-09-17T18:16:13.028Z",
+    "lastUpdated": "2026-09-17T18:16:27.225Z",
+    "surfaceMode": "light",
+    "generatedForSurfaceColor": "#FFFAF7",
+    "lightSurfaceUrl": "https://isteam.wsimg.com/genai-assistant/logoagent/customer/58491cbc-adec-419c-831d-2d6a61de7e26/session/a09c58ce-0ac5-4743-bd09-4f10d94d9ebf/favicon-transparent-32a05f3b-f76c-4d2a-9f18-aabb134530a1/logo-logo.png"
+  },
+  "products/new-product-1": {
+    "mediaType": "image",
+    "currentUrl": "/airo-assets/uploads/products-new-product-1-eecc3fd5.jpg",
+    "searchQuery": "basil herb logo green design",
+    "alternatives": [],
+    "userModified": true,
+    "createdAt": "2026-09-17T18:25:33.660Z",
+    "lastUpdated": "2026-09-17T18:25:33.660Z",
+    "uploadSources": {
+      "/airo-assets/uploads/products-new-product-1-eecc3fd5.jpg": "k65s0lrwil_1789668942319_file_R0IYS1nA03.jpeg"
+    },
+    "uploadContentHash": "47bbec2dfb4beb35dc3d20b8834b4e1a19f88e5768cb4b3f3d114ff2458ff169",
+    "caption": "basil herb logo green design"
+  },
+  "products/new-product-3": {
+    "orientations": "square",
+    "graphicalStyles": "photography",
+    "minimumSize": "large",
+    "mediaType": "image",
+    "currentUrl": "/airo-assets/uploads/products-new-product-3-fe7f37f8.png",
+    "searchQuery": "toddler pink white adorable outfit set",
+    "alternatives": [
+      "https://img1.wsimg.com/isteam/getty/1221358316",
+      "https://img1.wsimg.com/isteam/getty/1178909198",
+      "https://img1.wsimg.com/isteam/getty/1303638826"
+    ],
+    "userModified": true,
+    "createdAt": "2026-09-17T18:25:51.319Z",
+    "lastUpdated": "2026-09-22T08:10:07.944Z",
+    "alternativeGettyIds": [
+      "1221358316",
+      "1178909198",
+      "1303638826"
+    ],
+    "uploadSources": {
+      "/airo-assets/uploads/products-new-product-3-fe7f37f8.png": "k65s0lrwil_1790064527998_file_M0Ic-7hZQY.png"
+    },
+    "uploadContentHash": "5b80567aa22ad2560af79dbfd2a06ad7378326dbe6f550294df4607080f2c210",
+    "caption": "toddler pink white adorable outfit set"
+  },
+  "products/new-product-2": {
+    "orientations": "square",
+    "graphicalStyles": "photography",
+    "minimumSize": "large",
+    "mediaType": "image",
+    "currentUrl": "/airo-assets/uploads/products-new-product-2-2fdacb58.png",
+    "searchQuery": "toddler boy formal plaid vest outfit",
+    "alternatives": [
+      "https://img1.wsimg.com/isteam/getty/1221358785",
+      "https://img1.wsimg.com/isteam/getty/1215591957",
+      "https://img1.wsimg.com/isteam/getty/1480971339"
+    ],
+    "userModified": true,
+    "createdAt": "2026-09-17T18:25:53.787Z",
+    "lastUpdated": "2026-09-22T08:10:10.985Z",
+    "alternativeGettyIds": [
+      "1221358785",
+      "1215591957",
+      "1480971339"
+    ],
+    "uploadSources": {
+      "/airo-assets/uploads/products-new-product-2-2fdacb58.png": "k65s0lrwil_1790064529761_file_isvqg0ATaL.png"
+    },
+    "uploadContentHash": "9170a6390bca1125e406a2f6e4bccc3bcbfc6022e7afdbfb0cae256da3d2e673",
+    "caption": "toddler boy formal plaid vest outfit"
+  },
+  "products/new-product-6": {
+    "orientations": "square",
+    "graphicalStyles": "photography",
+    "minimumSize": "large",
+    "mediaType": "image",
+    "currentUrl": "/airo-assets/uploads/products-new-product-6-d148c146.png",
+    "searchQuery": "toddler boy formal plaid vest outfit",
+    "alternatives": [
+      "https://img1.wsimg.com/isteam/getty/1462385085",
+      "https://img1.wsimg.com/isteam/getty/1398204470",
+      "https://img1.wsimg.com/isteam/getty/1200721933"
+    ],
+    "userModified": true,
+    "createdAt": "2026-09-17T18:25:56.649Z",
+    "lastUpdated": "2026-09-22T08:10:09.421Z",
+    "alternativeGettyIds": [
+      "1462385085",
+      "1398204470",
+      "1200721933"
+    ],
+    "uploadSources": {
+      "/airo-assets/uploads/products-new-product-6-d148c146.png": "k65s0lrwil_1790064528017_file_6Dy0OjtyQ6.png"
+    },
+    "uploadContentHash": "79845389d73afd07808d1929f14711601314a3823a5f8bcfa184260004afed47",
+    "caption": "toddler boy formal plaid vest outfit"
+  },
+  "products/new-product-7": {
+    "orientations": "square",
+    "graphicalStyles": "photography",
+    "minimumSize": "large",
+    "mediaType": "image",
+    "currentUrl": "/airo-assets/uploads/products-new-product-7-a6dcfdd4.png",
+    "searchQuery": "young boy formal plaid suit smiling",
+    "alternatives": [
+      "https://img1.wsimg.com/isteam/getty/936357522",
+      "https://img1.wsimg.com/isteam/getty/1480971338",
+      "https://img1.wsimg.com/isteam/getty/1200829402"
+    ],
+    "userModified": true,
+    "createdAt": "2026-09-17T18:25:58.210Z",
+    "lastUpdated": "2026-09-22T08:10:11.670Z",
+    "alternativeGettyIds": [
+      "936357522",
+      "1480971338",
+      "1200829402"
+    ],
+    "uploadSources": {
+      "/airo-assets/uploads/products-new-product-7-a6dcfdd4.png": "k65s0lrwil_1790064528023_file_BSo6eMwaRG.png"
+    },
+    "uploadContentHash": "761238c30e273e47aa8b887b1c5da9a4f04bad4b22e4198530ec9160ee34c137",
+    "caption": "young boy formal plaid suit smiling"
+  },
+  "products/new-product-4": {
+    "orientations": "square",
+    "graphicalStyles": "photography",
+    "minimumSize": "large",
+    "mediaType": "image",
+    "currentUrl": "/airo-assets/uploads/products-new-product-4-d1334209.png",
+    "searchQuery": "smiling toddler wearing pink colorblock outfit",
+    "alternatives": [
+      "https://img1.wsimg.com/isteam/getty/2292144311",
+      "https://img1.wsimg.com/isteam/getty/1364316802",
+      "https://img1.wsimg.com/isteam/getty/1319221044"
+    ],
+    "userModified": true,
+    "createdAt": "2026-09-17T18:26:00.150Z",
+    "lastUpdated": "2026-09-22T08:10:08.721Z",
+    "alternativeGettyIds": [
+      "2292144311",
+      "1364316802",
+      "1319221044"
+    ],
+    "uploadSources": {
+      "/airo-assets/uploads/products-new-product-4-d1334209.png": "k65s0lrwil_1790064528006_file_bPjlRbKAbp.png"
+    },
+    "uploadContentHash": "d374bd521feb14e7fc0f82a0caceb9a8c763ff64fbe1038b5fd7f206c7f4c8d6",
+    "caption": "smiling toddler wearing pink colorblock outfit"
+  },
+  "products/new-product-5": {
+    "orientations": "square",
+    "graphicalStyles": "photography",
+    "minimumSize": "large",
+    "mediaType": "image",
+    "currentUrl": "/airo-assets/uploads/products-new-product-5-6f1fa761.png",
+    "searchQuery": "smiling toddler wearing colorblock adorable outfit",
+    "alternatives": [
+      "https://img1.wsimg.com/isteam/getty/960045596",
+      "https://img1.wsimg.com/isteam/getty/2270108317",
+      "https://img1.wsimg.com/isteam/getty/960045588"
+    ],
+    "userModified": true,
+    "createdAt": "2026-09-17T18:26:01.896Z",
+    "lastUpdated": "2026-09-22T08:10:10.263Z",
+    "alternativeGettyIds": [
+      "960045596",
+      "2270108317",
+      "960045588"
+    ],
+    "uploadSources": {
+      "/airo-assets/uploads/products-new-product-5-6f1fa761.png": "k65s0lrwil_1790064528012_file_Y65xz6yz7G.png"
+    },
+    "uploadContentHash": "d9572e0986b53a4367dd092bfbf88825dd4f6e83db3b31c55735bc457bf5d3e4",
+    "caption": "smiling toddler wearing colorblock adorable outfit"
+  },
+  "imported/image-1789669897646": {
+    "mediaType": "image",
+    "currentUrl": "https://img1.wsimg.com/isteam/getty/1328402289",
+    "searchQuery": "baby lying on blanket with arms raised",
+    "alternatives": [
+      "https://img1.wsimg.com/isteam/getty/1328402289"
+    ],
+    "userModified": false,
+    "displacedFrom": "products/baby-romper-2",
+    "createdAt": "2026-09-17T18:31:37.647Z",
+    "lastUpdated": "2026-09-17T18:31:37.647Z",
+    "caption": "baby lying on blanket with arms raised"
+  }
+}

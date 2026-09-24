@@ -1,0 +1,27 @@
+{
+  "hero": {
+    "eyebrow": "Get in touch",
+    "heading": "We'd love to hear from you",
+    "subheading": "Questions about sizing, orders, or our fabrics? Drop us a message and we'll get back to you within 24 hours."
+  },
+  "details": {
+    "heading": "Contact details",
+    "body": "Reach out through any of the channels below, or fill in the form and we'll respond promptly.",
+    "email": "packology.ent@gmail.com",
+    "phone": "+91 77009 05962",
+    "phoneHref": "tel:+917700905962",
+    "location": "India",
+    "hours": "Mon – Sat, 10 AM – 6 PM IST",
+    "responseTime": "We reply within 24 hours"
+  },
+  "trust": {
+    "label": "💛 Parents first",
+    "body": "Every message is read by our team. We're a small brand that genuinely cares — no bots, no templates."
+  },
+  "form": {
+    "heading": "Send us a message",
+    "successHeading": "Message sent!",
+    "successBody": "Thank you for reaching out. We'll get back to you within 24 hours.",
+    "successCta": "Send another message"
+  }
+}

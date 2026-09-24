@@ -1,0 +1,133 @@
+{
+  "hero": {
+    "eyebrow": "New arrivals for 0–3 years",
+    "title": "Dressed in softness, wrapped in love",
+    "subtitle": "Pure, safe & adorable clothes for your little one. OEKO-TEX certified fabrics, tagless designs, non-toxic dyes.",
+    "cta": "Shop Now",
+    "ctaSecondary": "Our Story"
+  },
+  "trustBadges": [
+    {
+      "id": "tb1",
+      "label": "OEKO-TEX Certified"
+    },
+    {
+      "id": "tb2",
+      "label": "Non-Toxic Dyes"
+    },
+    {
+      "id": "tb3",
+      "label": "Tagless & Seamless"
+    },
+    {
+      "id": "tb4",
+      "label": "Dermatologist Tested"
+    }
+  ],
+  "featuredSection": {
+    "title": "Featured Picks",
+    "subtitle": "Handpicked favourites for every little milestone."
+  },
+  "featured": [
+    {
+      "id": "f1",
+      "name": "Sunshine Romper",
+      "price": "₹699",
+      "badge": "Bestseller",
+      "ageRange": "0-6M",
+      "image": "/airo-assets/images/products/baby-romper-1",
+      "alt": "Sunshine Romper for newborns"
+    },
+    {
+      "id": "f2",
+      "name": "Cloud Soft Onesie",
+      "price": "₹699",
+      "badge": "New",
+      "ageRange": "0-6M",
+      "image": "/airo-assets/images/products/baby-onesie-1",
+      "alt": "Cloud Soft Onesie for newborns"
+    },
+    {
+      "id": "f3",
+      "name": "Dreamy Sleepsuit",
+      "price": "₹1299",
+      "badge": "",
+      "ageRange": "6-12M",
+      "image": "/airo-assets/images/products/baby-sleepwear-1",
+      "alt": "Dreamy Sleepsuit for babies"
+    },
+    {
+      "id": "f4",
+      "name": "Blossom Gift Set",
+      "price": "₹899",
+      "badge": "Gift Pick",
+      "ageRange": "0-6M",
+      "image": "/airo-assets/images/products/baby-set-1",
+      "alt": "Blossom Gift Set for newborns"
+    }
+  ],
+  "ageSection": {
+    "title": "Shop by Age",
+    "subtitle": "Find the perfect fit for every stage."
+  },
+  "ageGroups": [
+    {
+      "id": "ag1",
+      "label": "0–6 Months",
+      "range": "0-6M",
+      "emoji": "🌱"
+    },
+    {
+      "id": "ag2",
+      "label": "6–12 Months",
+      "range": "6-12M",
+      "emoji": "🌼"
+    },
+    {
+      "id": "ag3",
+      "label": "12–24 Months",
+      "range": "12-18M",
+      "emoji": "🌟"
+    },
+    {
+      "id": "ag4",
+      "label": "2–3 Years",
+      "range": "24-36M",
+      "emoji": "🚀"
+    }
+  ],
+  "ctaBanner": {
+    "title": "Every stitch made with love",
+    "subtitle": "Explore the full Bsbasil collection — soft, safe, and made for your little one.",
+    "cta": "Browse All Products"
+  },
+  "whyUs": {
+    "title": "Why parents love Bsbasil",
+    "items": [
+      {
+        "id": "w1",
+        "icon": "leaf",
+        "title": "Pure & Safe",
+        "desc": "OEKO-TEX certified fabrics free from harmful chemicals and dyes."
+      },
+      {
+        "id": "w2",
+        "icon": "heart",
+        "title": "Comfort First",
+        "desc": "Tagless, seamless designs crafted for delicate baby skin."
+      },
+      {
+        "id": "w3",
+        "icon": "sparkles",
+        "title": "Adorably Designed",
+        "desc": "Playful prints and colours that make every outfit a joy."
+      },
+      {
+        "id": "w4",
+        "icon": "shield",
+        "title": "Dermatologist Tested",
+        "desc": "Tested and approved for even the most sensitive skin."
+      }
+    ]
+  }
+}

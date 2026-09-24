@@ -1,0 +1,131 @@
+{
+  "meta": {
+    "title": "Privacy Policy — Bsbasil",
+    "description": "Learn how Bsbasil collects, uses, and protects your personal information when you shop for baby and toddler clothing on our website."
+  },
+  "hero": {
+    "heading": "Privacy Policy",
+    "lastUpdated": "17 September 2026"
+  },
+  "intro": {
+    "text": "At Bsbasil, we are committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you visit our website bsbasil.com or make a purchase from us. Please read this policy carefully."
+  },
+  "sections": [
+    {
+      "id": "s1",
+      "heading": "1. Information We Collect",
+      "body": [
+        {
+          "id": "p1",
+          "text": "We collect information you provide directly to us, such as your name, email address, shipping address, phone number, and payment information when you place an order or contact us."
+        },
+        {
+          "id": "p2",
+          "text": "We also automatically collect certain information when you visit our website, including your IP address, browser type, operating system, referring URLs, and pages viewed. This is collected through cookies and similar tracking technologies."
+        }
+      ]
+    },
+    {
+      "id": "s2",
+      "heading": "2. How We Use Your Information",
+      "body": [
+        {
+          "id": "p1",
+          "text": "We use the information we collect to process and fulfil your orders, send order confirmations and shipping updates, respond to your enquiries and provide customer support, and improve our website and product offerings."
+        },
+        {
+          "id": "p2",
+          "text": "With your consent, we may also send you promotional communications about new products, offers, and events. You may opt out of these communications at any time by clicking the unsubscribe link in any email."
+        }
+      ]
+    },
+    {
+      "id": "s3",
+      "heading": "3. Sharing Your Information",
+      "body": [
+        {
+          "id": "p1",
+          "text": "We do not sell, trade, or rent your personal information to third parties. We may share your information with trusted service providers who assist us in operating our website and conducting our business, such as payment processors (Stripe), shipping partners, and email service providers."
+        },
+        {
+          "id": "p2",
+          "text": "These third parties are contractually obligated to keep your information confidential and use it only for the purposes for which it was disclosed. We may also disclose your information if required by law or to protect our rights."
+        }
+      ]
+    },
+    {
+      "id": "s4",
+      "heading": "4. Payment Security",
+      "body": [
+        {
+          "id": "p1",
+          "text": "All payment transactions are processed securely through Stripe, a PCI-DSS compliant payment processor. We do not store your full credit or debit card details on our servers. Stripe's privacy policy governs the handling of your payment information."
+        }
+      ]
+    },
+    {
+      "id": "s5",
+      "heading": "5. Cookies",
+      "body": [
+        {
+          "id": "p1",
+          "text": "We use cookies and similar tracking technologies to enhance your browsing experience, analyse website traffic, and personalise content. You can control cookie settings through your browser preferences. Disabling cookies may affect some features of our website."
+        }
+      ]
+    },
+    {
+      "id": "s6",
+      "heading": "6. Data Retention",
+      "body": [
+        {
+          "id": "p1",
+          "text": "We retain your personal information for as long as necessary to fulfil the purposes outlined in this policy, comply with legal obligations, resolve disputes, and enforce our agreements. Order records are typically retained for seven years as required under Indian tax law."
+        }
+      ]
+    },
+    {
+      "id": "s7",
+      "heading": "7. Your Rights Under the DPDP Act, 2023",
+      "body": [
+        {
+          "id": "p1",
+          "text": "Under India's Digital Personal Data Protection Act, 2023, you have the right to access the personal data we hold about you, correct inaccurate or incomplete data, withdraw consent for processing, and request erasure of your data where applicable."
+        },
+        {
+          "id": "p2",
+          "text": "To exercise any of these rights, please contact us at packology.ent@gmail.com. We will respond to your request within 30 days."
+        }
+      ]
+    },
+    {
+      "id": "s8",
+      "heading": "8. Children's Privacy",
+      "body": [
+        {
+          "id": "p1",
+          "text": "Our website is intended for use by adults purchasing clothing for children. We do not knowingly collect personal information directly from children under the age of 18. All purchases must be made by a parent or legal guardian."
+        }
+      ]
+    },
+    {
+      "id": "s9",
+      "heading": "9. Changes to This Policy",
+      "body": [
+        {
+          "id": "p1",
+          "text": "We may update this Privacy Policy from time to time. We will notify you of any significant changes by posting the new policy on this page with an updated date. We encourage you to review this policy periodically."
+        }
+      ]
+    },
+    {
+      "id": "s10",
+      "heading": "10. Contact Us",
+      "body": [
+        {
+          "id": "p1",
+          "text": "If you have any questions or concerns about this Privacy Policy or our data practices, please contact us at packology.ent@gmail.com or write to us at Bsbasil, India."
+        }
+      ]
+    }
+  ]
+}

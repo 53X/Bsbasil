@@ -1,0 +1,11 @@
+{
+  "errors": {
+    "no_session": "No payment session found. Please try again.",
+    "invalid_format": "Invalid session format.",
+    "payment_not_completed": "Payment was not completed. Please try again.",
+    "session_expired": "Payment session expired. Please try again.",
+    "still_processing": "Payment is still processing. Please wait or contact support.",
+    "unexpected_state": "Unable to verify payment. Please contact support.",
+    "verification_failed": "Unable to verify payment. Please contact support if you were charged."
+  }
+}

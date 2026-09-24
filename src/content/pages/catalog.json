@@ -1,0 +1,78 @@
+{
+  "hero": {
+    "title": "Shop Bsbasil",
+    "subtitle": "Soft, safe & adorable clothes for your little one — ages 0 to 3 years."
+  },
+  "products": [
+    {
+      "id": "p1",
+      "name": "Sunshine Romper",
+      "category": "Rompers",
+      "ageRange": "0-6M",
+      "price": "₹799",
+      "badge": "Bestseller",
+      "image": "/airo-assets/images/products/baby-romper-1",
+      "alt": "Sunshine Romper for newborns"
+    },
+    {
+      "id": "p3",
+      "name": "Dreamy Sleepsuit",
+      "category": "Sleepwear",
+      "ageRange": "6-12M",
+      "price": "₹1299",
+      "badge": "",
+      "image": "/airo-assets/images/products/baby-sleepwear-1",
+      "alt": "Dreamy Sleepsuit for babies"
+    },
+    {
+      "id": "p4",
+      "name": "Blossom Gift Set",
+      "category": "Sets",
+      "ageRange": "0-6M",
+      "price": "₹799",
+      "badge": "Gift Pick",
+      "image": "/airo-assets/images/products/baby-set-1",
+      "alt": "Blossom Gift Set for newborns"
+    },
+    {
+      "id": "p5",
+      "name": "Petal Romper",
+      "category": "Rompers",
+      "ageRange": "6-12M",
+      "price": "₹1299",
+      "badge": "",
+      "image": "/airo-assets/images/products/baby-romper-2",
+      "alt": "Petal Romper for babies"
+    },
+    {
+      "id": "p13",
+      "name": "Bloom Dress",
+      "category": "Dresses",
+      "ageRange": "12-18M",
+      "price": "₹949",
+      "badge": "New",
+      "image": "/airo-assets/images/products/baby-dress-2",
+      "alt": "Bloom Dress for toddlers"
+    },
+    {
+      "id": "p14",
+      "name": "Adventure Jacket",
+      "category": "Outerwear",
+      "ageRange": "18-24M",
+      "price": "₹1,149",
+      "badge": "",
+      "image": "/airo-assets/images/products/baby-jacket-2",
+      "alt": "Adventure Jacket for toddlers"
+    },
+    {
+      "id": "p15",
+      "name": "Sunshine Gift Set",
+      "category": "Sets",
+      "ageRange": "6-12M",
+      "price": "₹1,349",
+      "badge": "Gift Pick",
+      "image": "/airo-assets/images/products/baby-set-3",
+      "alt": "Sunshine Gift Set for babies"
+    }
+  ]
+}

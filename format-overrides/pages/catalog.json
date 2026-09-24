@@ -1,0 +1,22 @@
+{
+  "overrides": {
+    "968f7d": {
+      "marks": {
+        "bold": false,
+        "color": "#0a0a0a",
+        "fontSize": "2.25rem",
+        "italic": true
+      },
+      "target": {
+        "contentKey": "catalog.hero.title",
+        "contentKeyTemplate": null,
+        "expressionHash": null,
+        "file": "src/pages/catalog.tsx",
+        "sourceKind": "content-key",
+        "tagName": "h1"
+      },
+      "updatedAt": "2026-09-17T18:58:11.343Z"
+    }
+  },
+  "version": 1
+}

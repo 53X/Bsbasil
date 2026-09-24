@@ -1,0 +1,134 @@
+{
+  "hero": {
+    "title": "Frequently Asked Questions",
+    "subtitle": "Everything you need to know about Bsbasil baby clothing — fabrics, sizing, safety, shipping, and more."
+  },
+  "categories": [
+    {
+      "id": "cat-1",
+      "title": "About Bsbasil",
+      "faqs": [
+        {
+          "id": "faq-1",
+          "question": "What is Bsbasil?",
+          "answer": "Bsbasil is an Indian baby clothing brand specialising in soft, safe, and stylish clothing for newborns and toddlers aged 0–3 years. Every piece is designed with a parent's peace of mind at the centre — gentle on delicate skin, easy to put on, and made to last through all the adventures of early childhood."
+        },
+        {
+          "id": "faq-2",
+          "question": "Where is Bsbasil based?",
+          "answer": "Bsbasil is based in India. We ship across the country and our products are crafted keeping Indian climate conditions and traditional aesthetics in mind — from breathable cottons for warm summers to cosy knits for cooler months."
+        },
+        {
+          "id": "faq-3",
+          "question": "What age group does Bsbasil cater to?",
+          "answer": "Our entire range is designed for babies and toddlers aged 0 to 3 years. We offer sizes from newborn (0–3 months) all the way up to 2–3 years, so you can find the perfect fit at every stage of your little one's growth."
+        },
+        {
+          "id": "faq-4",
+          "question": "Where can I buy Bsbasil products?",
+          "answer": "You can browse and shop our full collection directly on our website at bsbasil.com. You can also reach us on WhatsApp at +91 7700905962 to place an order or ask any questions before purchasing."
+        }
+      ]
+    },
+    {
+      "id": "cat-2",
+      "title": "Fabrics & Safety",
+      "faqs": [
+        {
+          "id": "faq-5",
+          "question": "What fabrics does Bsbasil use?",
+          "answer": "We use a carefully selected range of baby-safe fabrics including 100% pure cotton, soft muslin, breathable jersey knit, and gentle blended fabrics. All materials are chosen for their softness, breathability, and durability — ideal for a baby's sensitive skin."
+        },
+        {
+          "id": "faq-6",
+          "question": "Are Bsbasil clothes safe for newborns?",
+          "answer": "Yes, absolutely. Safety is our top priority. All our fabrics are free from harmful dyes and chemicals. Our garments are designed with flat seams and tagless labels to prevent irritation, and all fastenings are securely stitched to meet infant safety standards."
+        },
+        {
+          "id": "faq-7",
+          "question": "Are the dyes used in Bsbasil clothing safe for babies?",
+          "answer": "Yes. We use only non-toxic, baby-safe dyes across our range. The vibrant colours you see in our collection are achieved without compromising on safety — no harsh chemicals, no skin irritants."
+        },
+        {
+          "id": "faq-8",
+          "question": "How should I wash Bsbasil clothing?",
+          "answer": "We recommend machine washing on a gentle cycle with cold or lukewarm water using a mild, baby-safe detergent. Avoid bleach and fabric softeners. Tumble dry on low or air dry in shade to preserve the softness and colour of the fabric."
+        }
+      ]
+    },
+    {
+      "id": "cat-3",
+      "title": "Sizing & Fit",
+      "faqs": [
+        {
+          "id": "faq-9",
+          "question": "How do I choose the right size for my baby?",
+          "answer": "Our sizes are based on age and approximate weight. As a general guide: Newborn (up to 3.5 kg), 0–3 months (3.5–6 kg), 3–6 months (6–8 kg), 6–12 months (8–10 kg), 1–2 years (10–12 kg), 2–3 years (12–14 kg). If your baby is between sizes, we recommend sizing up for a comfortable fit with room to grow."
+        },
+        {
+          "id": "faq-10",
+          "question": "Do Bsbasil clothes run true to size?",
+          "answer": "Our clothing is designed to fit true to age-based sizing with a comfortable, non-restrictive fit. Babies grow quickly, so many parents prefer to size up slightly. If you are unsure, feel free to contact us on WhatsApp at +91 7700905962 and we will help you pick the right size."
+        }
+      ]
+    },
+    {
+      "id": "cat-4",
+      "title": "Orders & Shipping",
+      "faqs": [
+        {
+          "id": "faq-11",
+          "question": "How do I place an order?",
+          "answer": "You can shop directly on our website at bsbasil.com. Simply browse the catalog, add items to your cart, and proceed to checkout. You can also reach us on WhatsApp at +91 7700905962 to place an order directly."
+        },
+        {
+          "id": "faq-12",
+          "question": "Does Bsbasil ship across India?",
+          "answer": "Yes, we ship to all major cities and towns across India. Delivery timelines vary by location but typically range from 3–7 business days. You will receive a tracking update once your order is dispatched."
+        },
+        {
+          "id": "faq-13",
+          "question": "What payment methods does Bsbasil accept?",
+          "answer": "We accept all major payment methods including credit and debit cards, UPI, net banking, and popular wallets. All transactions are processed securely."
+        },
+        {
+          "id": "faq-14",
+          "question": "Can I return or exchange a product?",
+          "answer": "We want you to be completely happy with your purchase. If you receive a damaged or incorrect item, please contact us within 48 hours of delivery on WhatsApp at +91 7700905962 or email us at packology.ent@gmail.com and we will make it right."
+        }
+      ]
+    },
+    {
+      "id": "cat-5",
+      "title": "Products & Collections",
+      "faqs": [
+        {
+          "id": "faq-15",
+          "question": "What types of baby clothing does Bsbasil offer?",
+          "answer": "Our collection includes rompers, onesies, bodysuits, kurta sets, frocks, co-ord sets, sleepsuits, swaddle wraps, knit sweaters, festive lehenga sets, and more. We cover everyday essentials as well as special occasion outfits for your little one."
+        },
+        {
+          "id": "faq-16",
+          "question": "Does Bsbasil offer ethnic and festive wear for babies?",
+          "answer": "Yes! We have a beautiful range of ethnic and festive wear including kurta sets, lehenga choli sets, and co-ord sets inspired by Indian traditions. These are perfect for festivals, family functions, and special occasions."
+        },
+        {
+          "id": "faq-17",
+          "question": "Does Bsbasil offer gift sets for newborns?",
+          "answer": "Yes, we offer curated gift sets that make wonderful presents for baby showers, naming ceremonies, and birthdays. Our Blossom Gift Set is a popular choice for gifting — beautifully packaged and filled with essentials for a newborn."
+        },
+        {
+          "id": "faq-18",
+          "question": "Are Bsbasil products suitable as baby shower gifts?",
+          "answer": "Absolutely. Our clothing is thoughtfully designed and beautifully presented, making it an ideal gift for new parents. From soft onesies to festive sets, there is something for every occasion and budget."
+        }
+      ]
+    }
+  ],
+  "cta": {
+    "title": "Still have questions?",
+    "subtitle": "We are always happy to help. Reach out to us directly.",
+    "whatsappText": "Chat on WhatsApp",
+    "emailText": "Send an Email"
+  }
+}

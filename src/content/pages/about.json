@@ -1,0 +1,43 @@
+{
+  "values": [
+    {
+      "title": "Pure & Safe",
+      "description": "Only non-toxic, baby-safe dyes and OEKO-TEX certified fabrics — because your little one deserves nothing less than the purest.",
+      "color": "hsl(var(--success))",
+      "bg": "hsl(var(--muted))",
+      "id": "_0w5C8RlNFdXvrTAx4wh7"
+    },
+    {
+      "title": "Comfort First",
+      "description": "Tagless, seamless designs that never irritate delicate skin. Every stitch is crafted with tiny, sensitive bodies in mind.",
+      "color": "hsl(var(--primary))",
+      "bg": "hsl(var(--card))",
+      "id": "FWEJzf_MzZEENtNZvP_pr"
+    },
+    {
+      "title": "Made Responsibly",
+      "description": "Ethically sourced materials and sustainable packaging — because the world your baby grows up in matters just as much.",
+      "color": "hsl(var(--info))",
+      "bg": "hsl(var(--muted))",
+      "id": "ZAbkmukH81FSOYF9V7n12"
+    }
+  ],
+  "badges": [
+    {
+      "label": "OEKO-TEX Certified",
+      "id": "67iajxJjJh6nMcDCWw1dS"
+    },
+    {
+      "label": "Non-Toxic Dyes",
+      "id": "vrIyrdEXU9wqmWSVf3skh"
+    },
+    {
+      "label": "Dermatologist Tested",
+      "id": "yWI0DzSrptncuYEjXPpOz"
+    },
+    {
+      "label": "Made for Sensitive Skin",
+      "id": "Qv3UI9zdQV5Tg-Y6D4idy"
+    }
+  ]
+}
