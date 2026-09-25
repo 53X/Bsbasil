@@ -80,7 +80,7 @@ export default function Footer() {
           {/* Brand + tagline */}
           <div className="flex flex-col items-center md:items-start gap-1">
             <img
-              src="/airo-assets/images/logo/horizontal"
+              src="/logo-horizontal.png"
               alt="Bsbasil"
               className="block h-auto max-h-8 w-auto object-contain"
               width={120}

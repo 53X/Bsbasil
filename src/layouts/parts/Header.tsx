@@ -23,7 +23,7 @@ export default function Header() {
           {/* Logo */}
           <Link to="/" className="flex items-center group">
             <img
-              src="/airo-assets/images/logo/horizontal"
+              src="/logo-horizontal.png"
               alt="Bsbasil"
               className="block h-auto max-h-10 md:max-h-12 w-auto max-w-[180px] object-contain self-center"
               width={180}
