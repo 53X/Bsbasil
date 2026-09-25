@@ -76,8 +76,17 @@ interface RawVariantNode {
   availableForSale: boolean;
   quantityAvailable?: number | null;
   price: Money;
+  compareAtPrice?: Money | null;
   image?: RawImage | null;
   selectedOptions: { name: string; value: string }[];
+}
+
+export interface DiscountPreviewLine {
+  variantId: string;
+  quantity: number;
+  totalAmount: string;
+  subtotalAmount: string;
+  title: string | null;
 }
 
 export interface RawProductNode {
@@ -116,16 +125,60 @@ function mapMedia(node: RawMediaNode, fallbackAlt: string): StoreMedia | null {
 }
 
 function mapVariant(node: RawVariantNode): StoreVariant {
+  const price = toMinorUnits(node.price.amount);
+  const compareAt = node.compareAtPrice ? toMinorUnits(node.compareAtPrice.amount) : 0;
   return {
     id: node.id,
     title: node.title,
     available: node.availableForSale,
     quantityAvailable: node.quantityAvailable ?? null,
-    price: toMinorUnits(node.price.amount),
+    price,
+    compareAtPrice: compareAt > price ? compareAt : null,
+    discountTitle: null,
     currency: node.price.currencyCode,
     selectedOptions: node.selectedOptions,
     image: node.image?.url,
   };
+}
+
+function displayedVariant(product: StoreProduct): StoreVariant | undefined {
+  return product.variants.find((variant) => variant.price > 0) ?? product.variants[0];
+}
+
+export function refreshDisplayedPrice(product: StoreProduct): StoreProduct {
+  const first = displayedVariant(product);
+  if (!first) return product;
+  const compareAt = first.compareAtPrice && first.compareAtPrice > first.price ? first.compareAtPrice : null;
+  return {
+    ...product,
+    price: first.price,
+    compareAtPrice: compareAt,
+    discountTitle: first.discountTitle,
+    currency: first.currency,
+    priceLabel: formatMoney(first.price / 100, first.currency),
+  };
+}
+
+/** Apply a Shopify automatic discount from a one-item cart preview. */
+export function applyCartDiscounts(products: StoreProduct[], lines: DiscountPreviewLine[]): StoreProduct[] {
+  const byVariant = new Map(lines.map((line) => [line.variantId, line]));
+  return products.map((product) => {
+    const variants = product.variants.map((variant) => {
+      const line = byVariant.get(variant.id);
+      if (!line || line.quantity <= 0) return variant;
+      const sale = Math.round(toMinorUnits(line.totalAmount) / line.quantity);
+      const list = Math.round(toMinorUnits(line.subtotalAmount) / line.quantity);
+      if (list <= sale || sale < 0) return variant;
+      const original = Math.max(variant.compareAtPrice ?? 0, list, variant.price);
+      return {
+        ...variant,
+        price: sale,
+        compareAtPrice: original,
+        discountTitle: line.title ?? variant.discountTitle,
+      };
+    });
+    return refreshDisplayedPrice({ ...product, variants });
+  });
 }
 
 export function mapProduct(node: RawProductNode): StoreProduct {
@@ -135,6 +188,7 @@ export function mapProduct(node: RawProductNode): StoreProduct {
   const first = priced[0] ?? variants[0];
   const currency = first?.currency ?? "INR";
   const price = first?.price ?? 0;
+  const compareAtPrice = first?.compareAtPrice && first.compareAtPrice > price ? first.compareAtPrice : null;
   const media = (node.media?.nodes ?? [])
     .map((item) => mapMedia(item, node.title))
     .filter((item): item is StoreMedia => item !== null);
@@ -154,6 +208,8 @@ export function mapProduct(node: RawProductNode): StoreProduct {
     badge,
     featured: tags.some((tag) => tag.toLowerCase() === "featured"),
     price,
+    compareAtPrice,
+    discountTitle: first?.discountTitle ?? null,
     currency,
     priceLabel: formatMoney(price / 100, currency),
     image,

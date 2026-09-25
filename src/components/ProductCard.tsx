@@ -1,6 +1,7 @@
 import { Link } from 'react-router';
 import { useState } from 'react';
 import { ShoppingBag } from 'lucide-react';
+import PriceTag from '@/components/PriceTag';
 import ShareButtons from '@/components/ShareButtons';
 import { useCart } from '@/contexts/use-cart';
 import type { StoreProduct } from '@/lib/shopify/types';
@@ -84,9 +85,13 @@ export default function ProductCard({ product }: { product: StoreProduct }) {
           {product.name}
         </p>
         <div className="flex items-center justify-between mt-auto pt-sm gap-2">
-          <span className="text-lg font-bold" style={{ color: 'hsl(var(--foreground))' }}>
-            {product.priceLabel}
-          </span>
+          <PriceTag
+            price={product.price}
+            compareAt={product.compareAtPrice}
+            currency={product.currency}
+            discount={product.discountTitle}
+            priceClassName="text-lg font-bold"
+          />
           <div className="relative z-[2] flex items-center gap-2 pointer-events-auto">
             <ShareButtons productName={product.name} productPrice={product.priceLabel} url={`https://bsbasil.com/products/${product.handle}`} />
             {directVariant ? (

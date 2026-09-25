@@ -5,7 +5,7 @@ import { ShoppingBag } from 'lucide-react';
 import ShareButtons from '@/components/ShareButtons';
 import { useCart } from '@/contexts/use-cart';
 import { matchingVariant } from '@/lib/shopify/map';
-import { formatMoney } from '@/lib/shopify/map';
+import PriceTag from '@/components/PriceTag';
 import type { StoreMedia, StoreProduct, StoreCatalog } from '@/lib/shopify/types';
 
 const SIZE_GUIDE = [
@@ -95,7 +95,10 @@ export default function ProductPage() {
 
   const variant = matchingVariant(product, selected) ?? product.variants[0];
   const media = product.media[mediaIndex] ?? product.media[0];
-  const priceLabel = variant ? formatMoney(variant.price / 100, variant.currency) : product.priceLabel;
+  const price = variant?.price ?? product.price;
+  const compareAt = variant?.compareAtPrice ?? product.compareAtPrice;
+  const discountTitle = variant?.discountTitle ?? product.discountTitle;
+  const currency = variant?.currency ?? product.currency;
   const soldOut = variant ? !variant.available : !product.available;
   const stockLabel = soldOut
     ? 'Sold out'
@@ -165,7 +168,9 @@ export default function ProductPage() {
               <p className="text-xs font-bold uppercase tracking-wide mb-xs" style={{ color: 'hsl(var(--primary))' }}>{product.badge}</p>
             ) : null}
             <h1 className="text-3xl md:text-4xl font-bold mb-sm" style={{ color: 'hsl(var(--foreground))' }}>{product.name}</h1>
-            <p className="text-2xl font-bold mb-xs" style={{ color: 'hsl(var(--foreground))' }}>{priceLabel}</p>
+            <p className="mb-xs">
+              <PriceTag price={price} compareAt={compareAt} currency={currency} discount={discountTitle} priceClassName="text-2xl font-bold" />
+            </p>
             <p className="text-sm mb-base" style={{ color: soldOut ? 'hsl(var(--destructive, 0 70% 45%))' : 'hsl(var(--muted-foreground))' }}>{stockLabel}</p>
             {product.description ? (
               <p className="text-base mb-lg whitespace-pre-line" style={{ color: 'hsl(var(--muted-foreground))' }}>{product.description}</p>
@@ -244,7 +249,7 @@ export default function ProductPage() {
               </button>
             </div>
             {message ? <p className="text-sm mb-base" style={{ color: 'hsl(var(--muted-foreground))' }}>{message}</p> : null}
-            <ShareButtons productName={product.name} productPrice={priceLabel} url={`https://bsbasil.com/products/${product.handle}`} />
+            <ShareButtons productName={product.name} productPrice={product.priceLabel} url={`https://bsbasil.com/products/${product.handle}`} />
           </div>
         </div>
 
@@ -279,7 +284,7 @@ export default function ProductPage() {
         className="fixed bottom-0 inset-x-0 z-40 border-t p-3 md:hidden flex items-center gap-3"
         style={{ background: 'hsl(var(--background))', borderColor: 'hsl(var(--border))' }}
       >
-        <span className="font-bold" style={{ color: 'hsl(var(--foreground))' }}>{priceLabel}</span>
+        <PriceTag price={price} compareAt={compareAt} currency={currency} discount={discountTitle} />
         <button
           type="button"
           onClick={onAdd}

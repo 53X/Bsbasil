@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { htmlToText, mapProduct, mapShopRules, matchingVariant, toMinorUnits } from './map';
+import { applyCartDiscounts, htmlToText, mapProduct, mapShopRules, matchingVariant, toMinorUnits } from './map';
 
 describe('shopify product mapping', () => {
   it('keeps photos and video on the same product', () => {
@@ -26,6 +26,7 @@ describe('shopify product mapping', () => {
             availableForSale: true,
             quantityAvailable: 4,
             price: { amount: '799.00', currencyCode: 'INR' },
+            compareAtPrice: { amount: '999.00', currencyCode: 'INR' },
             selectedOptions: [{ name: 'Size', value: '0-6M' }],
           },
           {
@@ -40,6 +41,17 @@ describe('shopify product mapping', () => {
     });
 
     expect(product.priceLabel).toBe('₹799');
+    expect(product.compareAtPrice).toBe(99900);
+    const discounted = applyCartDiscounts([product], [{
+      variantId: 'gid://shopify/ProductVariant/1',
+      quantity: 1,
+      totalAmount: '699.00',
+      subtotalAmount: '799.00',
+      title: 'Festive offer',
+    }]);
+    expect(discounted[0]?.price).toBe(69900);
+    expect(discounted[0]?.compareAtPrice).toBe(99900);
+    expect(discounted[0]?.discountTitle).toBe('Festive offer');
     expect(product.ageRange).toBe('0-6M');
     expect(product.featured).toBe(true);
     expect(product.media.map((item) => item.kind)).toEqual(['image', 'video']);

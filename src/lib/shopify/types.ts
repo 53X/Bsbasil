@@ -22,6 +22,8 @@ export interface StoreVariant {
   available: boolean;
   quantityAvailable: number | null;
   price: number;
+  compareAtPrice: number | null;
+  discountTitle: string | null;
   currency: string;
   selectedOptions: { name: string; value: string }[];
   image?: string;
@@ -50,6 +52,8 @@ export interface StoreProduct {
   badge: string;
   featured: boolean;
   price: number;
+  compareAtPrice: number | null;
+  discountTitle: string | null;
   currency: string;
   priceLabel: string;
   image: string;
@@ -77,6 +81,8 @@ export interface CartLine {
   name: string;
   variantTitle: string;
   price: number;
+  compareAtPrice: number | null;
+  discountTitle: string | null;
   currency: string;
   quantity: number;
   image?: string;

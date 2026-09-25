@@ -12,6 +12,7 @@ import { Link } from 'react-router';
 import { Helmet } from '@dr.pogodin/react-helmet';
 
 import { useCart } from '@/contexts/use-cart';
+import PriceTag from '@/components/PriceTag';
 import { formatPrice } from '@/lib/stripe/format';
 
 export default function CartPage() {
@@ -115,7 +116,13 @@ export default function CartPage() {
                   <div className="flex-1 min-w-0">
                     <h3 className="font-semibold truncate" style={{ color: 'hsl(var(--foreground))' }}>{item.name}</h3>
                     {item.variantTitle ? <p className="text-sm" style={{ color: 'hsl(var(--muted-foreground))' }}>{item.variantTitle}</p> : null}
-                    <p style={{ color: 'hsl(var(--muted-foreground))' }}>{formatPrice(item.price, item.currency)}</p>
+                    <PriceTag
+                      price={item.price}
+                      compareAt={item.compareAtPrice}
+                      currency={item.currency}
+                      discount={item.discountTitle}
+                      priceClassName="font-medium"
+                    />
                   </div>
 
                   {/* Quantity Controls */}

@@ -1,5 +1,5 @@
 import { shopifyConfig } from "./config";
-import { htmlToText, mapProduct, mapShopRules, type RawProductNode } from "./map";
+import { applyCartDiscounts, htmlToText, mapProduct, mapShopRules, type RawProductNode } from "./map";
 import type { ShopRules, StoreCart, StoreCatalog, StorePolicy, StoreProduct } from "./types";
 
 const PRODUCT_FIELDS = `
@@ -38,6 +38,7 @@ const PRODUCT_FIELDS = `
       quantityAvailable
       selectedOptions { name value }
       price { amount currencyCode }
+      compareAtPrice { amount currencyCode }
       image { url altText }
     }
   }
@@ -58,6 +59,14 @@ const CART_FIELDS = `
           price { amount currencyCode }
           product { title }
         }
+      }
+      cost {
+        totalAmount { amount currencyCode }
+        subtotalAmount { amount currencyCode }
+      }
+      discountAllocations {
+        ... on CartAutomaticDiscountAllocation { title }
+        ... on CartCodeDiscountAllocation { code }
       }
     }
   }
@@ -114,6 +123,11 @@ interface CartPayload {
           price: { amount: string; currencyCode: string };
           product: { title: string };
         };
+        cost?: {
+          totalAmount: { amount: string; currencyCode: string };
+          subtotalAmount: { amount: string; currencyCode: string };
+        };
+        discountAllocations?: Array<{ title?: string; code?: string }>;
       }>;
     };
   } | null;
@@ -205,7 +219,8 @@ export async function loadCatalog(force = false): Promise<StoreCatalog> {
       cursor = data.products.pageInfo.endCursor;
     }
 
-    const value: StoreCatalog = { configured: true, products, ...details, error: null };
+    const priced = await previewProductDiscounts(products);
+    const value: StoreCatalog = { configured: true, products: priced, ...details, error: null };
     catalogCache = { at: Date.now(), value };
     return value;
   } catch (error) {
@@ -230,7 +245,7 @@ export async function loadProduct(handle: string): Promise<{ product: StoreProdu
       { handle },
     );
     return {
-      product: data.product ? mapProduct(data.product) : null,
+      product: data.product ? (await previewProductDiscounts([mapProduct(data.product)]))[0] ?? null : null,
       catalog: {
         ...catalog,
         ...shopDetails(data.shop),
@@ -247,21 +262,98 @@ export async function loadProduct(handle: string): Promise<{ product: StoreProdu
   }
 }
 
+function minor(amount: string): number {
+  return Math.round(Number(amount) * 100);
+}
+
 function mapCart(cart: NonNullable<CartPayload["cart"]>): StoreCart {
   return {
     id: cart.id,
     checkoutUrl: cart.checkoutUrl,
-    lines: cart.lines.nodes.map((line) => ({
-      id: line.id,
-      variantId: line.merchandise.id,
-      name: line.merchandise.product.title,
-      variantTitle: line.merchandise.title === "Default Title" ? "" : line.merchandise.title,
-      price: Math.round(Number(line.merchandise.price.amount) * 100),
-      currency: line.merchandise.price.currencyCode,
-      quantity: line.quantity,
-      image: line.merchandise.image?.url,
-    })),
+    lines: cart.lines.nodes.map((line) => {
+      const quantity = line.quantity || 1;
+      const total = line.cost ? minor(line.cost.totalAmount.amount) : minor(line.merchandise.price.amount) * quantity;
+      const list = line.cost ? minor(line.cost.subtotalAmount.amount) : total;
+      const unit = Math.round(total / quantity);
+      const listUnit = Math.round(list / quantity);
+      const discountTitle = (line.discountAllocations ?? [])
+        .map((allocation) => allocation.title || allocation.code)
+        .filter((title): title is string => Boolean(title))
+        .join(", ");
+      return {
+        id: line.id,
+        variantId: line.merchandise.id,
+        name: line.merchandise.product.title,
+        variantTitle: line.merchandise.title === "Default Title" ? "" : line.merchandise.title,
+        price: unit,
+        compareAtPrice: listUnit > unit ? listUnit : null,
+        discountTitle: discountTitle || null,
+        currency: line.cost?.totalAmount.currencyCode ?? line.merchandise.price.currencyCode,
+        quantity: line.quantity,
+        image: line.merchandise.image?.url,
+      };
+    }),
   };
+}
+
+async function previewProductDiscounts(products: StoreProduct[]): Promise<StoreProduct[]> {
+  const variantIds = products
+    .flatMap((product) => product.variants.filter((variant) => variant.available).map((variant) => variant.id))
+    .slice(0, 50);
+  if (variantIds.length === 0) return products;
+
+  try {
+    const data = await storefront<{
+      cartCreate: {
+        cart: {
+          lines: {
+            nodes: Array<{
+              quantity: number;
+              merchandise: { id: string };
+              cost: { totalAmount: { amount: string }; subtotalAmount: { amount: string } };
+              discountAllocations: Array<{ title?: string; code?: string }>;
+            }>;
+          };
+        } | null;
+      };
+    }>(
+      `mutation Preview($lines: [CartLineInput!]!) {
+        cartCreate(input: { lines: $lines }) {
+          cart {
+            lines(first: 50) {
+              nodes {
+                quantity
+                merchandise { ... on ProductVariant { id } }
+                cost {
+                  totalAmount { amount }
+                  subtotalAmount { amount }
+                }
+                discountAllocations {
+                  ... on CartAutomaticDiscountAllocation { title }
+                  ... on CartCodeDiscountAllocation { code }
+                }
+              }
+            }
+          }
+        }
+      }`,
+      { lines: variantIds.map((merchandiseId) => ({ merchandiseId, quantity: 1 })) },
+    );
+    const nodes = data.cartCreate.cart?.lines.nodes;
+    if (!nodes?.length) return products;
+    return applyCartDiscounts(
+      products,
+      nodes.map((line) => ({
+        variantId: line.merchandise.id,
+        quantity: line.quantity,
+        totalAmount: line.cost.totalAmount.amount,
+        subtotalAmount: line.cost.subtotalAmount.amount,
+        title: line.discountAllocations.map((allocation) => allocation.title || allocation.code).filter(Boolean).join(", ") || null,
+      })),
+    );
+  } catch {
+    return products;
+  }
 }
 
 async function cartResult(payload: CartPayload): Promise<StoreCart> {
