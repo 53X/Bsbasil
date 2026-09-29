@@ -38,41 +38,6 @@ export default function Footer() {
   return (
     <footer className="mt-auto border-t" style={{ borderColor: 'hsl(var(--border))', background: 'hsl(var(--background))' }}>
 
-      {/* ── Follow us on Instagram banner ── */}
-      <div
-        className="border-b"
-        style={{ borderColor: 'hsl(var(--border))', background: 'hsl(var(--muted))' }}
-      >
-        <div className="max-w-content mx-auto px-4 py-4 flex flex-col sm:flex-row items-center justify-between gap-3">
-          <div className="flex items-center gap-3">
-            <span
-              className="flex items-center justify-center w-9 h-9 rounded-full"
-              style={{ background: 'hsl(var(--primary))', color: 'hsl(var(--primary-foreground))' }}
-            >
-              <InstagramIcon />
-            </span>
-            <div>
-              <p className="text-sm font-semibold leading-tight" style={{ color: 'hsl(var(--foreground))' }}>
-                Follow us on Instagram
-              </p>
-              <p className="text-xs" style={{ color: 'hsl(var(--muted-foreground))' }}>
-                Behind-the-scenes, new arrivals & more
-              </p>
-            </div>
-          </div>
-          <a
-            href="https://www.instagram.com/packology_enterprise_/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold transition-opacity hover:opacity-90 shrink-0"
-            style={{ background: 'hsl(var(--primary))', color: 'hsl(var(--primary-foreground))' }}
-          >
-            <InstagramIcon />
-            @packology_enterprise_
-          </a>
-        </div>
-      </div>
-
       {/* ── Main footer row ── */}
       <div className="max-w-content mx-auto px-4 py-8">
         <div className="flex flex-col md:flex-row justify-between items-center gap-6">
