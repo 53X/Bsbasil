@@ -1,10 +1,10 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Link, useLoaderData } from 'react-router';
+import { Link, useLoaderData, useSearchParams } from 'react-router';
 import { Helmet } from '@dr.pogodin/react-helmet';
 import { ShoppingBag } from 'lucide-react';
 import ShareButtons from '@/components/ShareButtons';
 import { useCart } from '@/contexts/use-cart';
-import { matchingVariant, selectionForOption } from '@/lib/shopify/map';
+import { ageLabel, matchingVariant, selectionForOption } from '@/lib/shopify/map';
 import PriceTag from '@/components/PriceTag';
 import type { StoreMedia, StoreProduct, StoreCatalog } from '@/lib/shopify/types';
 
@@ -72,6 +72,7 @@ function MediaFrame({ item }: { item: StoreMedia }) {
 
 export default function ProductPage() {
   const { product, catalog } = useLoaderData() as { product: StoreProduct | null; catalog: StoreCatalog };
+  const [params] = useSearchParams();
   const { addVariant } = useCart();
   const [mediaIndex, setMediaIndex] = useState(0);
   const [quantity, setQuantity] = useState(1);
@@ -80,13 +81,23 @@ export default function ProductPage() {
   const [buying, setBuying] = useState(false);
 
   const initialSelection = useMemo(() => {
-    const variant = product?.variants.find((item) => item.available) ?? product?.variants[0];
+    const ageParam = params.get('age');
+    const preferredSize = ageParam ? ageLabel(ageParam) : null;
+    const preferred =
+      (preferredSize &&
+        product?.variants.find((item) =>
+          item.selectedOptions.some(
+            (option) => /size|age/i.test(option.name) && option.value === preferredSize,
+          ),
+        )) ||
+      product?.variants.find((item) => item.available) ||
+      product?.variants[0];
     const selected: Record<string, string> = {};
-    variant?.selectedOptions.forEach((option) => {
+    preferred?.selectedOptions.forEach((option) => {
       selected[option.name] = option.value;
     });
     return selected;
-  }, [product]);
+  }, [product, params]);
   const [selected, setSelected] = useState<Record<string, string>>(initialSelection);
 
   useEffect(() => {
@@ -94,9 +105,7 @@ export default function ProductPage() {
     setMediaIndex(0);
     setQuantity(1);
     setMessage(null);
-    // Reset only when the product itself changes. initialSelection is derived from that product.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [product?.id]);
+  }, [product?.id, initialSelection]);
 
   const variant = product ? matchingVariant(product, selected) ?? product.variants[0] : undefined;
   const gallery = useMemo(() => {

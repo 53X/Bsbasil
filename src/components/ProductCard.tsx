@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { ShoppingBag } from 'lucide-react';
 import PriceTag from '@/components/PriceTag';
 import { useCart } from '@/contexts/use-cart';
-import { ageLabel } from '@/lib/shopify/map';
+import { ageLabel, ageRangeLabel } from '@/lib/shopify/map';
 import type { StoreProduct } from '@/lib/shopify/types';
 
 const BADGE_COLORS: Record<string, { bg: string; text: string }> = {
@@ -24,9 +24,15 @@ export default function ProductCard({
   const [adding, setAdding] = useState(false);
   const purchasable = product.variants.filter((variant) => variant.available);
   const directVariant = purchasable.length === 1 ? purchasable[0] : null;
-  const href = `/products/${product.handle}`;
-  // One age per card — age groups are separate product listings.
-  const badgeText = ageLabel(ageHighlight || product.ageRange);
+  const href = ageHighlight
+    ? `/products/${product.handle}?age=${encodeURIComponent(ageHighlight)}`
+    : `/products/${product.handle}`;
+  // One product card: highlight filtered size, otherwise show the full size/age range.
+  const badgeText = ageHighlight
+    ? ageLabel(ageHighlight)
+    : product.ageRanges.length > 0
+      ? ageRangeLabel(product.ageRanges)
+      : ageLabel(product.ageRange);
 
   const onAdd = async () => {
     if (!directVariant) return;

@@ -121,18 +121,17 @@ export function productMatchesFilters(
   return ageMatch && catMatch;
 }
 
-/** One catalog card per age group so multi-age products appear separately. */
+/** Catalog lists one card per product; ages are sizes on that product, not separate listings. */
 export function expandProductsByAge<T extends { ageRanges: string[] }>(
   products: T[],
   selectedAge: string,
 ): { product: T; ageCode: string }[] {
-  if (selectedAge !== "All Ages") {
-    return products.map((product) => ({ product, ageCode: selectedAge }));
-  }
-  return products.flatMap((product) => {
-    const ages = product.ageRanges.length > 0 ? product.ageRanges : [""];
-    return ages.map((ageCode) => ({ product, ageCode }));
-  });
+  return products.map((product) => ({
+    product,
+    // When a specific age is filtered, highlight that size on the card; otherwise leave blank
+    // so the card can show the full available age/size range.
+    ageCode: selectedAge !== "All Ages" ? selectedAge : "",
+  }));
 }
 
 /** Turn a Shopify age tag or size label into one of the shop's age filters. */

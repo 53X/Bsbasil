@@ -48,7 +48,7 @@ export default function CatalogPage() {
   const hasActiveFilters = selectedAge !== 'All Ages' || selectedCategory !== 'All Categories';
 
   // All Ages = ignore age. All Categories = ignore category. Otherwise AND both.
-  // Each age group is its own catalog card (separate product listing per age).
+  // One catalog card per Shopify product — ages are sizes on the product page.
   const filteredProducts = products.filter((p) =>
     productMatchesFilters(p, selectedAge, selectedCategory),
   );
@@ -302,11 +302,11 @@ export default function CatalogPage() {
               </div>
             }
 
-            {/* Grid — one card per age group (each age is a separate listing) */}
+            {/* Grid — one card per product; age filter only limits which products appear */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-base">
               {catalogCards.map(({ product, ageCode }, i) => (
                   <motion.div
-                    key={`${product.id}-${ageCode || 'any'}`}
+                    key={product.id}
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ duration: 0.3, delay: Math.min(i, 8) * 0.04, ease: 'easeOut' as const }}

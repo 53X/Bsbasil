@@ -72,8 +72,7 @@ describe('shopify product mapping', () => {
     expect(productMatchesFilters(product, '0-3M', 'Sleepwear')).toBe(false);
     expect(productMatchesFilters(product, 'All Ages', 'Sleepwear')).toBe(false);
     expect(expandProductsByAge([product], 'All Ages')).toEqual([
-      { product, ageCode: '0-3M' },
-      { product, ageCode: '6-12M' },
+      { product, ageCode: '' },
     ]);
     expect(expandProductsByAge([product], '0-3M')).toEqual([{ product, ageCode: '0-3M' }]);
     expect(ageCode('0-6M')).toBeNull();
