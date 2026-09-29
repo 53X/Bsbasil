@@ -9,6 +9,7 @@ const PRODUCT_FIELDS = `
   description
   descriptionHtml
   productType
+  category { name }
   tags
   availableForSale
   featuredImage { url altText }

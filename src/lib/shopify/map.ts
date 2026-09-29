@@ -2,11 +2,12 @@ import type { Money, ShopRules, StoreMedia, StoreProduct, StoreVariant } from ".
 
 const AGE_TAGS = ["0-3M", "3-6M", "6-12M", "12-18M", "18-24M", "24-30M", "30-36M"];
 const CATEGORY_MATCHERS: { label: string; pattern: RegExp }[] = [
-  { label: "Romper", pattern: /\brompers?\b/i },
-  { label: "Sleepwear", pattern: /\b(sleepwear|sleepsuits?|pyjamas?|pajamas?)\b/i },
-  { label: "Sets", pattern: /\bsets?\b/i },
-  { label: "Winter wear", pattern: /\b(winter\s*wear|winterwear|outerwear|jackets?|sweaters?)\b/i },
-  { label: "Accessories", pattern: /\b(accessorise|accessorize|accessories|accessory)\b/i },
+  // Shop Type labels + Shopify Category taxonomy names (product description Category field)
+  { label: "Romper", pattern: /\brompers?\b|one-pieces?\b/i },
+  { label: "Sleepwear", pattern: /\b(sleepwear|sleepsuits?|pyjamas?|pajamas?|onesies?)\b/i },
+  { label: "Sets", pattern: /\b(sets?|outfits?)\b/i },
+  { label: "Winter wear", pattern: /\b(winter\s*wear|winterwear|outerwear|coats?\s*&?\s*jackets?|jackets?|sweaters?)\b/i },
+  { label: "Accessories", pattern: /\b(accessorise|accessorize|accessories|accessory|clothing accessories|bibs?)\b/i },
 ];
 const BADGES = ["Bestseller", "New", "Gift Pick"];
 
@@ -230,6 +231,7 @@ export interface RawProductNode {
   description?: string | null;
   descriptionHtml?: string | null;
   productType?: string | null;
+  category?: { name?: string | null } | null;
   tags: string[];
   availableForSale: boolean;
   featuredImage?: RawImage | null;
@@ -341,7 +343,10 @@ export function mapProduct(node: RawProductNode): StoreProduct {
     node.productType ?? "",
     tags,
     node.title,
-    (node.collections?.nodes ?? []).map((collection) => collection.title),
+    [
+      node.category?.name ?? "",
+      ...(node.collections?.nodes ?? []).map((collection) => collection.title),
+    ],
   );
   const badge = BADGES.find((name) => tags.some((tag) => tag.toLowerCase() === name.toLowerCase())) ?? "";
   const description = node.description?.trim() || htmlToText(node.descriptionHtml ?? "");
