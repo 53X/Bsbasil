@@ -65,7 +65,8 @@ function tagValue(tags: string[], prefix: string): string {
 }
 
 function canonicalCategory(productType: string, tags: string[], title: string, collections: string[]): string {
-  const labeled = [tagValue(tags, "category:"), productType, ...collections];
+  // Prefer Product organization Tags / Type (Romper, Sleepwear, …), then collections / taxonomy name.
+  const labeled = [tagValue(tags, "category:"), productType, ...tags, ...collections];
   for (const source of labeled) {
     if (!source.trim()) continue;
     const match = CATEGORY_MATCHERS.find((item) => item.pattern.test(source));
@@ -140,7 +141,13 @@ export function ageCode(raw: string): string | null {
   const compact = value.replace(/\s+/g, "");
   if (["0-3m", "0-3months", "0-3", "0-3 months", "0 to 3 months", "newborn"].includes(value) || ["0-3m", "0-3months"].includes(compact)) return "0-3M";
   if (["3-6m", "3-6months", "3-6", "3-6 months", "3 to 6 months"].includes(value) || ["3-6m", "3-6months"].includes(compact)) return "3-6M";
-  if (["6-12m", "6-12months", "6-12", "6-12 months", "6 to 12 months"].includes(value) || ["6-12m", "6-12months"].includes(compact)) return "6-12M";
+  // Shop uses 6–12; Shopify taxonomy often has 6–9 / 9–12 — both map into 6–12.
+  if (
+    ["6-12m", "6-12months", "6-12", "6-12 months", "6 to 12 months", "6-9m", "6-9months", "6-9", "6-9 months", "9-12m", "9-12months", "9-12", "9-12 months"].includes(value) ||
+    ["6-12m", "6-12months", "6-9m", "6-9months", "9-12m", "9-12months"].includes(compact)
+  ) {
+    return "6-12M";
+  }
   if (["12-18m", "12-18months", "12-18", "12-18 months", "12 to 18 months"].includes(value) || ["12-18m", "12-18months"].includes(compact)) return "12-18M";
   if (["18-24m", "18-24months", "18-24", "18-24 months", "18 to 24 months"].includes(value) || ["18-24m", "18-24months"].includes(compact)) return "18-24M";
   if (["24-30m", "24-30months", "24-30", "24-30 months", "24 to 30 months"].includes(value) || ["24-30m", "24-30months"].includes(compact)) return "24-30M";
@@ -152,6 +159,10 @@ export function ageCode(raw: string): string | null {
   return null;
 }
 
+/**
+ * Ages for catalog filters come from Category metafields → Size (shopify.size).
+ * Fall back to variant Size options / age tags only when Size metafield is empty.
+ */
 function collectAges(
   tags: string[],
   options: { name: string; values: string[] }[],
@@ -168,8 +179,12 @@ function collectAges(
     }
     found.add(code);
   };
-  // Prefer Category metafield Size labels (shopify.size), then tags, then variant Size options.
-  sizeLabels.forEach(add);
+
+  if (sizeLabels.length > 0) {
+    sizeLabels.forEach(add);
+    return AGE_TAGS.filter((age) => found.has(age));
+  }
+
   tags.forEach(add);
   options
     .filter((option) => /size|age/i.test(option.name))

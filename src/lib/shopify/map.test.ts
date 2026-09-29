@@ -103,9 +103,9 @@ describe('shopify product mapping', () => {
         handle: 'size-from-category',
         title: 'Category Size Romper',
         productType: 'Rompers',
-        tags: [],
+        tags: ['0-3M', '18-24M'], // ignored when Category Size metafield is set
         availableForSale: true,
-        options: [],
+        options: [{ name: 'Size', values: ['6–12 Months'] }],
         sizeMetafield: {
           references: {
             nodes: [
@@ -125,6 +125,8 @@ describe('shopify product mapping', () => {
         },
       }).ageRanges,
     ).toEqual(['0-3M', '24-30M']);
+    expect(ageCode('6-9 months')).toBe('6-12M');
+    expect(ageCode('9-12 months')).toBe('6-12M');
     expect(product.featured).toBe(true);
     expect(product.media.map((item) => item.kind)).toEqual(['image', 'video']);
     expect(toMinorUnits('799.00')).toBe(79900);
@@ -141,5 +143,81 @@ describe('shopify product mapping', () => {
       pricesIncludeGst: 'All prices include GST.',
       cashOnDelivery: null,
     });
+  });
+
+  it('ANDs age (Category Size) with category tags and treats All* as open filters', () => {
+    const waistcoat = mapProduct({
+      id: 'gid://shopify/Product/sets',
+      handle: 'waistcoat-set',
+      title: 'Boys Checkered Waistcoat Shirt & Trouser Set',
+      productType: 'Sets',
+      tags: ['Sets'],
+      availableForSale: true,
+      sizeMetafield: {
+        references: {
+          nodes: [
+            { handle: '12-18-months', fields: [{ key: 'label', value: '12-18 months' }] },
+            { handle: '18-24-months', fields: [{ key: 'label', value: '18-24 months' }] },
+            { handle: '24-30-months', fields: [{ key: 'label', value: '24-30 months' }] },
+          ],
+        },
+      },
+      variants: {
+        nodes: [{
+          id: 'gid://shopify/ProductVariant/sets',
+          title: 'Default',
+          availableForSale: true,
+          price: { amount: '1999.00', currencyCode: 'INR' },
+          selectedOptions: [],
+        }],
+      },
+    });
+    const sleepsuit = mapProduct({
+      id: 'gid://shopify/Product/sleep',
+      handle: 'sleepsuit',
+      title: 'Soft Cotton Sleepsuit',
+      productType: 'Sleepwear',
+      tags: ['Sleepwear'],
+      availableForSale: true,
+      sizeMetafield: {
+        references: {
+          nodes: [{ handle: '0-3-months', fields: [{ key: 'label', value: '0-3 months' }] }],
+        },
+      },
+      variants: {
+        nodes: [{
+          id: 'gid://shopify/ProductVariant/sleep',
+          title: 'Default',
+          availableForSale: true,
+          price: { amount: '899.00', currencyCode: 'INR' },
+          selectedOptions: [],
+        }],
+      },
+    });
+
+    expect(waistcoat.category).toBe('Sets');
+    expect(waistcoat.ageRanges).toEqual(['12-18M', '18-24M', '24-30M']);
+    expect(sleepsuit.category).toBe('Sleepwear');
+    expect(sleepsuit.ageRanges).toEqual(['0-3M']);
+
+    // All Ages + All Categories → everything
+    expect(productMatchesFilters(waistcoat, 'All Ages', 'All Categories')).toBe(true);
+    expect(productMatchesFilters(sleepsuit, 'All Ages', 'All Categories')).toBe(true);
+
+    // Age only
+    expect(productMatchesFilters(waistcoat, '18-24M', 'All Categories')).toBe(true);
+    expect(productMatchesFilters(sleepsuit, '18-24M', 'All Categories')).toBe(false);
+    expect(productMatchesFilters(sleepsuit, '0-3M', 'All Categories')).toBe(true);
+
+    // Category only
+    expect(productMatchesFilters(waistcoat, 'All Ages', 'Sets')).toBe(true);
+    expect(productMatchesFilters(sleepsuit, 'All Ages', 'Sets')).toBe(false);
+
+    // Age AND category
+    expect(productMatchesFilters(waistcoat, '18-24M', 'Sets')).toBe(true);
+    expect(productMatchesFilters(waistcoat, '18-24M', 'Sleepwear')).toBe(false);
+    expect(productMatchesFilters(sleepsuit, '0-3M', 'Sleepwear')).toBe(true);
+    expect(productMatchesFilters(sleepsuit, '0-3M', 'Sets')).toBe(false);
+    expect(productMatchesFilters(waistcoat, '0-3M', 'Sets')).toBe(false);
   });
 });
