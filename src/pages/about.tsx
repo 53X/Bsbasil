@@ -288,7 +288,7 @@ export default function AboutPage() {
         </section>
 
         {/* ── CTA Banner ── */}
-        <section className="py-xxl" style={{ background: 'hsl(var(--primary))' }}>
+        <section className="py-xxl" style={{ background: '#ffffff' }}>
           <motion.div
             initial="hidden"
             whileInView="visible"
@@ -299,14 +299,14 @@ export default function AboutPage() {
             <motion.h2
               variants={fadeUp}
               className="text-3xl md:text-4xl font-bold mb-base"
-              style={{ color: 'hsl(var(--primary-foreground))' }}
+              style={{ color: 'hsl(var(--foreground))' }}
             >
               Dress your little one in love
             </motion.h2>
             <motion.p
               variants={fadeUp}
               className="text-lg mb-lg"
-              style={{ color: 'hsl(var(--primary-foreground) / 0.85)' }}
+              style={{ color: 'hsl(var(--muted-foreground))' }}
             >
               Explore our collection of soft, safe, and adorable clothes for ages 0–3.
             </motion.p>
@@ -315,8 +315,8 @@ export default function AboutPage() {
                 to="/catalog"
                 className="inline-block px-xl py-base rounded-full font-bold text-base transition-transform hover:scale-105"
                 style={{
-                  background: 'hsl(var(--background))',
-                  color: 'hsl(var(--brand-ink))',
+                  background: 'hsl(var(--primary))',
+                  color: 'hsl(var(--primary-foreground))',
                 }}
               >
                 Shop Now

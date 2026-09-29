@@ -341,7 +341,7 @@ export default function HomePage() {
         </section>
 
         {/* ── CTA Banner ── */}
-        <section className="py-xxl" style={{ background: 'hsl(var(--primary))' }}>
+        <section className="py-xxl" style={{ background: '#ffffff' }}>
           <motion.div
             initial="hidden"
             whileInView="visible"
@@ -351,20 +351,20 @@ export default function HomePage() {
             <motion.h2
               variants={fadeUp}
               className="text-3xl md:text-4xl font-bold mb-base"
-              style={{ color: 'hsl(var(--primary-foreground))' }}>
+              style={{ color: 'hsl(var(--foreground))' }}>
               {home.ctaBanner.title}
             </motion.h2>
             <motion.p
               variants={fadeUp}
               className="text-lg mb-lg max-w-xl mx-auto"
-              style={{ color: 'hsl(var(--primary-foreground))' }}>
+              style={{ color: 'hsl(var(--muted-foreground))' }}>
               {home.ctaBanner.subtitle}
             </motion.p>
             <motion.div variants={fadeUp}>
               <Link
                 to="/catalog"
                 className="inline-flex items-center gap-2 px-xl py-base rounded-full font-bold text-base transition-transform hover:scale-105"
-                style={{ background: 'hsl(var(--background))', color: 'hsl(var(--brand-ink))' }}>
+                style={{ background: 'hsl(var(--primary))', color: 'hsl(var(--primary-foreground))' }}>
                 <ShoppingBag size={18} />
                 {home.ctaBanner.cta}
               </Link>
