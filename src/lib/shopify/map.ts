@@ -140,6 +140,14 @@ export function hasSelectableSizeOption(product: {
   );
 }
 
+/** Products with Shopify sizes must have one chosen before add-to-bag. */
+export function productRequiresSizeSelection(product: {
+  options: { name: string; values: string[] }[];
+  ageRanges: string[];
+}): boolean {
+  return productSizeLabels(product).length > 0;
+}
+
 /** Catalog filters: All Ages / All Categories mean no filter on that axis. */
 export function productMatchesFilters(
   product: { category: string; ageRanges: string[] },

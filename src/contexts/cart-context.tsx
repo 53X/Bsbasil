@@ -16,7 +16,11 @@ export interface AddToCartResult {
 
 interface CartContextType {
   cart: CartLine[];
-  addVariant: (variantId: string, quantity?: number) => Promise<AddToCartResult>;
+  addVariant: (
+    variantId: string,
+    quantity?: number,
+    attributes?: Array<{ key: string; value: string }>,
+  ) => Promise<AddToCartResult>;
   removeFromCart: (lineId: string) => Promise<void>;
   updateQuantity: (lineId: string, quantity: number) => Promise<void>;
   clearCart: () => void;
@@ -69,7 +73,11 @@ export function CartProvider({ children }: { children: ReactNode }) {
     else localStorage.removeItem(CART_KEY);
   }, [cartId, ready]);
 
-  const addVariant = useCallback(async (variantId: string, quantity = 1): Promise<AddToCartResult> => {
+  const addVariant = useCallback(async (
+    variantId: string,
+    quantity = 1,
+    attributes?: Array<{ key: string; value: string }>,
+  ): Promise<AddToCartResult> => {
     if (!isShopifyConfigured()) {
       return { success: false, error: 'The shop is not connected to Shopify yet.' };
     }
@@ -77,8 +85,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
     setCartError(null);
     try {
       const next = cartId
-        ? await addCartLine(cartId, variantId, quantity)
-        : await createCart(variantId, quantity);
+        ? await addCartLine(cartId, variantId, quantity, attributes)
+        : await createCart(variantId, quantity, attributes);
       applyCart(next);
       return { success: true, checkoutUrl: next.checkoutUrl };
     } catch (error) {
@@ -86,7 +94,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
       const cartGone = cartId && /does not exist|expired|not found/i.test(message);
       if (cartGone) {
         try {
-          const next = await createCart(variantId, quantity);
+          const next = await createCart(variantId, quantity, attributes);
           applyCart(next);
           return { success: true, checkoutUrl: next.checkoutUrl };
         } catch (retryError) {

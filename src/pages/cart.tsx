@@ -116,6 +116,13 @@ export default function CartPage() {
                   <div className="flex-1 min-w-0">
                     <h3 className="font-semibold truncate" style={{ color: 'hsl(var(--foreground))' }}>{item.name}</h3>
                     {item.variantTitle ? <p className="text-sm" style={{ color: 'hsl(var(--muted-foreground))' }}>{item.variantTitle}</p> : null}
+                    {!item.variantTitle && item.attributes?.length
+                      ? item.attributes.map((attr) => (
+                          <p key={`${attr.key}-${attr.value}`} className="text-sm" style={{ color: 'hsl(var(--muted-foreground))' }}>
+                            {attr.key}: {attr.value}
+                          </p>
+                        ))
+                      : null}
                     <PriceTag
                       price={item.price}
                       compareAt={item.compareAtPrice}

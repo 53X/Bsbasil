@@ -76,6 +76,11 @@ export interface StoreCatalog {
   error: string | null;
 }
 
+export interface CartLineAttribute {
+  key: string;
+  value: string;
+}
+
 export interface CartLine {
   id: string;
   variantId: string;
@@ -87,6 +92,7 @@ export interface CartLine {
   currency: string;
   quantity: number;
   image?: string;
+  attributes?: CartLineAttribute[];
 }
 
 export interface StoreCart {

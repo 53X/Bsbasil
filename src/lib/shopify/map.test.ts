@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { ageCode, ageLabel, ageRangeLabel, applyCartDiscounts, expandProductsByAge, hasSelectableSizeOption, htmlToText, mapProduct, mapShopRules, matchingVariant, productMatchesFilters, productSizeLabels, toMinorUnits } from './map';
+import { ageCode, ageLabel, ageRangeLabel, applyCartDiscounts, expandProductsByAge, hasSelectableSizeOption, htmlToText, mapProduct, mapShopRules, matchingVariant, productMatchesFilters, productRequiresSizeSelection, productSizeLabels, toMinorUnits } from './map';
 
 describe('shopify product mapping', () => {
   it('keeps photos and video on the same product', () => {
@@ -258,6 +258,7 @@ describe('shopify product mapping', () => {
     expect(productMatchesFilters(bunny, '18-24M', 'Romper')).toBe(true);
     expect(productMatchesFilters(bunny, '0-3M', 'Sets')).toBe(false);
     expect(hasSelectableSizeOption(bunny)).toBe(false);
+    expect(productRequiresSizeSelection(bunny)).toBe(true);
     expect(productSizeLabels(bunny)).toEqual([
       '0–3 Months',
       '3–6 Months',
@@ -300,6 +301,7 @@ describe('shopify product mapping', () => {
     });
 
     expect(hasSelectableSizeOption(product)).toBe(true);
+    expect(productRequiresSizeSelection(product)).toBe(true);
     expect(productSizeLabels(product)).toEqual(['6-12 months', '12-18 months']);
   });
 });

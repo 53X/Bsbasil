@@ -1,9 +1,7 @@
 import { Link } from 'react-router';
-import { useState } from 'react';
 import { ShoppingBag } from 'lucide-react';
 import PriceTag from '@/components/PriceTag';
-import { useCart } from '@/contexts/use-cart';
-import { ageLabel, ageRangeLabel } from '@/lib/shopify/map';
+import { ageLabel, ageRangeLabel, productRequiresSizeSelection } from '@/lib/shopify/map';
 import type { StoreProduct } from '@/lib/shopify/types';
 
 const BADGE_COLORS: Record<string, { bg: string; text: string }> = {
@@ -19,11 +17,6 @@ export default function ProductCard({
   product: StoreProduct;
   ageHighlight?: string;
 }) {
-  const { addVariant } = useCart();
-  const [message, setMessage] = useState<string | null>(null);
-  const [adding, setAdding] = useState(false);
-  const purchasable = product.variants.filter((variant) => variant.available);
-  const directVariant = purchasable.length === 1 ? purchasable[0] : null;
   const href = ageHighlight
     ? `/products/${product.handle}?age=${encodeURIComponent(ageHighlight)}`
     : `/products/${product.handle}`;
@@ -33,15 +26,8 @@ export default function ProductCard({
     : product.ageRanges.length > 0
       ? ageRangeLabel(product.ageRanges)
       : ageLabel(product.ageRange);
-
-  const onAdd = async () => {
-    if (!directVariant) return;
-    setAdding(true);
-    setMessage(null);
-    const result = await addVariant(directVariant.id, 1);
-    setAdding(false);
-    setMessage(result.success ? 'Added' : result.error ?? 'Could not add this item');
-  };
+  // Catalog never adds without a size — send shoppers to the product page to choose.
+  const needsSize = productRequiresSizeSelection(product);
 
   return (
     <article
@@ -109,32 +95,16 @@ export default function ProductCard({
             priceClassName="text-lg font-bold"
           />
           <div className="relative z-[2] flex items-center gap-2 pointer-events-auto">
-            {directVariant ? (
-              <button
-                type="button"
-                onClick={onAdd}
-                disabled={adding || !product.available}
-                className="flex items-center gap-2 px-base py-xs rounded-full text-sm font-semibold transition-transform hover:scale-105 disabled:opacity-60"
-                style={{ background: 'hsl(var(--primary))', color: 'hsl(var(--primary-foreground))' }}
-              >
-                <ShoppingBag size={14} />
-                {adding ? 'Adding' : product.available ? 'Add' : 'Sold out'}
-              </button>
-            ) : (
-              <Link
-                to={href}
-                className="flex items-center gap-2 px-base py-xs rounded-full text-sm font-semibold"
-                style={{ background: 'hsl(var(--primary))', color: 'hsl(var(--primary-foreground))' }}
-              >
-                <ShoppingBag size={14} />
-                {product.available ? 'Add' : 'Sold out'}
-              </Link>
-            )}
+            <Link
+              to={href}
+              className="flex items-center gap-2 px-base py-xs rounded-full text-sm font-semibold transition-transform hover:scale-105"
+              style={{ background: 'hsl(var(--primary))', color: 'hsl(var(--primary-foreground))' }}
+            >
+              <ShoppingBag size={14} />
+              {!product.available ? 'Sold out' : needsSize ? 'Select size' : 'Add'}
+            </Link>
           </div>
         </div>
-        {message ? (
-          <p className="text-xs" style={{ color: 'hsl(var(--muted-foreground))' }}>{message}</p>
-        ) : null}
       </div>
     </article>
   );

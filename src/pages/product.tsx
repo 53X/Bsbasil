@@ -4,7 +4,7 @@ import { Helmet } from '@dr.pogodin/react-helmet';
 import { ShoppingBag } from 'lucide-react';
 import ShareButtons from '@/components/ShareButtons';
 import { useCart } from '@/contexts/use-cart';
-import { ageLabel, hasSelectableSizeOption, matchingVariant, productSizeLabels, selectionForOption } from '@/lib/shopify/map';
+import { ageLabel, hasSelectableSizeOption, matchingVariant, productRequiresSizeSelection, productSizeLabels, selectionForOption } from '@/lib/shopify/map';
 import PriceTag from '@/components/PriceTag';
 import type { StoreMedia, StoreProduct, StoreCatalog } from '@/lib/shopify/types';
 
@@ -80,32 +80,59 @@ export default function ProductPage() {
   const [adding, setAdding] = useState(false);
   const [buying, setBuying] = useState(false);
 
-  const initialSelection = useMemo(() => {
+  const sizeLabels = useMemo(() => (product ? productSizeLabels(product) : []), [product]);
+  const requiresSize = product ? productRequiresSizeSelection(product) : false;
+  const sizeOptionName = useMemo(() => {
+    if (!product) return 'Size';
+    return (
+      product.options.find((option) => /size|age/i.test(option.name) && !/^title$/i.test(option.name))?.name ??
+      'Size'
+    );
+  }, [product]);
+  const selectableSize = product ? hasSelectableSizeOption(product) : false;
+
+  const preferredSizeFromUrl = useMemo(() => {
     const ageParam = params.get('age');
-    const preferredSize = ageParam ? ageLabel(ageParam) : null;
+    if (!ageParam || sizeLabels.length === 0) return null;
+    const labeled = ageLabel(ageParam);
+    if (sizeLabels.includes(labeled)) return labeled;
+    if (sizeLabels.includes(ageParam)) return ageParam;
+    return null;
+  }, [params, sizeLabels]);
+
+  const initialSelection = useMemo(() => {
     const preferred =
-      (preferredSize &&
+      (preferredSizeFromUrl &&
         product?.variants.find((item) =>
           item.selectedOptions.some(
-            (option) => /size|age/i.test(option.name) && option.value === preferredSize,
+            (option) => /size|age/i.test(option.name) && option.value === preferredSizeFromUrl,
           ),
         )) ||
       product?.variants.find((item) => item.available) ||
       product?.variants[0];
     const selected: Record<string, string> = {};
     preferred?.selectedOptions.forEach((option) => {
+      // Never auto-pick Size/Age — customer must choose (unless URL age already did).
+      if (/size|age/i.test(option.name) && !/^title$/i.test(option.name)) {
+        if (preferredSizeFromUrl && option.value === preferredSizeFromUrl) {
+          selected[option.name] = option.value;
+        }
+        return;
+      }
       selected[option.name] = option.value;
     });
     return selected;
-  }, [product, params]);
+  }, [product, preferredSizeFromUrl]);
   const [selected, setSelected] = useState<Record<string, string>>(initialSelection);
+  const [chosenSize, setChosenSize] = useState<string | null>(preferredSizeFromUrl);
 
   useEffect(() => {
     setSelected(initialSelection);
+    setChosenSize(preferredSizeFromUrl);
     setMediaIndex(0);
     setQuantity(1);
     setMessage(null);
-  }, [product?.id, initialSelection]);
+  }, [product?.id, initialSelection, preferredSizeFromUrl]);
 
   const variant = product ? matchingVariant(product, selected) ?? product.variants[0] : undefined;
   const gallery = useMemo(() => {
@@ -145,18 +172,28 @@ export default function ProductPage() {
 
   const onAdd = async () => {
     if (!variant || soldOut) return;
+    if (requiresSize && !chosenSize) {
+      setMessage('Please select a size');
+      return;
+    }
     setAdding(true);
     setMessage(null);
-    const result = await addVariant(variant.id, quantity);
+    const attributes = chosenSize ? [{ key: 'Size', value: chosenSize }] : undefined;
+    const result = await addVariant(variant.id, quantity, attributes);
     setAdding(false);
     setMessage(result.success ? 'Added to your bag' : result.error ?? 'Could not add this item');
   };
 
   const onBuyNow = async () => {
     if (!variant || soldOut) return;
+    if (requiresSize && !chosenSize) {
+      setMessage('Please select a size');
+      return;
+    }
     setBuying(true);
     setMessage(null);
-    const result = await addVariant(variant.id, quantity);
+    const attributes = chosenSize ? [{ key: 'Size', value: chosenSize }] : undefined;
+    const result = await addVariant(variant.id, quantity, attributes);
     if (result.success && result.checkoutUrl) {
       window.location.href = result.checkoutUrl;
       return;
@@ -234,11 +271,9 @@ export default function ProductPage() {
             })()}
 
             {(() => {
-              const sizeLabels = productSizeLabels(product);
               const sizeOption = product.options.find(
                 (option) => /size|age/i.test(option.name) && !/^title$/i.test(option.name),
               );
-              const selectable = hasSelectableSizeOption(product);
               const otherOptions = product.options.filter(
                 (option) =>
                   (option.values.length > 1 || option.name.toLowerCase() !== 'title') &&
@@ -250,20 +285,20 @@ export default function ProductPage() {
                   {sizeLabels.length > 0 ? (
                     <div className="mb-base">
                       <p className="text-xs font-semibold uppercase tracking-wide mb-xs" style={{ color: 'hsl(var(--muted-foreground))' }}>
-                        {selectable ? 'Size' : 'Available sizes'}
+                        Size
                       </p>
                       <div className="flex flex-wrap gap-2">
                         {sizeLabels.map((value) => {
-                          const optionName = sizeOption?.name ?? 'Size';
-                          const active = selectable && selected[optionName] === value;
-                          const offered = selectable
+                          const optionName = sizeOption?.name ?? sizeOptionName;
+                          const active = chosenSize === value;
+                          const offered = selectableSize
                             ? product.variants.some((item) =>
                                 item.selectedOptions.some(
                                   (entry) => entry.name === optionName && entry.value === value,
                                 ),
                               )
                             : true;
-                          const available = selectable
+                          const available = selectableSize
                             ? product.variants.some(
                                 (item) =>
                                   item.available &&
@@ -276,19 +311,21 @@ export default function ProductPage() {
                             <button
                               key={value}
                               type="button"
-                              disabled={selectable ? !offered || !available : true}
+                              disabled={selectableSize ? !offered || !available : false}
                               onClick={() => {
-                                if (!selectable || !sizeOption) return;
-                                setSelected((current) => selectionForOption(product, current, optionName, value));
+                                setChosenSize(value);
+                                setMessage(null);
+                                if (selectableSize && sizeOption) {
+                                  setSelected((current) => selectionForOption(product, current, optionName, value));
+                                }
                               }}
-                              aria-pressed={selectable ? active : undefined}
-                              className="px-base py-xs rounded-full text-sm font-medium border inline-flex items-center gap-2 disabled:opacity-100"
+                              aria-pressed={active}
+                              className="px-base py-xs rounded-full text-sm font-medium border inline-flex items-center gap-2 disabled:opacity-40"
                               style={{
                                 background: active ? 'hsl(var(--primary))' : 'hsl(var(--background))',
                                 color: active ? 'hsl(var(--primary-foreground))' : 'hsl(var(--foreground))',
                                 borderColor: active ? 'hsl(var(--primary))' : 'hsl(var(--border))',
-                                cursor: selectable ? 'pointer' : 'default',
-                                opacity: selectable && !available ? 0.4 : 1,
+                                cursor: selectableSize && (!offered || !available) ? 'not-allowed' : 'pointer',
                               }}
                             >
                               {value}
@@ -296,6 +333,11 @@ export default function ProductPage() {
                           );
                         })}
                       </div>
+                      {requiresSize && !chosenSize ? (
+                        <p className="text-xs mt-xs" style={{ color: 'hsl(var(--muted-foreground))' }}>
+                          Select a size to add this to your bag
+                        </p>
+                      ) : null}
                     </div>
                   ) : null}
 
@@ -348,7 +390,7 @@ export default function ProductPage() {
               <button
                 type="button"
                 onClick={onAdd}
-                disabled={adding || buying || soldOut}
+                disabled={adding || buying || soldOut || (requiresSize && !chosenSize)}
                 className="flex-1 flex items-center justify-center gap-2 px-xl py-sm rounded-full font-semibold disabled:opacity-60"
                 style={{ background: 'hsl(var(--primary))', color: 'hsl(var(--primary-foreground))' }}
               >
@@ -358,7 +400,7 @@ export default function ProductPage() {
               <button
                 type="button"
                 onClick={onBuyNow}
-                disabled={adding || buying || soldOut}
+                disabled={adding || buying || soldOut || (requiresSize && !chosenSize)}
                 className="px-xl py-sm rounded-full font-semibold border disabled:opacity-60"
                 style={{ borderColor: 'hsl(var(--primary))', color: 'hsl(var(--brand-ink))' }}
               >
@@ -405,7 +447,7 @@ export default function ProductPage() {
         <button
           type="button"
           onClick={onAdd}
-          disabled={adding || soldOut}
+          disabled={adding || soldOut || (requiresSize && !chosenSize)}
           className="flex-1 py-sm rounded-full font-semibold disabled:opacity-60"
           style={{ background: 'hsl(var(--primary))', color: 'hsl(var(--primary-foreground))' }}
         >

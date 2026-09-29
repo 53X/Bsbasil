@@ -65,6 +65,7 @@ const CART_FIELDS = `
     nodes {
       id
       quantity
+      attributes { key value }
       merchandise {
         ... on ProductVariant {
           id
@@ -130,6 +131,7 @@ interface CartPayload {
       nodes: Array<{
         id: string;
         quantity: number;
+        attributes?: Array<{ key: string; value: string }> | null;
         merchandise: {
           id: string;
           title: string;
@@ -294,17 +296,22 @@ function mapCart(cart: NonNullable<CartPayload["cart"]>): StoreCart {
         .map((allocation) => allocation.title || allocation.code)
         .filter((title): title is string => Boolean(title))
         .join(", ");
+      const attributes = (line.attributes ?? []).filter((entry) => entry.key && entry.value);
+      const sizeAttr = attributes.find((entry) => /^size$/i.test(entry.key))?.value;
+      const variantTitle =
+        line.merchandise.title === "Default Title" ? sizeAttr || "" : line.merchandise.title;
       return {
         id: line.id,
         variantId: line.merchandise.id,
         name: line.merchandise.product.title,
-        variantTitle: line.merchandise.title === "Default Title" ? "" : line.merchandise.title,
+        variantTitle,
         price: unit,
         compareAtPrice: listUnit > unit ? listUnit : null,
         discountTitle: discountTitle || null,
         currency: line.cost?.totalAmount.currencyCode ?? line.merchandise.price.currencyCode,
         quantity: line.quantity,
         image: line.merchandise.image?.url,
+        attributes: attributes.length > 0 ? attributes : undefined,
       };
     }),
   };
@@ -384,28 +391,56 @@ export async function fetchCart(cartId: string): Promise<StoreCart | null> {
   return data.cart ? mapCart(data.cart) : null;
 }
 
-export async function createCart(variantId: string, quantity: number): Promise<StoreCart> {
+export async function createCart(
+  variantId: string,
+  quantity: number,
+  attributes?: Array<{ key: string; value: string }>,
+): Promise<StoreCart> {
+  const lineAttributes = (attributes ?? []).filter((entry) => entry.key && entry.value);
   const data = await storefront<{ cartCreate: CartPayload }>(
-    `mutation Create($variantId: ID!, $quantity: Int!) {
-      cartCreate(input: { lines: [{ merchandiseId: $variantId, quantity: $quantity }] }) {
+    `mutation Create($lines: [CartLineInput!]!) {
+      cartCreate(input: { lines: $lines }) {
         cart { ${CART_FIELDS} }
         userErrors { message }
       }
     }`,
-    { variantId, quantity },
+    {
+      lines: [
+        {
+          merchandiseId: variantId,
+          quantity,
+          ...(lineAttributes.length > 0 ? { attributes: lineAttributes } : {}),
+        },
+      ],
+    },
   );
   return cartResult(data.cartCreate);
 }
 
-export async function addCartLine(cartId: string, variantId: string, quantity: number): Promise<StoreCart> {
+export async function addCartLine(
+  cartId: string,
+  variantId: string,
+  quantity: number,
+  attributes?: Array<{ key: string; value: string }>,
+): Promise<StoreCart> {
+  const lineAttributes = (attributes ?? []).filter((entry) => entry.key && entry.value);
   const data = await storefront<{ cartLinesAdd: CartPayload }>(
-    `mutation Add($cartId: ID!, $variantId: ID!, $quantity: Int!) {
-      cartLinesAdd(cartId: $cartId, lines: [{ merchandiseId: $variantId, quantity: $quantity }]) {
+    `mutation Add($cartId: ID!, $lines: [CartLineInput!]!) {
+      cartLinesAdd(cartId: $cartId, lines: $lines) {
         cart { ${CART_FIELDS} }
         userErrors { message }
       }
     }`,
-    { cartId, variantId, quantity },
+    {
+      cartId,
+      lines: [
+        {
+          merchandiseId: variantId,
+          quantity,
+          ...(lineAttributes.length > 0 ? { attributes: lineAttributes } : {}),
+        },
+      ],
+    },
   );
   return cartResult(data.cartLinesAdd);
 }
