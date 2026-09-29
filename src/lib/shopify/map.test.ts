@@ -220,4 +220,43 @@ describe('shopify product mapping', () => {
     expect(productMatchesFilters(sleepsuit, '0-3M', 'Sets')).toBe(false);
     expect(productMatchesFilters(waistcoat, '0-3M', 'Sets')).toBe(false);
   });
+
+  it('reads Category Size ages from metafield value GIDs when references are empty', () => {
+    const bunny = mapProduct({
+      id: 'gid://shopify/Product/bunny',
+      handle: 'baby-bunny-checkered-romper-set',
+      title: 'Baby Bunny Checkered Romper Set',
+      productType: 'Romper',
+      tags: ['Romper'],
+      availableForSale: true,
+      // Storefront shape: value present, references empty (no metaobject scope)
+      sizeMetafield: {
+        value: JSON.stringify([
+          'gid://shopify/Metaobject/428238504021',
+          'gid://shopify/Metaobject/428238536789',
+          'gid://shopify/Metaobject/428476498005',
+          'gid://shopify/Metaobject/428476399701',
+          'gid://shopify/Metaobject/428476432469',
+          'gid://shopify/Metaobject/428476530773',
+          'gid://shopify/Metaobject/428476563541',
+        ]),
+        references: { nodes: [] },
+      },
+      variants: {
+        nodes: [{
+          id: 'gid://shopify/ProductVariant/bunny',
+          title: 'Default',
+          availableForSale: true,
+          price: { amount: '1299.00', currencyCode: 'INR' },
+          selectedOptions: [],
+        }],
+      },
+    });
+
+    expect(bunny.category).toBe('Romper');
+    expect(bunny.ageRanges).toEqual(['0-3M', '3-6M', '6-12M', '12-18M', '18-24M', '24-30M', '30-36M']);
+    expect(productMatchesFilters(bunny, '0-3M', 'Romper')).toBe(true);
+    expect(productMatchesFilters(bunny, '18-24M', 'Romper')).toBe(true);
+    expect(productMatchesFilters(bunny, '0-3M', 'Sets')).toBe(false);
+  });
 });

@@ -15,6 +15,8 @@ const PRODUCT_FIELDS = `
   featuredImage { url altText }
   options { name values }
   sizeMetafield: metafield(namespace: "shopify", key: "size") {
+    type
+    value
     references(first: 20) {
       nodes {
         ... on Metaobject {

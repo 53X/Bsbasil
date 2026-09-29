@@ -160,6 +160,24 @@ export function ageCode(raw: string): string | null {
 }
 
 /**
+ * Shopify Category Size metaobjects (shopify--size).
+ * Storefront often returns only metafield `value` (GID JSON) because
+ * resolving references needs `unauthenticated_read_metaobjects`.
+ */
+const SIZE_METAOBJECT_LABELS: Record<string, string> = {
+  "gid://shopify/Metaobject/428238504021": "0-3 months",
+  "gid://shopify/Metaobject/428238536789": "3-6 months",
+  "gid://shopify/Metaobject/428239847509": "6-9 months",
+  "gid://shopify/Metaobject/428239880277": "9-12 months",
+  "gid://shopify/Metaobject/428476498005": "6-12 months",
+  "gid://shopify/Metaobject/428476399701": "12-18 months",
+  "gid://shopify/Metaobject/428476432469": "18-24 months",
+  "gid://shopify/Metaobject/428476530773": "24-30 months",
+  "gid://shopify/Metaobject/428476563541": "30-36 months",
+  "gid://shopify/Metaobject/428476465237": "2-3 years",
+};
+
+/**
  * Ages for catalog filters come from Category metafields → Size (shopify.size).
  * Fall back to variant Size options / age tags only when Size metafield is empty.
  */
@@ -194,16 +212,36 @@ function collectAges(
 
 function sizeMetafieldLabels(
   metafield?: {
-    references?: { nodes?: Array<{ handle?: string | null; fields?: Array<{ key: string; value: string }> | null } | null> | null } | null;
+    value?: string | null;
+    references?: {
+      nodes?: Array<{
+        handle?: string | null;
+        fields?: Array<{ key: string; value: string }> | null;
+      } | null> | null;
+    } | null;
   } | null,
 ): string[] {
-  return (metafield?.references?.nodes ?? [])
+  const fromRefs = (metafield?.references?.nodes ?? [])
     .filter((node): node is NonNullable<typeof node> => Boolean(node))
     .map((node) => {
       const label = node.fields?.find((field) => field.key === "label")?.value;
       return label || node.handle?.replace(/-/g, " ") || "";
     })
     .filter(Boolean);
+  if (fromRefs.length > 0) return fromRefs;
+
+  // Storefront without metaobject scope: value is a JSON array of metaobject GIDs.
+  const raw = metafield?.value?.trim();
+  if (!raw) return [];
+  try {
+    const parsed = JSON.parse(raw) as unknown;
+    if (!Array.isArray(parsed)) return [];
+    return parsed
+      .map((id) => (typeof id === "string" ? SIZE_METAOBJECT_LABELS[id] : null))
+      .filter((label): label is string => Boolean(label));
+  } catch {
+    return [];
+  }
 }
 
 interface RawImage {
@@ -252,6 +290,7 @@ export interface RawProductNode {
   featuredImage?: RawImage | null;
   options?: { name: string; values: string[] }[];
   sizeMetafield?: {
+    value?: string | null;
     references?: {
       nodes?: Array<{
         handle?: string | null;
