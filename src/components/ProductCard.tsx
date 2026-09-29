@@ -73,14 +73,6 @@ export default function ProductCard({
             {product.badge}
           </span>
         ) : null}
-        {badgeText ? (
-          <span
-            className="absolute top-3 right-3 px-2 py-1 rounded-full text-xs font-semibold"
-            style={{ background: 'hsl(var(--background))', color: 'hsl(var(--foreground))' }}
-          >
-            {badgeText}
-          </span>
-        ) : null}
         {product.media.some((item) => item.kind !== 'image') ? (
           <span
             className="absolute bottom-3 left-3 px-2 py-1 rounded-full text-xs font-semibold"
@@ -92,9 +84,19 @@ export default function ProductCard({
       </div>
 
       <div className="p-base flex flex-col flex-1 gap-xs pointer-events-none">
-        <p className="text-xs font-semibold uppercase tracking-wide" style={{ color: 'hsl(var(--brand-ink))' }}>
-          {product.category}
-        </p>
+        <div className="flex items-start justify-between gap-2">
+          <p className="text-xs font-semibold uppercase tracking-wide" style={{ color: 'hsl(var(--brand-ink))' }}>
+            {product.category}
+          </p>
+          {badgeText ? (
+            <span
+              className="shrink-0 text-[11px] font-semibold leading-tight text-right"
+              style={{ color: 'hsl(var(--muted-foreground))' }}
+            >
+              {badgeText}
+            </span>
+          ) : null}
+        </div>
         <p className="text-base font-bold leading-snug" style={{ color: 'hsl(var(--foreground))' }}>
           {product.name}
         </p>
