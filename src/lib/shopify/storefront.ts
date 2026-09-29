@@ -13,6 +13,16 @@ const PRODUCT_FIELDS = `
   availableForSale
   featuredImage { url altText }
   options { name values }
+  sizeMetafield: metafield(namespace: "shopify", key: "size") {
+    references(first: 20) {
+      nodes {
+        ... on Metaobject {
+          handle
+          fields { key value }
+        }
+      }
+    }
+  }
   collections(first: 10) { nodes { title } }
   media(first: 20) {
     nodes {

@@ -151,7 +151,11 @@ export function ageCode(raw: string): string | null {
   return null;
 }
 
-function collectAges(tags: string[], options: { name: string; values: string[] }[]): string[] {
+function collectAges(
+  tags: string[],
+  options: { name: string; values: string[] }[],
+  sizeLabels: string[] = [],
+): string[] {
   const found = new Set<string>();
   const add = (value: string) => {
     const code = ageCode(value.replace(/^age:/i, ""));
@@ -163,11 +167,27 @@ function collectAges(tags: string[], options: { name: string; values: string[] }
     }
     found.add(code);
   };
+  // Prefer Category metafield Size labels (shopify.size), then tags, then variant Size options.
+  sizeLabels.forEach(add);
   tags.forEach(add);
   options
     .filter((option) => /size|age/i.test(option.name))
     .forEach((option) => option.values.forEach(add));
   return AGE_TAGS.filter((age) => found.has(age));
+}
+
+function sizeMetafieldLabels(
+  metafield?: {
+    references?: { nodes?: Array<{ handle?: string | null; fields?: Array<{ key: string; value: string }> | null } | null> | null } | null;
+  } | null,
+): string[] {
+  return (metafield?.references?.nodes ?? [])
+    .filter((node): node is NonNullable<typeof node> => Boolean(node))
+    .map((node) => {
+      const label = node.fields?.find((field) => field.key === "label")?.value;
+      return label || node.handle?.replace(/-/g, " ") || "";
+    })
+    .filter(Boolean);
 }
 
 interface RawImage {
@@ -214,6 +234,14 @@ export interface RawProductNode {
   availableForSale: boolean;
   featuredImage?: RawImage | null;
   options?: { name: string; values: string[] }[];
+  sizeMetafield?: {
+    references?: {
+      nodes?: Array<{
+        handle?: string | null;
+        fields?: Array<{ key: string; value: string }> | null;
+      } | null> | null;
+    } | null;
+  } | null;
   collections?: { nodes: { title: string }[] };
   media?: { nodes: RawMediaNode[] };
   variants?: { nodes: RawVariantNode[] };
@@ -308,7 +336,7 @@ export function mapProduct(node: RawProductNode): StoreProduct {
     .map((item) => mapMedia(item, node.title))
     .filter((item): item is StoreMedia => item !== null);
   const image = node.featuredImage?.url || media.find((item) => item.kind === "image")?.url || media[0]?.poster || "";
-  const ageRanges = collectAges(tags, node.options ?? []);
+  const ageRanges = collectAges(tags, node.options ?? [], sizeMetafieldLabels(node.sizeMetafield));
   const category = canonicalCategory(
     node.productType ?? "",
     tags,

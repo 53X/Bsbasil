@@ -97,6 +97,34 @@ describe('shopify product mapping', () => {
         },
       }).ageRanges,
     ).toEqual(['24-30M', '30-36M']);
+    expect(
+      mapProduct({
+        id: 'gid://shopify/Product/size-meta',
+        handle: 'size-from-category',
+        title: 'Category Size Romper',
+        productType: 'Rompers',
+        tags: [],
+        availableForSale: true,
+        options: [],
+        sizeMetafield: {
+          references: {
+            nodes: [
+              { handle: '0-3-months', fields: [{ key: 'label', value: '0-3 months' }] },
+              { handle: '24-30-months', fields: [{ key: 'label', value: '24-30 months' }] },
+            ],
+          },
+        },
+        variants: {
+          nodes: [{
+            id: 'gid://shopify/ProductVariant/size-meta',
+            title: 'Default',
+            availableForSale: true,
+            price: { amount: '500.00', currencyCode: 'INR' },
+            selectedOptions: [],
+          }],
+        },
+      }).ageRanges,
+    ).toEqual(['0-3M', '24-30M']);
     expect(product.featured).toBe(true);
     expect(product.media.map((item) => item.kind)).toEqual(['image', 'video']);
     expect(toMinorUnits('799.00')).toBe(79900);
