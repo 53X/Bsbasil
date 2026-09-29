@@ -1,7 +1,7 @@
 import { Link } from 'react-router';
 import { ShoppingBag } from 'lucide-react';
 import PriceTag from '@/components/PriceTag';
-import { ageLabel, ageRangeLabel, productRequiresSizeSelection } from '@/lib/shopify/map';
+import { productRequiresSizeSelection } from '@/lib/shopify/map';
 import type { StoreProduct } from '@/lib/shopify/types';
 
 const BADGE_COLORS: Record<string, { bg: string; text: string }> = {
@@ -12,20 +12,12 @@ const BADGE_COLORS: Record<string, { bg: string; text: string }> = {
 
 export default function ProductCard({
   product,
-  ageHighlight,
 }: {
   product: StoreProduct;
+  /** Kept for catalog callers; sizes are chosen on the product page, not shown on cards. */
   ageHighlight?: string;
 }) {
-  const href = ageHighlight
-    ? `/products/${product.handle}?age=${encodeURIComponent(ageHighlight)}`
-    : `/products/${product.handle}`;
-  // One product card: highlight filtered size, otherwise show the full size/age range.
-  const badgeText = ageHighlight
-    ? ageLabel(ageHighlight)
-    : product.ageRanges.length > 0
-      ? ageRangeLabel(product.ageRanges)
-      : ageLabel(product.ageRange);
+  const href = `/products/${product.handle}`;
   // Catalog never adds without a size — send shoppers to the product page to choose.
   const needsSize = productRequiresSizeSelection(product);
 
@@ -70,19 +62,11 @@ export default function ProductCard({
       </div>
 
       <div className="p-base flex flex-col flex-1 gap-xs pointer-events-none">
-        <div className="flex items-start justify-between gap-2">
+        {product.category ? (
           <p className="text-xs font-semibold uppercase tracking-wide" style={{ color: 'hsl(var(--brand-ink))' }}>
             {product.category}
           </p>
-          {badgeText ? (
-            <span
-              className="shrink-0 text-[11px] font-semibold leading-tight text-right"
-              style={{ color: 'hsl(var(--muted-foreground))' }}
-            >
-              {badgeText}
-            </span>
-          ) : null}
-        </div>
+        ) : null}
         <p className="text-base font-bold leading-snug" style={{ color: 'hsl(var(--foreground))' }}>
           {product.name}
         </p>
