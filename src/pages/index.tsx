@@ -274,7 +274,7 @@ export default function HomePage() {
               whileInView="visible"
               viewport={{ once: true }}
               variants={stagger}
-              className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-base">
+              className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-base">
               {home.ageGroups.map((group) =>
               <motion.div key={group.id} variants={fadeUp}>
                   <Link

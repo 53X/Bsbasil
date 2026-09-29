@@ -1,6 +1,6 @@
 import type { Money, ShopRules, StoreMedia, StoreProduct, StoreVariant } from "./types";
 
-const AGE_TAGS = ["0-3M", "3-6M", "6-12M", "12-18M", "18-24M", "24-36M"];
+const AGE_TAGS = ["0-3M", "3-6M", "6-12M", "12-18M", "18-24M", "24-30M", "30-36M"];
 const CATEGORY_MATCHERS: { label: string; pattern: RegExp }[] = [
   { label: "Romper", pattern: /\brompers?\b/i },
   { label: "Sleepwear", pattern: /\b(sleepwear|sleepsuits?|pyjamas?|pajamas?)\b/i },
@@ -87,8 +87,10 @@ export function ageLabel(code: string): string {
       return "12–18 Months";
     case "18-24M":
       return "18–24 Months";
-    case "24-36M":
-      return "24–36 Months";
+    case "24-30M":
+      return "24–30 Months";
+    case "30-36M":
+      return "30–36 Months";
     default:
       return code;
   }
@@ -140,7 +142,12 @@ export function ageCode(raw: string): string | null {
   if (["6-12m", "6-12months", "6-12", "6-12 months", "6 to 12 months"].includes(value) || ["6-12m", "6-12months"].includes(compact)) return "6-12M";
   if (["12-18m", "12-18months", "12-18", "12-18 months", "12 to 18 months"].includes(value) || ["12-18m", "12-18months"].includes(compact)) return "12-18M";
   if (["18-24m", "18-24months", "18-24", "18-24 months", "18 to 24 months"].includes(value) || ["18-24m", "18-24months"].includes(compact)) return "18-24M";
-  if (["24-36m", "24-36months", "24-36", "24-36 months", "24 to 36 months", "2-3", "2-3 years", "2 to 3 years"].includes(value) || ["24-36m", "24-36months", "2-3years"].includes(compact)) return "24-36M";
+  if (["24-30m", "24-30months", "24-30", "24-30 months", "24 to 30 months"].includes(value) || ["24-30m", "24-30months"].includes(compact)) return "24-30M";
+  if (["30-36m", "30-36months", "30-36", "30-36 months", "30 to 36 months"].includes(value) || ["30-36m", "30-36months"].includes(compact)) return "30-36M";
+  // Legacy 24–36 / 2–3 years spans both new bands.
+  if (["24-36m", "24-36months", "24-36", "24-36 months", "24 to 36 months", "2-3", "2-3 years", "2 to 3 years"].includes(value) || ["24-36m", "24-36months", "2-3years"].includes(compact)) {
+    return "24-36M";
+  }
   return null;
 }
 
@@ -148,7 +155,13 @@ function collectAges(tags: string[], options: { name: string; values: string[] }
   const found = new Set<string>();
   const add = (value: string) => {
     const code = ageCode(value.replace(/^age:/i, ""));
-    if (code) found.add(code);
+    if (!code) return;
+    if (code === "24-36M") {
+      found.add("24-30M");
+      found.add("30-36M");
+      return;
+    }
+    found.add(code);
   };
   tags.forEach(add);
   options

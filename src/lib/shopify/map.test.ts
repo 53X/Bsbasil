@@ -57,10 +57,12 @@ describe('shopify product mapping', () => {
     expect(product.category).toBe('Romper');
     expect(ageCode('0–3 Months')).toBe('0-3M');
     expect(ageCode('2–3 Years')).toBe('24-36M');
-    expect(ageCode('0-6M')).toBeNull();
+    expect(ageCode('24–30 Months')).toBe('24-30M');
+    expect(ageCode('30–36 Months')).toBe('30-36M');
     expect(ageLabel('0-3M')).toBe('0–3 Months');
     expect(ageLabel('6-12M')).toBe('6–12 Months');
-    expect(ageLabel('24-36M')).toBe('24–36 Months');
+    expect(ageLabel('24-30M')).toBe('24–30 Months');
+    expect(ageLabel('30-36M')).toBe('30–36 Months');
     expect(ageRangeLabel(['0-3M', '3-6M', '6-12M'])).toBe('0–3 – 6–12 Months');
     expect(ageRangeLabel(['12-18M'])).toBe('12–18 Months');
     expect(productMatchesFilters(product, 'All Ages', 'Romper')).toBe(true);
@@ -74,6 +76,27 @@ describe('shopify product mapping', () => {
       { product, ageCode: '6-12M' },
     ]);
     expect(expandProductsByAge([product], '0-3M')).toEqual([{ product, ageCode: '0-3M' }]);
+    expect(ageCode('0-6M')).toBeNull();
+    expect(
+      mapProduct({
+        id: 'gid://shopify/Product/legacy',
+        handle: 'legacy-toddler',
+        title: 'Legacy Toddler Tee',
+        productType: 'Sets',
+        tags: ['24-36M'],
+        availableForSale: true,
+        options: [{ name: 'Size', values: ['24–36 Months'] }],
+        variants: {
+          nodes: [{
+            id: 'gid://shopify/ProductVariant/legacy',
+            title: '24–36 Months',
+            availableForSale: true,
+            price: { amount: '0.00', currencyCode: 'INR' },
+            selectedOptions: [{ name: 'Size', value: '24–36 Months' }],
+          }],
+        },
+      }).ageRanges,
+    ).toEqual(['24-30M', '30-36M']);
     expect(product.featured).toBe(true);
     expect(product.media.map((item) => item.kind)).toEqual(['image', 'video']);
     expect(toMinorUnits('799.00')).toBe(79900);

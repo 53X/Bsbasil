@@ -14,7 +14,8 @@ const AGE_FILTERS = [
   { value: '6-12M', label: '6–12 Months' },
   { value: '12-18M', label: '12–18 Months' },
   { value: '18-24M', label: '18–24 Months' },
-  { value: '24-36M', label: '24–36 Months' },
+  { value: '24-30M', label: '24–30 Months' },
+  { value: '30-36M', label: '30–36 Months' },
 ] as const;
 const CATEGORY_FILTERS = ['All Categories', 'Romper', 'Sleepwear', 'Sets', 'Winter wear', 'Accessories'] as const;
 

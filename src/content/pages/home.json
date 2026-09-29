@@ -103,9 +103,15 @@
     },
     {
       "id": "ag5",
-      "label": "24–36 Months",
-      "range": "24-36M",
+      "label": "24–30 Months",
+      "range": "24-30M",
       "emoji": "🚀"
+    },
+    {
+      "id": "ag6",
+      "label": "30–36 Months",
+      "range": "30-36M",
+      "emoji": "⭐"
     }
   ],
   "ctaBanner": {
