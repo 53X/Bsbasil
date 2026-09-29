@@ -4,7 +4,7 @@ import { Helmet } from '@dr.pogodin/react-helmet';
 import { ShoppingBag } from 'lucide-react';
 import ShareButtons from '@/components/ShareButtons';
 import { useCart } from '@/contexts/use-cart';
-import { ageLabel, matchingVariant, selectionForOption } from '@/lib/shopify/map';
+import { ageLabel, hasSelectableSizeOption, matchingVariant, productSizeLabels, selectionForOption } from '@/lib/shopify/map';
 import PriceTag from '@/components/PriceTag';
 import type { StoreMedia, StoreProduct, StoreCatalog } from '@/lib/shopify/types';
 
@@ -233,42 +233,111 @@ export default function ProductPage() {
               );
             })()}
 
-            {product.options.filter((option) => option.values.length > 1 || option.name.toLowerCase() !== 'title').map((option) => (
-              <div key={option.name} className="mb-base">
-                <p className="text-xs font-semibold uppercase tracking-wide mb-xs" style={{ color: 'hsl(var(--muted-foreground))' }}>{option.name}</p>
-                <div className="flex flex-wrap gap-2">
-                  {option.values.map((value) => {
-                    const active = selected[option.name] === value;
-                    const offered = product.variants.some((item) =>
-                      item.selectedOptions.some((entry) => entry.name === option.name && entry.value === value),
-                    );
-                    const dot = isColorOption(option.name) ? COLOR_DOTS[value.trim().toLowerCase()] : undefined;
-                    return (
-                      <button
-                        key={value}
-                        type="button"
-                        disabled={!offered}
-                        onClick={() => setSelected((current) => selectionForOption(product, current, option.name, value))}
-                        className="px-base py-xs rounded-full text-sm font-medium border inline-flex items-center gap-2 disabled:opacity-40"
-                        style={{
-                          background: active ? 'hsl(var(--primary))' : 'hsl(var(--background))',
-                          color: active ? 'hsl(var(--primary-foreground))' : 'hsl(var(--foreground))',
-                          borderColor: active ? 'hsl(var(--primary))' : 'hsl(var(--border))',
-                        }}
-                      >
-                        {dot ? (
-                          <span
-                            className="w-3.5 h-3.5 rounded-full border"
-                            style={{ background: dot, borderColor: active ? 'hsl(var(--primary-foreground))' : 'hsl(var(--border))' }}
-                          />
-                        ) : null}
-                        {value}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-            ))}
+            {(() => {
+              const sizeLabels = productSizeLabels(product);
+              const sizeOption = product.options.find(
+                (option) => /size|age/i.test(option.name) && !/^title$/i.test(option.name),
+              );
+              const selectable = hasSelectableSizeOption(product);
+              const otherOptions = product.options.filter(
+                (option) =>
+                  (option.values.length > 1 || option.name.toLowerCase() !== 'title') &&
+                  !/size|age/i.test(option.name),
+              );
+
+              return (
+                <>
+                  {sizeLabels.length > 0 ? (
+                    <div className="mb-base">
+                      <p className="text-xs font-semibold uppercase tracking-wide mb-xs" style={{ color: 'hsl(var(--muted-foreground))' }}>
+                        {selectable ? 'Size' : 'Available sizes'}
+                      </p>
+                      <div className="flex flex-wrap gap-2">
+                        {sizeLabels.map((value) => {
+                          const optionName = sizeOption?.name ?? 'Size';
+                          const active = selectable && selected[optionName] === value;
+                          const offered = selectable
+                            ? product.variants.some((item) =>
+                                item.selectedOptions.some(
+                                  (entry) => entry.name === optionName && entry.value === value,
+                                ),
+                              )
+                            : true;
+                          const available = selectable
+                            ? product.variants.some(
+                                (item) =>
+                                  item.available &&
+                                  item.selectedOptions.some(
+                                    (entry) => entry.name === optionName && entry.value === value,
+                                  ),
+                              )
+                            : true;
+                          return (
+                            <button
+                              key={value}
+                              type="button"
+                              disabled={selectable ? !offered || !available : true}
+                              onClick={() => {
+                                if (!selectable || !sizeOption) return;
+                                setSelected((current) => selectionForOption(product, current, optionName, value));
+                              }}
+                              aria-pressed={selectable ? active : undefined}
+                              className="px-base py-xs rounded-full text-sm font-medium border inline-flex items-center gap-2 disabled:opacity-100"
+                              style={{
+                                background: active ? 'hsl(var(--primary))' : 'hsl(var(--background))',
+                                color: active ? 'hsl(var(--primary-foreground))' : 'hsl(var(--foreground))',
+                                borderColor: active ? 'hsl(var(--primary))' : 'hsl(var(--border))',
+                                cursor: selectable ? 'pointer' : 'default',
+                                opacity: selectable && !available ? 0.4 : 1,
+                              }}
+                            >
+                              {value}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  ) : null}
+
+                  {otherOptions.map((option) => (
+                    <div key={option.name} className="mb-base">
+                      <p className="text-xs font-semibold uppercase tracking-wide mb-xs" style={{ color: 'hsl(var(--muted-foreground))' }}>{option.name}</p>
+                      <div className="flex flex-wrap gap-2">
+                        {option.values.map((value) => {
+                          const active = selected[option.name] === value;
+                          const offered = product.variants.some((item) =>
+                            item.selectedOptions.some((entry) => entry.name === option.name && entry.value === value),
+                          );
+                          const dot = isColorOption(option.name) ? COLOR_DOTS[value.trim().toLowerCase()] : undefined;
+                          return (
+                            <button
+                              key={value}
+                              type="button"
+                              disabled={!offered}
+                              onClick={() => setSelected((current) => selectionForOption(product, current, option.name, value))}
+                              className="px-base py-xs rounded-full text-sm font-medium border inline-flex items-center gap-2 disabled:opacity-40"
+                              style={{
+                                background: active ? 'hsl(var(--primary))' : 'hsl(var(--background))',
+                                color: active ? 'hsl(var(--primary-foreground))' : 'hsl(var(--foreground))',
+                                borderColor: active ? 'hsl(var(--primary))' : 'hsl(var(--border))',
+                              }}
+                            >
+                              {dot ? (
+                                <span
+                                  className="w-3.5 h-3.5 rounded-full border"
+                                  style={{ background: dot, borderColor: active ? 'hsl(var(--primary-foreground))' : 'hsl(var(--border))' }}
+                                />
+                              ) : null}
+                              {value}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  ))}
+                </>
+              );
+            })()}
 
             <div className="flex items-center gap-3 mb-base">
               <div className="flex items-center rounded-full overflow-hidden border" style={{ borderColor: 'hsl(var(--border))' }}>

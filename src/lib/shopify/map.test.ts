@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { ageCode, ageLabel, ageRangeLabel, applyCartDiscounts, expandProductsByAge, htmlToText, mapProduct, mapShopRules, matchingVariant, productMatchesFilters, toMinorUnits } from './map';
+import { ageCode, ageLabel, ageRangeLabel, applyCartDiscounts, expandProductsByAge, hasSelectableSizeOption, htmlToText, mapProduct, mapShopRules, matchingVariant, productMatchesFilters, productSizeLabels, toMinorUnits } from './map';
 
 describe('shopify product mapping', () => {
   it('keeps photos and video on the same product', () => {
@@ -257,5 +257,49 @@ describe('shopify product mapping', () => {
     expect(productMatchesFilters(bunny, '0-3M', 'Romper')).toBe(true);
     expect(productMatchesFilters(bunny, '18-24M', 'Romper')).toBe(true);
     expect(productMatchesFilters(bunny, '0-3M', 'Sets')).toBe(false);
+    expect(hasSelectableSizeOption(bunny)).toBe(false);
+    expect(productSizeLabels(bunny)).toEqual([
+      '0–3 Months',
+      '3–6 Months',
+      '6–12 Months',
+      '12–18 Months',
+      '18–24 Months',
+      '24–30 Months',
+      '30–36 Months',
+    ]);
+  });
+
+  it('shows Size option values as available sizes when variants use Size', () => {
+    const product = mapProduct({
+      id: 'gid://shopify/Product/sized',
+      handle: 'sized',
+      title: 'Sized',
+      description: '',
+      productType: 'Romper',
+      tags: [],
+      availableForSale: true,
+      options: [{ name: 'Size', values: ['6-12 months', '12-18 months'] }],
+      variants: {
+        nodes: [
+          {
+            id: 'gid://shopify/ProductVariant/s1',
+            title: '6-12 months',
+            availableForSale: true,
+            price: { amount: '999.00', currencyCode: 'INR' },
+            selectedOptions: [{ name: 'Size', value: '6-12 months' }],
+          },
+          {
+            id: 'gid://shopify/ProductVariant/s2',
+            title: '12-18 months',
+            availableForSale: true,
+            price: { amount: '999.00', currencyCode: 'INR' },
+            selectedOptions: [{ name: 'Size', value: '12-18 months' }],
+          },
+        ],
+      },
+    });
+
+    expect(hasSelectableSizeOption(product)).toBe(true);
+    expect(productSizeLabels(product)).toEqual(['6-12 months', '12-18 months']);
   });
 });

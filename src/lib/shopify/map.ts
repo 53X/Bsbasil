@@ -107,6 +107,39 @@ export function ageRangeLabel(codes: string[]): string {
   return `${start} – ${ageLabel(ordered[ordered.length - 1])}`;
 }
 
+/** Human-readable sizes from Shopify Size options or Category Size metafield ages. */
+export function productSizeLabels(product: {
+  options: { name: string; values: string[] }[];
+  ageRanges: string[];
+}): string[] {
+  const sizeOption = product.options.find(
+    (option) => /size|age/i.test(option.name) && !/^title$/i.test(option.name),
+  );
+  const optionValues = (sizeOption?.values ?? []).filter(
+    (value) => value && !/^default\s*title$/i.test(value),
+  );
+  if (optionValues.length > 0) return optionValues;
+  return product.ageRanges.map((code) => ageLabel(code)).filter(Boolean);
+}
+
+/** True when Size/Age is a real purchasable variant option (not Title / Default Title). */
+export function hasSelectableSizeOption(product: {
+  options: { name: string; values: string[] }[];
+  variants: { selectedOptions: { name: string; value: string }[] }[];
+}): boolean {
+  const sizeOption = product.options.find(
+    (option) => /size|age/i.test(option.name) && !/^title$/i.test(option.name),
+  );
+  if (!sizeOption) return false;
+  const values = sizeOption.values.filter((value) => value && !/^default\s*title$/i.test(value));
+  if (values.length === 0) return false;
+  return product.variants.some((variant) =>
+    variant.selectedOptions.some(
+      (entry) => entry.name === sizeOption.name && values.includes(entry.value),
+    ),
+  );
+}
+
 /** Catalog filters: All Ages / All Categories mean no filter on that axis. */
 export function productMatchesFilters(
   product: { category: string; ageRanges: string[] },
