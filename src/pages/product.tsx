@@ -4,9 +4,26 @@ import { Helmet } from '@dr.pogodin/react-helmet';
 import { ShoppingBag } from 'lucide-react';
 import ShareButtons from '@/components/ShareButtons';
 import { useCart } from '@/contexts/use-cart';
-import { matchingVariant } from '@/lib/shopify/map';
+import { matchingVariant, selectionForOption } from '@/lib/shopify/map';
 import PriceTag from '@/components/PriceTag';
 import type { StoreMedia, StoreProduct, StoreCatalog } from '@/lib/shopify/types';
+
+const COLOR_DOTS: Record<string, string> = {
+  pink: '#e7a0b4',
+  'mint green': '#9ec9ae',
+  green: '#6a9a3a',
+  yellow: '#e6c15a',
+  navy: '#1e3a5f',
+  beige: '#e6d3b3',
+  white: '#f4f4f4',
+  black: '#222222',
+  red: '#c4473a',
+  blue: '#3d6ea8',
+};
+
+function isColorOption(name: string): boolean {
+  return /colou?r/i.test(name);
+}
 
 const SIZE_GUIDE = [
   ['Newborn', 'Up to 3.5 kg'],
@@ -81,6 +98,18 @@ export default function ProductPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [product?.id]);
 
+  const variant = product ? matchingVariant(product, selected) ?? product.variants[0] : undefined;
+  const gallery = useMemo(() => {
+    if (!product) return [];
+    if (!variant?.image) return product.media;
+    const rest = product.media.filter((item) => item.url !== variant.image);
+    return [{ kind: 'image' as const, url: variant.image, alt: product.name }, ...rest];
+  }, [product, variant]);
+
+  useEffect(() => {
+    setMediaIndex(0);
+  }, [variant?.id]);
+
   if (!product) {
     return (
       <main className="max-w-content mx-auto px-4 py-xxl text-center">
@@ -88,13 +117,12 @@ export default function ProductPage() {
         <p className="mb-lg" style={{ color: 'hsl(var(--muted-foreground))' }}>
           {catalog.error || 'This product is not on the shop right now.'}
         </p>
-        <Link to="/catalog" className="font-semibold" style={{ color: 'hsl(var(--primary))' }}>Back to the shop</Link>
+        <Link to="/catalog" className="font-semibold" style={{ color: 'hsl(var(--brand-ink))' }}>Back to the shop</Link>
       </main>
     );
   }
 
-  const variant = matchingVariant(product, selected) ?? product.variants[0];
-  const media = product.media[mediaIndex] ?? product.media[0];
+  const media = gallery[mediaIndex] ?? gallery[0];
   const price = variant?.price ?? product.price;
   const compareAt = variant?.compareAtPrice ?? product.compareAtPrice;
   const discountTitle = variant?.discountTitle ?? product.discountTitle;
@@ -137,7 +165,7 @@ export default function ProductPage() {
       </Helmet>
       <main className="max-w-content mx-auto px-4 py-xl pb-28 md:pb-xl">
         <p className="text-sm mb-base" style={{ color: 'hsl(var(--muted-foreground))' }}>
-          <Link to="/catalog" style={{ color: 'hsl(var(--primary))' }}>Shop</Link>
+          <Link to="/catalog" style={{ color: 'hsl(var(--brand-ink))' }}>Shop</Link>
           {product.category ? ` / ${product.category}` : ''}
         </p>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-xl">
@@ -145,9 +173,9 @@ export default function ProductPage() {
             <div className="aspect-square rounded-2xl overflow-hidden border" style={{ borderColor: 'hsl(var(--border))' }}>
               {media ? <MediaFrame item={media} /> : <div className="w-full h-full" style={{ background: 'hsl(var(--muted))' }} />}
             </div>
-            {product.media.length > 1 ? (
+            {gallery.length > 1 ? (
               <div className="flex gap-2 mt-sm overflow-x-auto">
-                {product.media.map((item, index) => (
+                {gallery.map((item, index) => (
                   <button
                     key={`${item.kind}-${item.url ?? item.embedUrl}-${index}`}
                     type="button"
@@ -165,7 +193,7 @@ export default function ProductPage() {
 
           <div>
             {product.badge ? (
-              <p className="text-xs font-bold uppercase tracking-wide mb-xs" style={{ color: 'hsl(var(--primary))' }}>{product.badge}</p>
+              <p className="text-xs font-bold uppercase tracking-wide mb-xs" style={{ color: 'hsl(var(--brand-ink))' }}>{product.badge}</p>
             ) : null}
             <h1 className="text-3xl md:text-4xl font-bold mb-sm" style={{ color: 'hsl(var(--foreground))' }}>{product.name}</h1>
             <p className="mb-xs">
@@ -202,18 +230,29 @@ export default function ProductPage() {
                 <div className="flex flex-wrap gap-2">
                   {option.values.map((value) => {
                     const active = selected[option.name] === value;
+                    const offered = product.variants.some((item) =>
+                      item.selectedOptions.some((entry) => entry.name === option.name && entry.value === value),
+                    );
+                    const dot = isColorOption(option.name) ? COLOR_DOTS[value.trim().toLowerCase()] : undefined;
                     return (
                       <button
                         key={value}
                         type="button"
-                        onClick={() => setSelected((current) => ({ ...current, [option.name]: value }))}
-                        className="px-base py-xs rounded-full text-sm font-medium border"
+                        disabled={!offered}
+                        onClick={() => setSelected((current) => selectionForOption(product, current, option.name, value))}
+                        className="px-base py-xs rounded-full text-sm font-medium border inline-flex items-center gap-2 disabled:opacity-40"
                         style={{
                           background: active ? 'hsl(var(--primary))' : 'hsl(var(--background))',
                           color: active ? 'hsl(var(--primary-foreground))' : 'hsl(var(--foreground))',
                           borderColor: active ? 'hsl(var(--primary))' : 'hsl(var(--border))',
                         }}
                       >
+                        {dot ? (
+                          <span
+                            className="w-3.5 h-3.5 rounded-full border"
+                            style={{ background: dot, borderColor: active ? 'hsl(var(--primary-foreground))' : 'hsl(var(--border))' }}
+                          />
+                        ) : null}
                         {value}
                       </button>
                     );
@@ -243,7 +282,7 @@ export default function ProductPage() {
                 onClick={onBuyNow}
                 disabled={adding || buying || soldOut}
                 className="px-xl py-sm rounded-full font-semibold border disabled:opacity-60"
-                style={{ borderColor: 'hsl(var(--primary))', color: 'hsl(var(--primary))' }}
+                style={{ borderColor: 'hsl(var(--primary))', color: 'hsl(var(--brand-ink))' }}
               >
                 {buying ? 'Opening checkout' : 'Buy now'}
               </button>

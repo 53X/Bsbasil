@@ -102,7 +102,7 @@ export default function AboutPage() {
               <motion.p
                 variants={fadeUp}
                 className="text-sm font-semibold tracking-wide mb-sm"
-                style={{ color: 'hsl(var(--primary))' }}
+                style={{ color: 'hsl(var(--brand-ink))' }}
               >
                 Our Story
               </motion.p>
@@ -112,7 +112,7 @@ export default function AboutPage() {
                 style={{ color: 'hsl(var(--foreground))' }}
               >
                 Made with Love,<br />
-                <span style={{ color: 'hsl(var(--primary))' }}>Worn with Joy</span>
+                <span style={{ color: 'hsl(var(--brand-ink))' }}>Worn with Joy</span>
               </motion.h1>
               <motion.p
                 variants={fadeUp}
@@ -199,7 +199,7 @@ export default function AboutPage() {
               className="text-center"
             >
               <motion.div variants={fadeUp} className="mb-sm">
-                <ShieldCheck size={48} style={{ color: 'hsl(var(--primary))', margin: '0 auto' }} />
+                <ShieldCheck size={48} style={{ color: 'hsl(var(--brand-ink))', margin: '0 auto' }} />
               </motion.div>
               <motion.h2
                 variants={fadeUp}
@@ -236,7 +236,7 @@ export default function AboutPage() {
                         color: 'hsl(var(--foreground))',
                       }}
                     >
-                      <Icon size={18} style={{ color: 'hsl(var(--primary))' }} />
+                      <Icon size={18} style={{ color: 'hsl(var(--brand-ink))' }} />
                       <span>{b.label}</span>
                     </motion.div>
                   );
@@ -268,7 +268,7 @@ export default function AboutPage() {
                 />
               </motion.div>
               <motion.div variants={fadeUp} className="text-center md:text-left">
-                <p className="text-sm font-semibold mb-sm" style={{ color: 'hsl(var(--primary))' }}>
+                <p className="text-sm font-semibold mb-sm" style={{ color: 'hsl(var(--brand-ink))' }}>
                   A note from our founder
                 </p>
                 <blockquote
@@ -316,7 +316,7 @@ export default function AboutPage() {
                 className="inline-block px-xl py-base rounded-full font-bold text-base transition-transform hover:scale-105"
                 style={{
                   background: 'hsl(var(--background))',
-                  color: 'hsl(var(--primary))',
+                  color: 'hsl(var(--brand-ink))',
                 }}
               >
                 Shop Now

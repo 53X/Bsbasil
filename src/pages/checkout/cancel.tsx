@@ -77,7 +77,7 @@ export default function CheckoutCancel() {
 
           <p className="mt-6 text-sm" style={{ color: 'hsl(var(--muted-foreground))' }}>
             {t('stripe.need_help_text')}{' '}
-            <Link to="/contact" className="hover:underline" style={{ color: 'hsl(var(--primary))' }}>
+            <Link to="/contact" className="hover:underline" style={{ color: 'hsl(var(--brand-ink))' }}>
               {t('stripe.contact_support_link')}
             </Link>
           </p>

@@ -202,7 +202,7 @@ export default function CheckoutSuccess() {
           <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6" style={{ background: 'hsl(var(--primary) / 0.12)' }}>
             <svg
               className="w-8 h-8"
-              style={{ color: 'hsl(var(--primary))' }}
+              style={{ color: 'hsl(var(--brand-ink))' }}
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -233,7 +233,7 @@ export default function CheckoutSuccess() {
               )}
               <p className="text-sm" style={{ color: 'hsl(var(--muted-foreground))' }}>
                 <span className="font-medium" style={{ color: 'hsl(var(--foreground))' }}>{t('stripe.detail_status_label')}:</span>{' '}
-                <span className="font-medium" style={{ color: 'hsl(var(--primary))' }}>{t('stripe.detail_status_verified')}</span>
+                <span className="font-medium" style={{ color: 'hsl(var(--brand-ink))' }}>{t('stripe.detail_status_verified')}</span>
               </p>
             </div>
           )}

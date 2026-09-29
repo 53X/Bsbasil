@@ -6,26 +6,47 @@ import { SlidersHorizontal, X } from 'lucide-react';
 import ProductCard from '@/components/ProductCard';
 import type { StoreCatalog } from '@/lib/shopify/types';
 
-const AGE_FILTERS = ['All Ages', '0-6M', '6-12M', '12-18M', '18-24M', '24-36M'] as const;
-const CATEGORY_FILTERS = ['All', 'Onesies', 'Rompers', 'Sleepwear', 'Sets', 'Dresses', 'Outerwear', 'Bottoms'] as const;
+const AGE_FILTERS = [
+  { value: 'All Ages', label: 'All Ages' },
+  { value: '0-3M', label: '0–3 Months' },
+  { value: '3-6M', label: '3–6 Months' },
+  { value: '6-12M', label: '6–12 Months' },
+  { value: '12-18M', label: '12–18 Months' },
+  { value: '18-24M', label: '18–24 Months' },
+  { value: '24-36M', label: '24–36 Months' },
+] as const;
+const CATEGORY_FILTERS = ['All', 'Romper', 'Sleepwear', 'Sets', 'Winter wear', 'Accessories'] as const;
 
 export default function CatalogPage() {
   const store = useLoaderData() as StoreCatalog;
-  const [params] = useSearchParams();
+  const [params, setSearchParams] = useSearchParams();
   const ageFromUrl = params.get('age');
-  const [selectedAge, setSelectedAge] = useState<string>(ageFromUrl && AGE_FILTERS.includes(ageFromUrl as typeof AGE_FILTERS[number]) ? ageFromUrl : 'All Ages');
-  const [selectedCategory, setSelectedCategory] = useState<string>('All');
+  const categoryFromUrl = params.get('category');
+  const selectedAge = ageFromUrl && AGE_FILTERS.some((age) => age.value === ageFromUrl) ? ageFromUrl : 'All Ages';
+  const selectedCategory = categoryFromUrl && CATEGORY_FILTERS.includes(categoryFromUrl as typeof CATEGORY_FILTERS[number])
+    ? categoryFromUrl
+    : 'All';
   const [showFilters, setShowFilters] = useState(false);
   const products = store.products;
 
+  const setFilters = (age: string, category: string) => {
+    const next = new URLSearchParams();
+    if (age !== 'All Ages') next.set('age', age);
+    if (category !== 'All') next.set('category', category);
+    setSearchParams(next, { replace: true });
+  };
+
+  const clearFilters = () => setFilters('All Ages', 'All');
+
   const hasActiveFilters = selectedAge !== 'All Ages' || selectedCategory !== 'All';
 
-  // Compute visible count for display (does not filter the rendered list)
-  const visibleCount = products.filter((p) => {
-    const ageMatch = selectedAge === 'All Ages' || p.ageRange === selectedAge;
+  // Products must match every active filter (age AND category).
+  const filteredProducts = products.filter((p) => {
+    const ageMatch = selectedAge === 'All Ages' || p.ageRanges.includes(selectedAge);
     const catMatch = selectedCategory === 'All' || p.category === selectedCategory;
     return ageMatch && catMatch;
-  }).length;
+  });
+  const visibleCount = filteredProducts.length;
 
   return (
     <>
@@ -137,9 +158,9 @@ export default function CatalogPage() {
               </button>
               {hasActiveFilters && (
                 <button
-                  onClick={() => { setSelectedAge('All Ages'); setSelectedCategory('All'); }}
+                  onClick={clearFilters}
                   className="flex items-center gap-1 text-sm"
-                  style={{ color: 'hsl(var(--primary))' }}>
+                  style={{ color: 'hsl(var(--brand-ink))' }}>
                   <X size={14} />
                   Clear
                 </button>
@@ -155,15 +176,15 @@ export default function CatalogPage() {
                 <div className="flex flex-wrap gap-2">
                   {AGE_FILTERS.map((age) => (
                     <button
-                      key={age}
-                      onClick={() => setSelectedAge(age)}
+                      key={age.value}
+                      onClick={() => setFilters(age.value, selectedCategory)}
                       className="px-base py-xs rounded-full text-sm font-medium border transition-all"
                       style={{
-                        background: selectedAge === age ? 'hsl(var(--primary))' : 'hsl(var(--background))',
-                        color: selectedAge === age ? 'hsl(var(--primary-foreground))' : 'hsl(var(--foreground))',
-                        borderColor: selectedAge === age ? 'hsl(var(--primary))' : 'hsl(var(--border))'
+                        background: selectedAge === age.value ? 'hsl(var(--primary))' : 'hsl(var(--background))',
+                        color: selectedAge === age.value ? 'hsl(var(--primary-foreground))' : 'hsl(var(--foreground))',
+                        borderColor: selectedAge === age.value ? 'hsl(var(--primary))' : 'hsl(var(--border))'
                       }}>
-                      {age}
+                      {age.label}
                     </button>
                   ))}
                 </div>
@@ -178,7 +199,7 @@ export default function CatalogPage() {
                   {CATEGORY_FILTERS.map((cat) => (
                     <button
                       key={cat}
-                      onClick={() => setSelectedCategory(cat)}
+                      onClick={() => setFilters(selectedAge, cat)}
                       className="px-base py-xs rounded-full text-sm font-medium border transition-all"
                       style={{
                         background: selectedCategory === cat ? 'hsl(var(--accent))' : 'hsl(var(--background))',
@@ -208,9 +229,9 @@ export default function CatalogPage() {
               </p>
               {hasActiveFilters &&
               <button
-                onClick={() => {setSelectedAge('All Ages');setSelectedCategory('All');}}
+                onClick={clearFilters}
                 className="hidden md:flex items-center gap-1 text-sm font-medium"
-                style={{ color: 'hsl(var(--primary))' }}>
+                style={{ color: 'hsl(var(--brand-ink))' }}>
                 
                   <X size={14} />
                   Clear filters
@@ -252,7 +273,7 @@ export default function CatalogPage() {
                   Try a different age range or category.
                 </p>
                 <button
-                onClick={() => {setSelectedAge('All Ages');setSelectedCategory('All');}}
+                onClick={clearFilters}
                 className="px-xl py-sm rounded-full font-semibold text-sm"
                 style={{ background: 'hsl(var(--primary))', color: 'hsl(var(--primary-foreground))' }}>
                 
@@ -261,23 +282,21 @@ export default function CatalogPage() {
               </div>
             }
 
-            {/* Grid — all products rendered; CSS controls visibility */}
+            {/* Grid — only products matching every active filter */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-base">
-              {products.map((product, i) => {
-                const ageMatch = selectedAge === 'All Ages' || product.ageRange === selectedAge;
-                const catMatch = selectedCategory === 'All' || product.category === selectedCategory;
-                if (!ageMatch || !catMatch) return null;
-                return (
+              {filteredProducts.map((product, i) => (
                   <motion.div
                     key={product.id}
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ duration: 0.3, delay: Math.min(i, 8) * 0.04, ease: 'easeOut' as const }}
                   >
-                    <ProductCard product={product} />
+                    <ProductCard
+                      product={product}
+                      ageHighlight={selectedAge !== 'All Ages' ? selectedAge : undefined}
+                    />
                   </motion.div>
-                );
-              })}
+              ))}
             </div>
           </div>
         </section>

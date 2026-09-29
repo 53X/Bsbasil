@@ -49,6 +49,7 @@ export interface StoreProduct {
   description: string;
   category: string;
   ageRange: string;
+  ageRanges: string[];
   badge: string;
   featured: boolean;
   price: number;

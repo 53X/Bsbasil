@@ -7,23 +7,24 @@
 @layer base {
   :root {
     /* Core Colors */
-    --background: 22 100% 98%;
+    --background: 147 45% 97%;
     --error-bg: 0 84% 97%;
     --error-border: 0 72% 85%;
     --error-text: 0 72% 40%;
-    --foreground: 0 0% 4%;
-    --card: 23 100% 97%;
-    --card-foreground: 0 0% 4%;
-    --popover: 22 100% 98%;
-    --popover-foreground: 0 0% 4%;
-    --primary: 16 77% 60%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 27 87% 67%;
-    --secondary-foreground: 0 0% 100%;
-    --muted: 21 100% 95%;
-    --muted-foreground: 18 21% 39%;
-    --accent: 18 70% 51%;
-    --accent-foreground: 0 0% 100%;
+    --foreground: 151 30% 14%;
+    --card: 147 40% 96%;
+    --card-foreground: 151 30% 14%;
+    --popover: 147 45% 97%;
+    --popover-foreground: 151 30% 14%;
+    --primary: 147.13 56.65% 60.2%; /* #60D394 */
+    --primary-foreground: 151 45% 14%;
+    --brand-ink: 151 72% 24%;
+    --secondary: 147 42% 40%;
+    --secondary-foreground: 147 40% 97%;
+    --muted: 147 30% 93%;
+    --muted-foreground: 151 16% 32%;
+    --accent: 147.13 56.65% 60.2%;
+    --accent-foreground: 151 45% 14%;
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
     --success: 160 84% 39%;
@@ -32,9 +33,9 @@
     --warning-foreground: 0 0% 100%;
     --info: 217 91% 60%;
     --info-foreground: 0 0% 100%;
-    --border: 20 71% 87%;
-    --input: 20 71% 87%;
-    --ring: 16 77% 60%;
+    --border: 147 28% 84%;
+    --input: 147 28% 84%;
+    --ring: 147.13 56.65% 60.2%;
 
     /* Social brand colours */
     --social-whatsapp: 142 70% 49%;
@@ -43,21 +44,21 @@
     --social-fg: 0 0% 100%;
 
     /* Extended Colors */
-    --chart-1: 15 76% 90%;
-    --chart-2: 16 78% 75%;
-    --chart-3: 16 77% 60%;
-    --chart-4: 16 77% 45%;
-    --chart-5: 16 78% 30%;
+    --chart-1: 147 45% 88%;
+    --chart-2: 147 48% 72%;
+    --chart-3: 147.13 56.65% 60.2%;
+    --chart-4: 147 42% 40%;
+    --chart-5: 151 40% 28%;
 
     /* Sidebar Colors */
-    --sidebar: 21 100% 95%;
-    --sidebar-foreground: 0 0% 4%;
-    --sidebar-primary: 16 77% 60%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 18 70% 51%;
-    --sidebar-accent-foreground: 0 0% 100%;
-    --sidebar-border: 20 71% 87%;
-    --sidebar-ring: 16 77% 60%;
+    --sidebar: 147 30% 93%;
+    --sidebar-foreground: 151 30% 14%;
+    --sidebar-primary: 147.13 56.65% 60.2%;
+    --sidebar-primary-foreground: 151 45% 14%;
+    --sidebar-accent: 147.13 56.65% 60.2%;
+    --sidebar-accent-foreground: 151 45% 14%;
+    --sidebar-border: 147 28% 84%;
+    --sidebar-ring: 147.13 56.65% 60.2%;
 
     /* Typography */
     --font-sans: "Nunito", -apple-system, BlinkMacSystemFont, sans-serif;
@@ -165,7 +166,7 @@
     margin-bottom: 1.25rem;
   }
   .rich-text a {
-    color: hsl(var(--primary));
+    color: hsl(var(--brand-ink));
     text-decoration: underline;
   }
   .rich-text ul,

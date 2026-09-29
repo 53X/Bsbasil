@@ -2,8 +2,8 @@ import { Link } from 'react-router';
 import { useState } from 'react';
 import { ShoppingBag } from 'lucide-react';
 import PriceTag from '@/components/PriceTag';
-import ShareButtons from '@/components/ShareButtons';
 import { useCart } from '@/contexts/use-cart';
+import { ageLabel } from '@/lib/shopify/map';
 import type { StoreProduct } from '@/lib/shopify/types';
 
 const BADGE_COLORS: Record<string, { bg: string; text: string }> = {
@@ -12,13 +12,21 @@ const BADGE_COLORS: Record<string, { bg: string; text: string }> = {
   'Gift Pick': { bg: 'hsl(var(--secondary))', text: 'hsl(var(--secondary-foreground))' },
 };
 
-export default function ProductCard({ product }: { product: StoreProduct }) {
+export default function ProductCard({
+  product,
+  ageHighlight,
+}: {
+  product: StoreProduct;
+  ageHighlight?: string;
+}) {
   const { addVariant } = useCart();
   const [message, setMessage] = useState<string | null>(null);
   const [adding, setAdding] = useState(false);
   const purchasable = product.variants.filter((variant) => variant.available);
   const directVariant = purchasable.length === 1 ? purchasable[0] : null;
   const href = `/products/${product.handle}`;
+  const badgeAge =
+    ageHighlight && product.ageRanges.includes(ageHighlight) ? ageHighlight : product.ageRange;
 
   const onAdd = async () => {
     if (!directVariant) return;
@@ -59,12 +67,12 @@ export default function ProductCard({ product }: { product: StoreProduct }) {
             {product.badge}
           </span>
         ) : null}
-        {product.ageRange ? (
+        {badgeAge ? (
           <span
             className="absolute top-3 right-3 px-2 py-1 rounded-full text-xs font-semibold"
             style={{ background: 'hsl(var(--background))', color: 'hsl(var(--foreground))' }}
           >
-            {product.ageRange}
+            {ageLabel(badgeAge)}
           </span>
         ) : null}
         {product.media.some((item) => item.kind !== 'image') ? (
@@ -78,7 +86,7 @@ export default function ProductCard({ product }: { product: StoreProduct }) {
       </div>
 
       <div className="p-base flex flex-col flex-1 gap-xs pointer-events-none">
-        <p className="text-xs font-semibold uppercase tracking-wide" style={{ color: 'hsl(var(--primary))' }}>
+        <p className="text-xs font-semibold uppercase tracking-wide" style={{ color: 'hsl(var(--brand-ink))' }}>
           {product.category}
         </p>
         <p className="text-base font-bold leading-snug" style={{ color: 'hsl(var(--foreground))' }}>
@@ -93,7 +101,6 @@ export default function ProductCard({ product }: { product: StoreProduct }) {
             priceClassName="text-lg font-bold"
           />
           <div className="relative z-[2] flex items-center gap-2 pointer-events-auto">
-            <ShareButtons productName={product.name} productPrice={product.priceLabel} url={`https://bsbasil.com/products/${product.handle}`} />
             {directVariant ? (
               <button
                 type="button"
@@ -112,7 +119,7 @@ export default function ProductCard({ product }: { product: StoreProduct }) {
                 style={{ background: 'hsl(var(--primary))', color: 'hsl(var(--primary-foreground))' }}
               >
                 <ShoppingBag size={14} />
-                {product.available ? 'Choose' : 'Sold out'}
+                {product.available ? 'Add' : 'Sold out'}
               </Link>
             )}
           </div>

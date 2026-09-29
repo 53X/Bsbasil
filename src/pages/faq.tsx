@@ -71,7 +71,7 @@ export default function FAQPage() {
           >
             <span
               className="inline-block text-sm font-semibold px-4 py-1.5 rounded-full mb-4"
-              style={{ background: 'hsl(var(--primary) / 0.12)', color: 'hsl(var(--primary))' }}
+              style={{ background: 'hsl(var(--primary) / 0.12)', color: 'hsl(var(--brand-ink))' }}
             >
               Help Centre
             </span>

@@ -41,7 +41,7 @@ export default function Header() {
                 style={{
                   color:
                     location.pathname === item.href
-                      ? 'hsl(var(--primary))'
+                      ? 'hsl(var(--brand-ink))'
                       : 'hsl(var(--muted-foreground))',
                 }}
               >
@@ -107,7 +107,7 @@ export default function Header() {
                   style={{
                     color:
                       location.pathname === item.href
-                        ? 'hsl(var(--primary))'
+                        ? 'hsl(var(--brand-ink))'
                         : 'hsl(var(--muted-foreground))',
                     background:
                       location.pathname === item.href ? 'hsl(var(--muted))' : 'transparent',

@@ -16,7 +16,7 @@ export default function DemoContent() {
           </p>
           <button 
             className="px-8 py-3 bg-white font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all hover:scale-105"
-            style={{ color: `hsl(var(--primary))` }}
+            style={{ color: `hsl(var(--brand-ink))` }}
           >
             Get Started
           </button>

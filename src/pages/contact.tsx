@@ -95,7 +95,7 @@ export default function ContactPage() {
           <div className="max-w-content mx-auto px-4">
             <p
               className="text-sm font-semibold mb-sm tracking-wide uppercase"
-              style={{ color: 'hsl(var(--primary))' }}
+              style={{ color: 'hsl(var(--brand-ink))' }}
             >
               {contact.hero.eyebrow}
             </p>
@@ -131,14 +131,14 @@ export default function ContactPage() {
                       className="w-11 h-11 rounded-2xl flex items-center justify-center shrink-0"
                       style={{ background: 'hsl(var(--primary) / 0.12)' }}
                     >
-                      <Mail size={20} style={{ color: 'hsl(var(--primary))' }} />
+                      <Mail size={20} style={{ color: 'hsl(var(--brand-ink))' }} />
                     </div>
                     <div>
                       <p className="text-sm font-semibold mb-1" style={{ color: 'hsl(var(--foreground))' }}>Email</p>
                       <a
                         href={`mailto:${contact.details.email}`}
                         className="text-sm transition-colors hover:underline"
-                        style={{ color: 'hsl(var(--primary))' }}
+                        style={{ color: 'hsl(var(--brand-ink))' }}
                       >
                         {contact.details.email}
                       </a>
@@ -151,14 +151,14 @@ export default function ContactPage() {
                       className="w-11 h-11 rounded-2xl flex items-center justify-center shrink-0"
                       style={{ background: 'hsl(var(--primary) / 0.12)' }}
                     >
-                      <Phone size={20} style={{ color: 'hsl(var(--primary))' }} />
+                      <Phone size={20} style={{ color: 'hsl(var(--brand-ink))' }} />
                     </div>
                     <div>
                       <p className="text-sm font-semibold mb-1" style={{ color: 'hsl(var(--foreground))' }}>Phone / WhatsApp</p>
                       <a
                         href={contact.details.phoneHref}
                         className="text-sm transition-colors hover:underline"
-                        style={{ color: 'hsl(var(--primary))' }}
+                        style={{ color: 'hsl(var(--brand-ink))' }}
                       >
                         {contact.details.phone}
                       </a>
@@ -171,7 +171,7 @@ export default function ContactPage() {
                       className="w-11 h-11 rounded-2xl flex items-center justify-center shrink-0"
                       style={{ background: 'hsl(var(--primary) / 0.12)' }}
                     >
-                      <MapPin size={20} style={{ color: 'hsl(var(--primary))' }} />
+                      <MapPin size={20} style={{ color: 'hsl(var(--brand-ink))' }} />
                     </div>
                     <div>
                       <p className="text-sm font-semibold mb-1" style={{ color: 'hsl(var(--foreground))' }}>Location</p>
@@ -185,7 +185,7 @@ export default function ContactPage() {
                       className="w-11 h-11 rounded-2xl flex items-center justify-center shrink-0"
                       style={{ background: 'hsl(var(--primary) / 0.12)' }}
                     >
-                      <Clock size={20} style={{ color: 'hsl(var(--primary))' }} />
+                      <Clock size={20} style={{ color: 'hsl(var(--brand-ink))' }} />
                     </div>
                     <div>
                       <p className="text-sm font-semibold mb-1" style={{ color: 'hsl(var(--foreground))' }}>Response time</p>
@@ -206,7 +206,7 @@ export default function ContactPage() {
                     border: '1px solid hsl(var(--primary) / 0.2)',
                   }}
                 >
-                  <p className="text-sm font-semibold mb-1" style={{ color: 'hsl(var(--primary))' }}>
+                  <p className="text-sm font-semibold mb-1" style={{ color: 'hsl(var(--brand-ink))' }}>
                     {contact.trust.label}
                   </p>
                   <p className="text-sm" style={{ color: 'hsl(var(--muted-foreground))' }}>
@@ -227,7 +227,7 @@ export default function ContactPage() {
                         className="w-16 h-16 rounded-full flex items-center justify-center"
                         style={{ background: 'hsl(var(--primary) / 0.12)' }}
                       >
-                        <CheckCircle size={32} style={{ color: 'hsl(var(--primary))' }} />
+                        <CheckCircle size={32} style={{ color: 'hsl(var(--brand-ink))' }} />
                       </div>
                       <h3 className="text-2xl font-bold" style={{ color: 'hsl(var(--foreground))' }}>
                         {contact.form.successHeading}
@@ -267,7 +267,7 @@ export default function ContactPage() {
                             className="text-sm font-semibold"
                             style={{ color: 'hsl(var(--foreground))' }}
                           >
-                            Your name <span style={{ color: 'hsl(var(--primary))' }}>*</span>
+                            Your name <span style={{ color: 'hsl(var(--brand-ink))' }}>*</span>
                           </label>
                           <input
                             id="name"
@@ -291,7 +291,7 @@ export default function ContactPage() {
                             className="text-sm font-semibold"
                             style={{ color: 'hsl(var(--foreground))' }}
                           >
-                            Email address <span style={{ color: 'hsl(var(--primary))' }}>*</span>
+                            Email address <span style={{ color: 'hsl(var(--brand-ink))' }}>*</span>
                           </label>
                           <input
                             id="email"
@@ -369,7 +369,7 @@ export default function ContactPage() {
                           className="text-sm font-semibold"
                           style={{ color: 'hsl(var(--foreground))' }}
                         >
-                          Message <span style={{ color: 'hsl(var(--primary))' }}>*</span>
+                          Message <span style={{ color: 'hsl(var(--brand-ink))' }}>*</span>
                         </label>
                         <textarea
                           id="message"

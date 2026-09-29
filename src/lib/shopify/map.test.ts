@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { applyCartDiscounts, htmlToText, mapProduct, mapShopRules, matchingVariant, toMinorUnits } from './map';
+import { ageCode, ageLabel, applyCartDiscounts, htmlToText, mapProduct, mapShopRules, matchingVariant, toMinorUnits } from './map';
 
 describe('shopify product mapping', () => {
   it('keeps photos and video on the same product', () => {
@@ -9,7 +9,7 @@ describe('shopify product mapping', () => {
       title: 'Sunshine Romper',
       description: 'Soft cotton romper.',
       productType: 'Rompers',
-      tags: ['featured', '0-6M', 'Bestseller'],
+      tags: ['featured', '0-3M', 'Bestseller'],
       availableForSale: true,
       options: [{ name: 'Size', values: ['0-6M', '6-12M'] }],
       media: {
@@ -52,7 +52,15 @@ describe('shopify product mapping', () => {
     expect(discounted[0]?.price).toBe(69900);
     expect(discounted[0]?.compareAtPrice).toBe(99900);
     expect(discounted[0]?.discountTitle).toBe('Festive offer');
-    expect(product.ageRange).toBe('0-6M');
+    expect(product.ageRange).toBe('0-3M');
+    expect(product.ageRanges).toEqual(['0-3M', '6-12M']);
+    expect(product.category).toBe('Romper');
+    expect(ageCode('0–3 Months')).toBe('0-3M');
+    expect(ageCode('2–3 Years')).toBe('24-36M');
+    expect(ageCode('0-6M')).toBeNull();
+    expect(ageLabel('0-3M')).toBe('0–3 Months');
+    expect(ageLabel('6-12M')).toBe('6–12 Months');
+    expect(ageLabel('24-36M')).toBe('24–36 Months');
     expect(product.featured).toBe(true);
     expect(product.media.map((item) => item.kind)).toEqual(['image', 'video']);
     expect(toMinorUnits('799.00')).toBe(79900);

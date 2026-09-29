@@ -34,7 +34,7 @@
       "name": "Sunshine Romper",
       "price": "₹699",
       "badge": "Bestseller",
-      "ageRange": "0-6M",
+      "ageRange": "0–3 Months",
       "image": "/airo-assets/images/products/baby-romper-1",
       "alt": "Sunshine Romper for newborns"
     },
@@ -43,7 +43,7 @@
       "name": "Cloud Soft Onesie",
       "price": "₹699",
       "badge": "New",
-      "ageRange": "0-6M",
+      "ageRange": "0–3 Months",
       "image": "/airo-assets/images/products/baby-onesie-1",
       "alt": "Cloud Soft Onesie for newborns"
     },
@@ -52,7 +52,7 @@
       "name": "Dreamy Sleepsuit",
       "price": "₹1299",
       "badge": "",
-      "ageRange": "6-12M",
+      "ageRange": "6–12 Months",
       "image": "/airo-assets/images/products/baby-sleepwear-1",
       "alt": "Dreamy Sleepsuit for babies"
     },
@@ -61,7 +61,7 @@
       "name": "Blossom Gift Set",
       "price": "₹899",
       "badge": "Gift Pick",
-      "ageRange": "0-6M",
+      "ageRange": "0–3 Months",
       "image": "/airo-assets/images/products/baby-set-1",
       "alt": "Blossom Gift Set for newborns"
     }
@@ -72,10 +72,16 @@
   },
   "ageGroups": [
     {
-      "id": "ag1",
-      "label": "0–6 Months",
-      "range": "0-6M",
+      "id": "ag0",
+      "label": "0–3 Months",
+      "range": "0-3M",
       "emoji": "🌱"
+    },
+    {
+      "id": "ag1",
+      "label": "3–6 Months",
+      "range": "3-6M",
+      "emoji": "🌿"
     },
     {
       "id": "ag2",
@@ -85,13 +91,19 @@
     },
     {
       "id": "ag3",
-      "label": "12–24 Months",
+      "label": "12–18 Months",
       "range": "12-18M",
       "emoji": "🌟"
     },
     {
       "id": "ag4",
-      "label": "2–3 Years",
+      "label": "18–24 Months",
+      "range": "18-24M",
+      "emoji": "🌙"
+    },
+    {
+      "id": "ag5",
+      "label": "24–36 Months",
       "range": "24-36M",
       "emoji": "🚀"
     }

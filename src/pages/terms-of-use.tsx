@@ -72,7 +72,7 @@ export default function TermsOfUsePage() {
             <Link
               to="/"
               className="text-sm font-medium transition-colors"
-              style={{ color: 'hsl(var(--primary))' }}
+              style={{ color: 'hsl(var(--brand-ink))' }}
             >
               ← Back to Home
             </Link>

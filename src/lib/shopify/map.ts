@@ -1,6 +1,13 @@
 import type { Money, ShopRules, StoreMedia, StoreProduct, StoreVariant } from "./types";
 
-const AGE_TAGS = ["0-6M", "6-12M", "12-18M", "18-24M", "24-36M"];
+const AGE_TAGS = ["0-3M", "3-6M", "6-12M", "12-18M", "18-24M", "24-36M"];
+const CATEGORY_MATCHERS: { label: string; pattern: RegExp }[] = [
+  { label: "Romper", pattern: /\brompers?\b/i },
+  { label: "Sleepwear", pattern: /\b(sleepwear|sleepsuits?|pyjamas?|pajamas?)\b/i },
+  { label: "Sets", pattern: /\bsets?\b/i },
+  { label: "Winter wear", pattern: /\b(winter\s*wear|winterwear|outerwear|jackets?|sweaters?)\b/i },
+  { label: "Accessories", pattern: /\b(accessorise|accessorize|accessories|accessory)\b/i },
+];
 const BADGES = ["Bestseller", "New", "Gift Pick"];
 
 export function formatMoney(amount: number, currency = "INR"): string {
@@ -56,6 +63,63 @@ function tagValue(tags: string[], prefix: string): string {
   return found ? found.slice(prefix.length).trim() : "";
 }
 
+function canonicalCategory(productType: string, tags: string[], title: string, collections: string[]): string {
+  const labeled = [tagValue(tags, "category:"), productType, ...collections];
+  for (const source of labeled) {
+    if (!source.trim()) continue;
+    const match = CATEGORY_MATCHERS.find((item) => item.pattern.test(source));
+    if (match) return match.label;
+  }
+  const fromTitle = CATEGORY_MATCHERS.find((item) => item.pattern.test(title));
+  return fromTitle?.label ?? "Shop";
+}
+
+/** Human-readable age label for UI (filters, badges, shop-by-age). */
+export function ageLabel(code: string): string {
+  switch (code) {
+    case "0-3M":
+      return "0–3 Months";
+    case "3-6M":
+      return "3–6 Months";
+    case "6-12M":
+      return "6–12 Months";
+    case "12-18M":
+      return "12–18 Months";
+    case "18-24M":
+      return "18–24 Months";
+    case "24-36M":
+      return "24–36 Months";
+    default:
+      return code;
+  }
+}
+
+/** Turn a Shopify age tag or size label into one of the shop's age filters. */
+export function ageCode(raw: string): string | null {
+  const value = raw.trim().toLowerCase().replace(/[–—]/g, "-").replace(/\s+/g, " ");
+  const compact = value.replace(/\s+/g, "");
+  if (["0-3m", "0-3months", "0-3", "0-3 months", "0 to 3 months", "newborn"].includes(value) || ["0-3m", "0-3months"].includes(compact)) return "0-3M";
+  if (["3-6m", "3-6months", "3-6", "3-6 months", "3 to 6 months"].includes(value) || ["3-6m", "3-6months"].includes(compact)) return "3-6M";
+  if (["6-12m", "6-12months", "6-12", "6-12 months", "6 to 12 months"].includes(value) || ["6-12m", "6-12months"].includes(compact)) return "6-12M";
+  if (["12-18m", "12-18months", "12-18", "12-18 months", "12 to 18 months"].includes(value) || ["12-18m", "12-18months"].includes(compact)) return "12-18M";
+  if (["18-24m", "18-24months", "18-24", "18-24 months", "18 to 24 months"].includes(value) || ["18-24m", "18-24months"].includes(compact)) return "18-24M";
+  if (["24-36m", "24-36months", "24-36", "24-36 months", "24 to 36 months", "2-3", "2-3 years", "2 to 3 years"].includes(value) || ["24-36m", "24-36months", "2-3years"].includes(compact)) return "24-36M";
+  return null;
+}
+
+function collectAges(tags: string[], options: { name: string; values: string[] }[]): string[] {
+  const found = new Set<string>();
+  const add = (value: string) => {
+    const code = ageCode(value.replace(/^age:/i, ""));
+    if (code) found.add(code);
+  };
+  tags.forEach(add);
+  options
+    .filter((option) => /size|age/i.test(option.name))
+    .forEach((option) => option.values.forEach(add));
+  return AGE_TAGS.filter((age) => found.has(age));
+}
+
 interface RawImage {
   url: string;
   altText?: string | null;
@@ -100,6 +164,7 @@ export interface RawProductNode {
   availableForSale: boolean;
   featuredImage?: RawImage | null;
   options?: { name: string; values: string[] }[];
+  collections?: { nodes: { title: string }[] };
   media?: { nodes: RawMediaNode[] };
   variants?: { nodes: RawVariantNode[] };
 }
@@ -193,8 +258,13 @@ export function mapProduct(node: RawProductNode): StoreProduct {
     .map((item) => mapMedia(item, node.title))
     .filter((item): item is StoreMedia => item !== null);
   const image = node.featuredImage?.url || media.find((item) => item.kind === "image")?.url || media[0]?.poster || "";
-  const ageRange = tagValue(tags, "age:") || AGE_TAGS.find((age) => tags.includes(age)) || "";
-  const category = node.productType?.trim() || tagValue(tags, "category:") || "Shop";
+  const ageRanges = collectAges(tags, node.options ?? []);
+  const category = canonicalCategory(
+    node.productType ?? "",
+    tags,
+    node.title,
+    (node.collections?.nodes ?? []).map((collection) => collection.title),
+  );
   const badge = BADGES.find((name) => tags.some((tag) => tag.toLowerCase() === name.toLowerCase())) ?? "";
   const description = node.description?.trim() || htmlToText(node.descriptionHtml ?? "");
 
@@ -204,7 +274,8 @@ export function mapProduct(node: RawProductNode): StoreProduct {
     name: node.title,
     description,
     category,
-    ageRange,
+    ageRange: ageRanges[0] ?? "",
+    ageRanges,
     badge,
     featured: tags.some((tag) => tag.toLowerCase() === "featured"),
     price,
@@ -225,4 +296,20 @@ export function matchingVariant(product: StoreProduct, selected: Record<string, 
   return product.variants.find((variant) =>
     variant.selectedOptions.every((option) => selected[option.name] === option.value),
   );
+}
+
+/** Keep a valid size and colour together when one of them changes. */
+export function selectionForOption(
+  product: StoreProduct,
+  selected: Record<string, string>,
+  name: string,
+  value: string,
+): Record<string, string> {
+  const next = { ...selected, [name]: value };
+  if (matchingVariant(product, next)) return next;
+  const fallback = product.variants.find((variant) =>
+    variant.selectedOptions.some((option) => option.name === name && option.value === value),
+  );
+  if (!fallback) return next;
+  return Object.fromEntries(fallback.selectedOptions.map((option) => [option.name, option.value]));
 }

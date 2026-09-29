@@ -25,7 +25,7 @@ export default function PriceTag({
         {formatMoney(price / 100, currency)}
       </span>
       {discount ? (
-        <span className="text-xs font-semibold" style={{ color: 'hsl(var(--primary))' }}>{discount}</span>
+        <span className="text-xs font-semibold" style={{ color: 'hsl(var(--brand-ink))' }}>{discount}</span>
       ) : null}
     </span>
   );

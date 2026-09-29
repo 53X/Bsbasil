@@ -128,7 +128,7 @@ export default function HomePage() {
               <motion.p
                 variants={fadeUp}
                 className="inline-block px-base py-xs rounded-full text-sm font-semibold mb-base"
-                style={{ background: 'hsl(var(--primary) / 0.12)', color: 'hsl(var(--primary))' }}>
+                style={{ background: 'hsl(var(--primary) / 0.12)', color: 'hsl(var(--brand-ink))' }}>
                 {home.hero.eyebrow}
               </motion.p>
 
@@ -242,7 +242,7 @@ export default function HomePage() {
               <Link
                 to="/catalog"
                 className="inline-flex items-center gap-2 px-xl py-base rounded-full font-bold text-base border transition-colors hover:bg-muted"
-                style={{ borderColor: 'hsl(var(--primary))', color: 'hsl(var(--primary))' }}>
+                style={{ borderColor: 'hsl(var(--primary))', color: 'hsl(var(--brand-ink))' }}>
                 View all products
                 <ArrowRight size={16} />
               </Link>
@@ -274,7 +274,7 @@ export default function HomePage() {
               whileInView="visible"
               viewport={{ once: true }}
               variants={stagger}
-              className="grid grid-cols-2 md:grid-cols-4 gap-base">
+              className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-base">
               {home.ageGroups.map((group) =>
               <motion.div key={group.id} variants={fadeUp}>
                   <Link
@@ -323,7 +323,7 @@ export default function HomePage() {
                     <div
                       className="w-12 h-12 rounded-full flex items-center justify-center mb-base"
                       style={{ background: 'hsl(var(--primary) / 0.12)' }}>
-                      <Icon size={24} style={{ color: 'hsl(var(--primary))' }} />
+                      <Icon size={24} style={{ color: 'hsl(var(--brand-ink))' }} />
                     </div>
                     <h3
                       className="text-base font-bold mb-xs"
@@ -364,7 +364,7 @@ export default function HomePage() {
               <Link
                 to="/catalog"
                 className="inline-flex items-center gap-2 px-xl py-base rounded-full font-bold text-base transition-transform hover:scale-105"
-                style={{ background: 'hsl(var(--background))', color: 'hsl(var(--primary))' }}>
+                style={{ background: 'hsl(var(--background))', color: 'hsl(var(--brand-ink))' }}>
                 <ShoppingBag size={18} />
                 {home.ctaBanner.cta}
               </Link>

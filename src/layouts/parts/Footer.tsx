@@ -102,7 +102,7 @@ export default function Footer() {
                 aria-label={s.label}
                 className="p-2 rounded-full transition-colors hover:bg-muted"
                 style={{ color: 'hsl(var(--muted-foreground))' }}
-                onMouseEnter={(e) => (e.currentTarget.style.color = 'hsl(var(--primary))')}
+                onMouseEnter={(e) => (e.currentTarget.style.color = 'hsl(var(--brand-ink))')}
                 onMouseLeave={(e) => (e.currentTarget.style.color = 'hsl(var(--muted-foreground))')}
               >
                 {s.icon}

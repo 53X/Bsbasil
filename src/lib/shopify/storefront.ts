@@ -13,6 +13,7 @@ const PRODUCT_FIELDS = `
   availableForSale
   featuredImage { url altText }
   options { name values }
+  collections(first: 10) { nodes { title } }
   media(first: 20) {
     nodes {
       mediaContentType

@@ -24,9 +24,9 @@ export default function NotFoundPage() {
 
         <div className="flex justify-center gap-4">
           <Link to="/">
-            <button className="px-8 py-3 bg-white font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all hover:scale-105" style={{ color: 'hsl(var(--primary))' }}>🏠 Go Home</button>
+            <button className="px-8 py-3 bg-white font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all hover:scale-105" style={{ color: 'hsl(var(--brand-ink))' }}>🏠 Go Home</button>
           </Link>
-          <button className="px-8 py-3 bg-white font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all hover:scale-105" style={{ color: 'hsl(var(--primary))' }} onClick={() => window.history.back()}>← Go Back</button>
+          <button className="px-8 py-3 bg-white font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all hover:scale-105" style={{ color: 'hsl(var(--brand-ink))' }} onClick={() => window.history.back()}>← Go Back</button>
         </div>
       </div>
     </div>
