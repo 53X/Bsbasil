@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { ageCode, ageLabel, applyCartDiscounts, htmlToText, mapProduct, mapShopRules, matchingVariant, toMinorUnits } from './map';
+import { ageCode, ageLabel, ageRangeLabel, applyCartDiscounts, expandProductsByAge, htmlToText, mapProduct, mapShopRules, matchingVariant, productMatchesFilters, toMinorUnits } from './map';
 
 describe('shopify product mapping', () => {
   it('keeps photos and video on the same product', () => {
@@ -61,6 +61,19 @@ describe('shopify product mapping', () => {
     expect(ageLabel('0-3M')).toBe('0–3 Months');
     expect(ageLabel('6-12M')).toBe('6–12 Months');
     expect(ageLabel('24-36M')).toBe('24–36 Months');
+    expect(ageRangeLabel(['0-3M', '3-6M', '6-12M'])).toBe('0–3 – 6–12 Months');
+    expect(ageRangeLabel(['12-18M'])).toBe('12–18 Months');
+    expect(productMatchesFilters(product, 'All Ages', 'Romper')).toBe(true);
+    expect(productMatchesFilters(product, 'All Ages', 'All Categories')).toBe(true);
+    expect(productMatchesFilters(product, '0-3M', 'Romper')).toBe(true);
+    expect(productMatchesFilters(product, '12-18M', 'Romper')).toBe(false);
+    expect(productMatchesFilters(product, '0-3M', 'Sleepwear')).toBe(false);
+    expect(productMatchesFilters(product, 'All Ages', 'Sleepwear')).toBe(false);
+    expect(expandProductsByAge([product], 'All Ages')).toEqual([
+      { product, ageCode: '0-3M' },
+      { product, ageCode: '6-12M' },
+    ]);
+    expect(expandProductsByAge([product], '0-3M')).toEqual([{ product, ageCode: '0-3M' }]);
     expect(product.featured).toBe(true);
     expect(product.media.map((item) => item.kind)).toEqual(['image', 'video']);
     expect(toMinorUnits('799.00')).toBe(79900);

@@ -4,6 +4,7 @@ import { useLoaderData, useSearchParams } from 'react-router';
 import { motion } from 'motion/react';
 import { SlidersHorizontal, X } from 'lucide-react';
 import ProductCard from '@/components/ProductCard';
+import { ageLabel, expandProductsByAge, productMatchesFilters } from '@/lib/shopify/map';
 import type { StoreCatalog } from '@/lib/shopify/types';
 
 const AGE_FILTERS = [
@@ -15,7 +16,7 @@ const AGE_FILTERS = [
   { value: '18-24M', label: '18–24 Months' },
   { value: '24-36M', label: '24–36 Months' },
 ] as const;
-const CATEGORY_FILTERS = ['All', 'Romper', 'Sleepwear', 'Sets', 'Winter wear', 'Accessories'] as const;
+const CATEGORY_FILTERS = ['All Categories', 'Romper', 'Sleepwear', 'Sets', 'Winter wear', 'Accessories'] as const;
 
 export default function CatalogPage() {
   const store = useLoaderData() as StoreCatalog;
@@ -23,30 +24,39 @@ export default function CatalogPage() {
   const ageFromUrl = params.get('age');
   const categoryFromUrl = params.get('category');
   const selectedAge = ageFromUrl && AGE_FILTERS.some((age) => age.value === ageFromUrl) ? ageFromUrl : 'All Ages';
-  const selectedCategory = categoryFromUrl && CATEGORY_FILTERS.includes(categoryFromUrl as typeof CATEGORY_FILTERS[number])
-    ? categoryFromUrl
-    : 'All';
+  const selectedCategory =
+    categoryFromUrl &&
+    categoryFromUrl !== 'All' &&
+    categoryFromUrl !== 'All Categories' &&
+    (CATEGORY_FILTERS as readonly string[]).includes(categoryFromUrl)
+      ? categoryFromUrl
+      : 'All Categories';
   const [showFilters, setShowFilters] = useState(false);
   const products = store.products;
 
   const setFilters = (age: string, category: string) => {
     const next = new URLSearchParams();
+    // All Ages / All Categories omit that param = no filter on that axis.
     if (age !== 'All Ages') next.set('age', age);
-    if (category !== 'All') next.set('category', category);
+    if (category !== 'All Categories' && category !== 'All') next.set('category', category);
     setSearchParams(next, { replace: true });
   };
 
-  const clearFilters = () => setFilters('All Ages', 'All');
+  const clearFilters = () => setFilters('All Ages', 'All Categories');
 
-  const hasActiveFilters = selectedAge !== 'All Ages' || selectedCategory !== 'All';
+  const hasActiveFilters = selectedAge !== 'All Ages' || selectedCategory !== 'All Categories';
 
-  // Products must match every active filter (age AND category).
-  const filteredProducts = products.filter((p) => {
-    const ageMatch = selectedAge === 'All Ages' || p.ageRanges.includes(selectedAge);
-    const catMatch = selectedCategory === 'All' || p.category === selectedCategory;
-    return ageMatch && catMatch;
-  });
-  const visibleCount = filteredProducts.length;
+  // All Ages = ignore age. All Categories = ignore category. Otherwise AND both.
+  // Each age group is its own catalog card (separate product listing per age).
+  const filteredProducts = products.filter((p) =>
+    productMatchesFilters(p, selectedAge, selectedCategory),
+  );
+  const catalogCards = expandProductsByAge(filteredProducts, selectedAge);
+  const visibleCount = catalogCards.length;
+  const filterSummary = [
+    selectedCategory === 'All Categories' ? null : selectedCategory,
+    selectedAge === 'All Ages' ? null : ageLabel(selectedAge),
+  ].filter(Boolean).join(' · ');
 
   return (
     <>
@@ -219,13 +229,22 @@ export default function CatalogPage() {
         <section className="py-xl" style={{ background: 'hsl(var(--background))' }}>
           <div className="max-w-content mx-auto px-4">
             {/* Results count */}
-            <div className="flex items-center justify-between mb-lg">
+            <div className="flex items-center justify-between mb-lg gap-4">
               <p className="text-sm" style={{ color: 'hsl(var(--muted-foreground))' }}>
                 Showing{' '}
                 <span className="font-semibold" style={{ color: 'hsl(var(--foreground))' }}>
                   {visibleCount}
                 </span>{' '}
                 {visibleCount === 1 ? 'item' : 'items'}
+                {filterSummary ? (
+                  <>
+                    {' '}
+                    <span aria-hidden="true">·</span>{' '}
+                    <span className="font-semibold" style={{ color: 'hsl(var(--foreground))' }}>
+                      {filterSummary}
+                    </span>
+                  </>
+                ) : null}
               </p>
               {hasActiveFilters &&
               <button
@@ -282,18 +301,18 @@ export default function CatalogPage() {
               </div>
             }
 
-            {/* Grid — only products matching every active filter */}
+            {/* Grid — one card per age group (each age is a separate listing) */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-base">
-              {filteredProducts.map((product, i) => (
+              {catalogCards.map(({ product, ageCode }, i) => (
                   <motion.div
-                    key={product.id}
+                    key={`${product.id}-${ageCode || 'any'}`}
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ duration: 0.3, delay: Math.min(i, 8) * 0.04, ease: 'easeOut' as const }}
                   >
                     <ProductCard
                       product={product}
-                      ageHighlight={selectedAge !== 'All Ages' ? selectedAge : undefined}
+                      ageHighlight={ageCode || undefined}
                     />
                   </motion.div>
               ))}

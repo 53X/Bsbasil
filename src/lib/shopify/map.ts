@@ -94,6 +94,43 @@ export function ageLabel(code: string): string {
   }
 }
 
+/** Label for one age, or a span when a product covers several ages. */
+export function ageRangeLabel(codes: string[]): string {
+  const ordered = AGE_TAGS.filter((age) => codes.includes(age));
+  if (ordered.length === 0) return "";
+  if (ordered.length === 1) return ageLabel(ordered[0]);
+  const start = ageLabel(ordered[0]).replace(/ Months$/, "");
+  return `${start} – ${ageLabel(ordered[ordered.length - 1])}`;
+}
+
+/** Catalog filters: All Ages / All Categories mean no filter on that axis. */
+export function productMatchesFilters(
+  product: { category: string; ageRanges: string[] },
+  selectedAge: string,
+  selectedCategory: string,
+): boolean {
+  const ageOpen = selectedAge === "All Ages" || !selectedAge;
+  const categoryOpen =
+    selectedCategory === "All Categories" || selectedCategory === "All" || !selectedCategory;
+  const ageMatch = ageOpen || product.ageRanges.includes(selectedAge);
+  const catMatch = categoryOpen || product.category === selectedCategory;
+  return ageMatch && catMatch;
+}
+
+/** One catalog card per age group so multi-age products appear separately. */
+export function expandProductsByAge<T extends { ageRanges: string[] }>(
+  products: T[],
+  selectedAge: string,
+): { product: T; ageCode: string }[] {
+  if (selectedAge !== "All Ages") {
+    return products.map((product) => ({ product, ageCode: selectedAge }));
+  }
+  return products.flatMap((product) => {
+    const ages = product.ageRanges.length > 0 ? product.ageRanges : [""];
+    return ages.map((ageCode) => ({ product, ageCode }));
+  });
+}
+
 /** Turn a Shopify age tag or size label into one of the shop's age filters. */
 export function ageCode(raw: string): string | null {
   const value = raw.trim().toLowerCase().replace(/[–—]/g, "-").replace(/\s+/g, " ");

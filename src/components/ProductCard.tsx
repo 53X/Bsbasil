@@ -25,8 +25,8 @@ export default function ProductCard({
   const purchasable = product.variants.filter((variant) => variant.available);
   const directVariant = purchasable.length === 1 ? purchasable[0] : null;
   const href = `/products/${product.handle}`;
-  const badgeAge =
-    ageHighlight && product.ageRanges.includes(ageHighlight) ? ageHighlight : product.ageRange;
+  // One age per card — age groups are separate product listings.
+  const badgeText = ageLabel(ageHighlight || product.ageRange);
 
   const onAdd = async () => {
     if (!directVariant) return;
@@ -67,12 +67,12 @@ export default function ProductCard({
             {product.badge}
           </span>
         ) : null}
-        {badgeAge ? (
+        {badgeText ? (
           <span
             className="absolute top-3 right-3 px-2 py-1 rounded-full text-xs font-semibold"
             style={{ background: 'hsl(var(--background))', color: 'hsl(var(--foreground))' }}
           >
-            {ageLabel(badgeAge)}
+            {badgeText}
           </span>
         ) : null}
         {product.media.some((item) => item.kind !== 'image') ? (
