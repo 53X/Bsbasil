@@ -499,6 +499,25 @@ export async function productLoader({ params }: { params: { handle?: string } })
   return loadProduct(params.handle);
 }
 
+export async function updateCartBuyer(
+  cartId: string,
+  buyer: { email?: string | null; phone?: string | null },
+): Promise<StoreCart> {
+  const buyerIdentity: { email?: string; phone?: string } = {};
+  if (buyer.email) buyerIdentity.email = buyer.email;
+  if (buyer.phone) buyerIdentity.phone = buyer.phone;
+  const data = await storefront<{ cartBuyerIdentityUpdate: CartPayload }>(
+    `mutation Buyer($cartId: ID!, $buyerIdentity: CartBuyerIdentityInput!) {
+      cartBuyerIdentityUpdate(cartId: $cartId, buyerIdentity: $buyerIdentity) {
+        cart { ${CART_FIELDS} }
+        userErrors { message }
+      }
+    }`,
+    { cartId, buyerIdentity },
+  );
+  return cartResult(data.cartBuyerIdentityUpdate);
+}
+
 export async function removeCartLine(cartId: string, lineId: string): Promise<StoreCart> {
   const data = await storefront<{ cartLinesRemove: CartPayload }>(
     `mutation Remove($cartId: ID!, $lineId: ID!) {

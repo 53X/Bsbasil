@@ -1,12 +1,14 @@
 import { Link, useLocation } from 'react-router';
 import { Menu, X, ShoppingBag, ShoppingCart } from 'lucide-react';
 import { useState } from 'react';
+import { useAuth } from '@/contexts/auth-context';
 import { useCart } from '@/contexts/use-cart';
 
 export default function Header() {
   const location = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { cartCount } = useCart();
+  const { user, ready, signOut } = useAuth();
 
   const navItems = [
     { href: '/', label: 'Home' },
@@ -52,6 +54,24 @@ export default function Header() {
 
           {/* Right actions */}
           <div className="flex items-center gap-3">
+            {ready && user ? (
+              <button
+                type="button"
+                onClick={() => signOut()}
+                className="text-sm font-medium"
+                style={{ color: 'hsl(var(--muted-foreground))' }}
+              >
+                Sign out
+              </button>
+            ) : (
+              <Link
+                to="/sign-in"
+                className="text-sm font-medium"
+                style={{ color: 'hsl(var(--brand-ink))' }}
+              >
+                Sign in
+              </Link>
+            )}
             {/* Cart icon */}
             <Link
               to="/cart"
@@ -117,6 +137,25 @@ export default function Header() {
                   {item.label}
                 </Link>
               ))}
+              {ready && user ? (
+                <button
+                  type="button"
+                  onClick={() => { setIsMobileMenuOpen(false); void signOut(); }}
+                  className="text-sm font-medium py-2 px-2 text-left"
+                  style={{ color: 'hsl(var(--muted-foreground))' }}
+                >
+                  Sign out
+                </button>
+              ) : (
+                <Link
+                  to="/sign-in"
+                  className="text-sm font-medium py-2 px-2"
+                  style={{ color: 'hsl(var(--brand-ink))' }}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  Sign in
+                </Link>
+              )}
             </nav>
           </div>
         )}

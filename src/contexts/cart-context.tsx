@@ -5,7 +5,7 @@
  */
 import { createContext, useState, useEffect, useCallback, useMemo, ReactNode } from 'react';
 import { isShopifyConfigured } from '@/lib/shopify/config';
-import { addCartLine, createCart, fetchCart, removeCartLine, updateCartLine } from '@/lib/shopify/storefront';
+import { addCartLine, createCart, fetchCart, removeCartLine, updateCartBuyer, updateCartLine } from '@/lib/shopify/storefront';
 import type { CartLine } from '@/lib/shopify/types';
 
 export interface AddToCartResult {
@@ -29,6 +29,7 @@ interface CartContextType {
   checkoutUrl: string | null;
   cartError: string | null;
   cartBusy: boolean;
+  attachBuyer: (buyer: { email?: string | null; phone?: string | null }) => Promise<string | null>;
 }
 
 const CART_KEY = 'shopify-cart-id';
@@ -140,6 +141,17 @@ export function CartProvider({ children }: { children: ReactNode }) {
     }
   }, [applyCart, cartId, removeFromCart]);
 
+  const attachBuyer = useCallback(async (buyer: { email?: string | null; phone?: string | null }) => {
+    if (!cartId || (!buyer.email && !buyer.phone)) return checkoutUrl;
+    try {
+      const next = await updateCartBuyer(cartId, buyer);
+      applyCart(next);
+      return next.checkoutUrl;
+    } catch {
+      return checkoutUrl;
+    }
+  }, [applyCart, cartId, checkoutUrl]);
+
   const clearCart = useCallback(() => {
     applyCart(null);
     localStorage.removeItem(CART_KEY);
@@ -160,8 +172,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
       checkoutUrl,
       cartError,
       cartBusy,
+      attachBuyer,
     }),
-    [cart, addVariant, removeFromCart, updateQuantity, clearCart, cartTotal, cartCount, checkoutUrl, cartError, cartBusy],
+    [cart, addVariant, removeFromCart, updateQuantity, clearCart, cartTotal, cartCount, checkoutUrl, cartError, cartBusy, attachBuyer],
   );
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;

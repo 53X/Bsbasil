@@ -6,31 +6,53 @@
  *
  * Route: /cart
  */
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router';
+import { Link, useNavigate, useSearchParams } from 'react-router';
 import { Helmet } from '@dr.pogodin/react-helmet';
 
+import { useAuth } from '@/contexts/auth-context';
 import { useCart } from '@/contexts/use-cart';
+import { savePendingPurchase } from '@/lib/pending-purchase';
 import PriceTag from '@/components/PriceTag';
 import { formatPrice } from '@/lib/stripe/format';
 
 export default function CartPage() {
   const { t } = useTranslation();
-  const { cart, removeFromCart, updateQuantity, clearCart, cartTotal, cartCount, checkoutUrl, cartError } = useCart();
+  const navigate = useNavigate();
+  const [params, setParams] = useSearchParams();
+  const { user, ready } = useAuth();
+  const { cart, removeFromCart, updateQuantity, clearCart, cartTotal, cartCount, checkoutUrl, cartError, attachBuyer } = useCart();
   const [checkingOut, setCheckingOut] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const checkoutStarted = useRef(false);
 
-  const handleCheckout = () => {
+  const handleCheckout = async () => {
     if (cart.length === 0) return;
+    if (!user) {
+      savePendingPurchase({ kind: 'checkout' });
+      navigate('/sign-in?next=/cart');
+      return;
+    }
     if (!checkoutUrl) {
       setError('Checkout is not ready yet. Connect Shopify, then try again.');
       return;
     }
     setCheckingOut(true);
     setError(null);
-    window.location.href = checkoutUrl;
+    const url = await attachBuyer(user);
+    window.location.href = url || checkoutUrl;
   };
+
+  useEffect(() => {
+    if (params.get('checkout') !== '1' || !ready || !user || !checkoutUrl || checkoutStarted.current) return;
+    checkoutStarted.current = true;
+    setParams({}, { replace: true });
+    setCheckingOut(true);
+    void attachBuyer(user).then((url) => {
+      window.location.href = url || checkoutUrl;
+    });
+  }, [attachBuyer, checkoutUrl, params, ready, setParams, user]);
 
   return (
     <>

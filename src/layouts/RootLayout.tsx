@@ -6,6 +6,7 @@ import HomepageSameAsJsonLd from '@/components/HomepageSameAsJsonLd';
 import Footer from '@/layouts/parts/Footer';
 import Header from '@/layouts/parts/Header';
 import Website from '@/layouts/Website';
+import { AuthProvider } from '@/contexts/auth-context';
 import { CartProvider } from '@/contexts/cart-context';
 
 interface RootLayoutProps {
@@ -14,6 +15,7 @@ interface RootLayoutProps {
 
 export default function RootLayout({ children }: RootLayoutProps) {
   return (
+    <AuthProvider>
     <CartProvider>
       <Website>
         <Helmet>
@@ -38,5 +40,6 @@ export default function RootLayout({ children }: RootLayoutProps) {
         <Footer />
       </Website>
     </CartProvider>
+    </AuthProvider>
   );
 }

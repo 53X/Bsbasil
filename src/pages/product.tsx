@@ -1,8 +1,10 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Link, useLoaderData, useSearchParams } from 'react-router';
+import { Link, useLoaderData, useNavigate, useSearchParams } from 'react-router';
 import { Helmet } from '@dr.pogodin/react-helmet';
 import { ShoppingBag } from 'lucide-react';
+import { useAuth } from '@/contexts/auth-context';
 import { useCart } from '@/contexts/use-cart';
+import { savePendingPurchase } from '@/lib/pending-purchase';
 import { ageLabel, hasSelectableSizeOption, productRequiresSizeSelection, productSizeLabels, selectionForOption, variantForSelection } from '@/lib/shopify/map';
 import PriceTag from '@/components/PriceTag';
 import type { StoreMedia, StoreProduct, StoreCatalog } from '@/lib/shopify/types';
@@ -191,7 +193,9 @@ function MediaFrame({ item }: { item: StoreMedia }) {
 export default function ProductPage() {
   const { product, catalog } = useLoaderData() as { product: StoreProduct | null; catalog: StoreCatalog };
   const [params] = useSearchParams();
-  const { addVariant } = useCart();
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  const { addVariant, attachBuyer } = useCart();
   const [mediaIndex, setMediaIndex] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [message, setMessage] = useState<string | null>(null);
@@ -315,9 +319,21 @@ export default function ProductPage() {
       ...(chosenSize ? [{ key: 'Size', value: chosenSize }] : []),
       ...(chosenColor ? [{ key: 'Color', value: chosenColor }] : []),
     ];
+    if (!user) {
+      savePendingPurchase({
+        kind: 'buy',
+        variantId: variant.id,
+        quantity,
+        attributes: attributes.length ? attributes : undefined,
+      });
+      navigate(`/sign-in?next=${encodeURIComponent(window.location.pathname)}`);
+      setBuying(false);
+      return;
+    }
     const result = await addVariant(variant.id, quantity, attributes.length ? attributes : undefined);
     if (result.success && result.checkoutUrl) {
-      window.location.href = result.checkoutUrl;
+      const checkoutUrl = await attachBuyer(user);
+      window.location.href = checkoutUrl || result.checkoutUrl;
       return;
     }
     setBuying(false);

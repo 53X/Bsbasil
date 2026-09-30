@@ -11,6 +11,7 @@ import CheckoutCancel from './pages/checkout/cancel';
 import PrivacyPolicyPage from './pages/privacy-policy';
 import TermsOfUsePage from './pages/terms-of-use';
 import FAQPage from './pages/faq';
+import SignInPage from './pages/sign-in';
 // Eager import so renderToString doesn't hit a Suspense boundary on 404 routes
 // and abort to client rendering. The prod 404 page is tiny; the dev-tools
 // variant stays lazy because it pulls in dev-only code we don't want in
@@ -51,6 +52,14 @@ export const routes: RouteObject[] = [
   {
     path: '/contact',
     element: <ContactPage />,
+  },
+  {
+    path: '/sign-in',
+    element: <SignInPage />,
+  },
+  {
+    path: '/sign-up',
+    element: <SignInPage />,
   },
   {
     path: '/checkout/success',
