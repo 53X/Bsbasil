@@ -8,8 +8,8 @@ const InstagramIcon = () => (
 
 const SOCIAL_LINKS = [
   {
-    label: 'Bsbasil on Instagram',
-    href: 'https://www.instagram.com/bsbasil',
+    label: 'Instagram',
+    href: 'https://www.instagram.com/bs_basil_/',
     icon: <InstagramIcon />,
   },
   {

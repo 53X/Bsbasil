@@ -42,7 +42,7 @@ export default function HomePage() {
         contactOption: 'TollFree',
       },
       sameAs: [
-        'https://www.instagram.com/bsbasil',
+        'https://www.instagram.com/bs_basil_/',
         'https://www.facebook.com/bsbasil',
       ],
       areaServed: {
