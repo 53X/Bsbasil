@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router';
 import './HeroCube.css';
 
 export type HeroFace = {
@@ -43,7 +44,7 @@ export const HERO_FACES: HeroFace[] = [
     headline: 'Warm layers for cooler days',
     image: '/hero-cube/winter-wear.jpg',
     alt: 'Baby in a light blue giraffe hoodie',
-    href: '/catalog?category=Winter%20wear',
+    href: '/catalog?category=Winter wear',
   },
   {
     category: 'Sets',
@@ -76,30 +77,47 @@ const HOLD_MS = 3200;
 
 export default function HeroCube({ onFaceChange }: { onFaceChange: (face: HeroFace) => void }) {
   const [index, setIndex] = useState(0);
+  const [paused, setPaused] = useState(false);
 
   useEffect(() => {
     onFaceChange(HERO_FACES[index]);
   }, [index, onFaceChange]);
 
   useEffect(() => {
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    if (paused || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     const timer = window.setInterval(() => {
       setIndex((current) => (current + 1) % HERO_FACES.length);
     }, HOLD_MS);
     return () => window.clearInterval(timer);
-  }, []);
+  }, [paused]);
 
   return (
-    <div className="hero-cube-scene" aria-hidden="true">
+    <div
+      className="hero-cube-scene"
+      onMouseEnter={() => setPaused(true)}
+      onMouseLeave={() => setPaused(false)}
+      onFocus={() => setPaused(true)}
+      onBlur={() => setPaused(false)}>
       <div className="hero-cube-tilt">
       <div className="hero-cube-rig" style={{ transform: POSES[index] }}>
         <div className="hero-cube">
-          {HERO_FACES.map((face, faceIndex) => (
-            <div key={face.image} className="hero-cube-face" style={{ transform: FACE_TRANSFORM[faceIndex] }}>
-              <img src={face.image} alt="" sizes="(min-width: 1024px) 28vw, 62vw" />
-              <span>{face.category}</span>
-            </div>
-          ))}
+          {HERO_FACES.map((face, faceIndex) => {
+            const front = faceIndex === index;
+            return (
+              <Link
+                key={face.image}
+                to={face.href}
+                className="hero-cube-face"
+                style={{ transform: FACE_TRANSFORM[faceIndex] }}
+                aria-label={`Shop ${face.category}`}
+                aria-hidden={front ? undefined : true}
+                tabIndex={front ? 0 : -1}
+                data-front={front ? '' : undefined}>
+                <img src={face.image} alt="" sizes="(min-width: 1024px) 28vw, 62vw" />
+                <span>{face.category}</span>
+              </Link>
+            );
+          })}
         </div>
       </div>
       </div>

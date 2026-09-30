@@ -107,7 +107,11 @@ export default function HomePage() {
       <main>
         {/* ── Hero ── */}
         <section className="relative flex items-center overflow-hidden py-10 sm:py-14 lg:min-h-[85vh] lg:py-xxl" style={{ background: 'hsl(var(--background))' }}>
-          <div className="hero-wash" aria-hidden="true" />
+          <div className="hero-orbs" aria-hidden="true">
+            <span />
+            <span />
+            <span />
+          </div>
           <div className="relative z-10 max-w-content mx-auto px-4 w-full min-w-0 grid grid-cols-1 lg:grid-cols-2 items-center gap-8 sm:gap-10 lg:gap-xl">
             <motion.div initial="hidden" animate="visible" variants={stagger} className="max-w-xl min-w-0 order-2 lg:order-1">
               <motion.p

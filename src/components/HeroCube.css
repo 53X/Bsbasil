@@ -41,6 +41,19 @@
   box-shadow: 0 18px 40px hsl(var(--foreground) / 0.12);
   background: hsl(var(--muted));
   container-type: inline-size;
+  pointer-events: none;
+  color: inherit;
+  text-decoration: none;
+}
+
+.hero-cube-face[data-front] {
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+.hero-cube-face[data-front]:focus-visible {
+  outline: 2px solid hsl(var(--primary));
+  outline-offset: 4px;
 }
 
 .hero-cube-face img {

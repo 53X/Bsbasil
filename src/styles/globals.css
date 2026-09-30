@@ -247,29 +247,55 @@ html {
   scroll-behavior: smooth;
 }
 
-.hero-wash {
+.hero-orbs {
   position: absolute;
   inset: 0;
   pointer-events: none;
-  background:
-    radial-gradient(ellipse 50% 70% at 15% 40%, hsl(147 56% 74% / 0.45), transparent 68%),
-    radial-gradient(ellipse 45% 60% at 85% 55%, hsl(40 48% 90% / 0.85), transparent 62%),
-    linear-gradient(115deg, hsl(147 45% 96%), hsl(42 42% 96%) 48%, hsl(147 36% 94%));
-  background-size: 180% 180%;
-  animation: hero-wash 28s ease-in-out infinite alternate;
+  overflow: hidden;
 }
 
-@keyframes hero-wash {
-  from {
-    background-position: 0% 35%;
-  }
-  to {
-    background-position: 100% 65%;
-  }
+.hero-orbs span {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(36px);
+  animation: hero-orb 26s ease-in-out infinite alternate;
+}
+
+.hero-orbs span:nth-child(1) {
+  width: min(34rem, 70vw);
+  height: min(34rem, 70vw);
+  left: -12%;
+  top: 8%;
+  background: radial-gradient(circle, hsl(147 56% 72% / 0.55), transparent 68%);
+}
+
+.hero-orbs span:nth-child(2) {
+  width: min(28rem, 58vw);
+  height: min(28rem, 58vw);
+  right: -8%;
+  bottom: -6%;
+  background: radial-gradient(circle, hsl(40 42% 88% / 0.72), transparent 70%);
+  animation-duration: 32s;
+  animation-delay: -10s;
+}
+
+.hero-orbs span:nth-child(3) {
+  width: min(22rem, 46vw);
+  height: min(22rem, 46vw);
+  left: 38%;
+  top: 28%;
+  background: radial-gradient(circle, hsl(147 42% 84% / 0.5), transparent 70%);
+  animation-duration: 36s;
+  animation-delay: -18s;
+}
+
+@keyframes hero-orb {
+  from { transform: translate3d(0, 0, 0) scale(1); }
+  to { transform: translate3d(8%, -6%, 0) scale(1.08); }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .hero-wash {
+  .hero-orbs span {
     animation: none;
   }
 }
