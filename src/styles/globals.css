@@ -246,3 +246,30 @@
 html {
   scroll-behavior: smooth;
 }
+
+.hero-wash {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 50% 70% at 15% 40%, hsl(147 56% 74% / 0.45), transparent 68%),
+    radial-gradient(ellipse 45% 60% at 85% 55%, hsl(40 48% 90% / 0.85), transparent 62%),
+    linear-gradient(115deg, hsl(147 45% 96%), hsl(42 42% 96%) 48%, hsl(147 36% 94%));
+  background-size: 180% 180%;
+  animation: hero-wash 28s ease-in-out infinite alternate;
+}
+
+@keyframes hero-wash {
+  from {
+    background-position: 0% 35%;
+  }
+  to {
+    background-position: 100% 65%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-wash {
+    animation: none;
+  }
+}

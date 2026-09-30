@@ -7,10 +7,17 @@
   margin-inline: auto;
 }
 
+.hero-cube-tilt,
 .hero-cube-rig,
 .hero-cube,
 .hero-cube-face {
   transform-style: preserve-3d;
+}
+
+.hero-cube-tilt {
+  width: 100%;
+  height: 100%;
+  transform: rotateX(-12deg) rotateY(16deg);
 }
 
 .hero-cube-rig {
@@ -23,7 +30,6 @@
   position: relative;
   width: 100%;
   height: 100%;
-  transform: rotateX(-12deg) rotateY(16deg);
 }
 
 .hero-cube-face {
@@ -73,7 +79,7 @@
     --cube: clamp(15rem, 26vw, 22rem);
   }
 
-  .hero-cube {
+  .hero-cube-tilt {
     transform: rotateX(-14deg) rotateY(18deg);
   }
 }

@@ -68,7 +68,7 @@ const POSES = [
   'rotateX(0deg) rotateY(-90deg)',
   'rotateX(0deg) rotateY(-180deg)',
   'rotateX(0deg) rotateY(-270deg)',
-  'rotateX(-90deg) rotateY(-270deg)',
+  'rotateX(-90deg) rotateY(-360deg)',
   'rotateX(90deg) rotateY(-360deg)',
 ];
 
@@ -91,6 +91,7 @@ export default function HeroCube({ onFaceChange }: { onFaceChange: (face: HeroFa
 
   return (
     <div className="hero-cube-scene" aria-hidden="true">
+      <div className="hero-cube-tilt">
       <div className="hero-cube-rig" style={{ transform: POSES[index] }}>
         <div className="hero-cube">
           {HERO_FACES.map((face, faceIndex) => (
@@ -100,6 +101,7 @@ export default function HeroCube({ onFaceChange }: { onFaceChange: (face: HeroFa
             </div>
           ))}
         </div>
+      </div>
       </div>
     </div>
   );
