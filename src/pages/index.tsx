@@ -1,17 +1,10 @@
 import { Helmet } from '@dr.pogodin/react-helmet';
 import { Link, useLoaderData } from 'react-router';
 import { motion } from 'motion/react';
-import { Leaf, Heart, Sparkles, ShieldCheck, ArrowRight, ShoppingBag } from 'lucide-react';
+import { ArrowRight, ShoppingBag } from 'lucide-react';
 import { home } from 'virtual:content';
 import ProductCard from '@/components/ProductCard';
 import type { StoreCatalog } from '@/lib/shopify/types';
-
-const ICON_MAP: Record<string, React.ElementType> = {
-  leaf: Leaf,
-  heart: Heart,
-  sparkles: Sparkles,
-  shield: ShieldCheck
-};
 
 const fadeUp = {
   hidden: { opacity: 0, y: 28 },
@@ -166,31 +159,6 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* ── Trust Badges ── */}
-        <section
-          className="py-base border-b"
-          style={{ background: 'hsl(var(--muted))', borderColor: 'hsl(var(--border))' }}>
-          <div className="max-w-content mx-auto px-4">
-            <motion.div
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true }}
-              variants={stagger}
-              className="flex flex-wrap justify-center gap-base">
-              {home.trustBadges.map((badge) =>
-              <motion.div
-                key={badge.id}
-                variants={fadeUp}
-                className="flex items-center gap-2 text-sm font-semibold"
-                style={{ color: 'hsl(var(--foreground))' }}>
-                  <span className="w-2 h-2 rounded-full" style={{ background: 'hsl(var(--primary))' }} />
-                  {badge.label}
-                </motion.div>
-              )}
-            </motion.div>
-          </div>
-        </section>
-
         {/* ── Featured Products ── */}
         <section className="py-xxl" style={{ background: 'hsl(var(--background))' }}>
           <div className="max-w-content mx-auto px-4">
@@ -288,54 +256,6 @@ export default function HomePage() {
                   </Link>
                 </motion.div>
               )}
-            </motion.div>
-          </div>
-        </section>
-
-        {/* ── Why Us ── */}
-        <section className="py-xxl" style={{ background: 'hsl(var(--background))' }}>
-          <div className="max-w-content mx-auto px-4">
-            <motion.div
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true }}
-              variants={fadeUp}
-              className="text-center mb-xl">
-              <h2 className="text-3xl md:text-4xl font-bold" style={{ color: 'hsl(var(--foreground))' }}>
-                {home.whyUs.title}
-              </h2>
-            </motion.div>
-
-            <motion.div
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true }}
-              variants={stagger}
-              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-base">
-              {home.whyUs.items.map((item) => {
-                const Icon = ICON_MAP[item.icon] ?? Leaf;
-                return (
-                  <motion.div
-                    key={item.id}
-                    variants={fadeUp}
-                    className="flex flex-col items-center text-center p-lg rounded-2xl border"
-                    style={{ background: 'hsl(var(--muted))', borderColor: 'hsl(var(--border))' }}>
-                    <div
-                      className="w-12 h-12 rounded-full flex items-center justify-center mb-base"
-                      style={{ background: 'hsl(var(--primary) / 0.12)' }}>
-                      <Icon size={24} style={{ color: 'hsl(var(--brand-ink))' }} />
-                    </div>
-                    <h3
-                      className="text-base font-bold mb-xs"
-                      style={{ color: 'hsl(var(--foreground))' }}>
-                      {item.title}
-                    </h3>
-                    <p className="text-sm leading-relaxed" style={{ color: 'hsl(var(--muted-foreground))' }}>
-                      {item.desc}
-                    </p>
-                  </motion.div>);
-
-              })}
             </motion.div>
           </div>
         </section>

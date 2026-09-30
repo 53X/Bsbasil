@@ -2,7 +2,6 @@ import { useEffect, useMemo, useState } from 'react';
 import { Link, useLoaderData, useSearchParams } from 'react-router';
 import { Helmet } from '@dr.pogodin/react-helmet';
 import { ShoppingBag } from 'lucide-react';
-import ShareButtons from '@/components/ShareButtons';
 import { useCart } from '@/contexts/use-cart';
 import { ageLabel, hasSelectableSizeOption, matchingVariant, productRequiresSizeSelection, productSizeLabels, selectionForOption } from '@/lib/shopify/map';
 import PriceTag from '@/components/PriceTag';
@@ -404,7 +403,6 @@ export default function ProductPage() {
               </button>
             </div>
             {message ? <p className="text-sm mb-base" style={{ color: 'hsl(var(--muted-foreground))' }}>{message}</p> : null}
-            <ShareButtons productName={product.name} productPrice={product.priceLabel} url={`https://bsbasil.com/products/${product.handle}`} />
           </div>
         </div>
 
