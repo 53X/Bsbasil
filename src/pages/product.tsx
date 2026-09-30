@@ -164,11 +164,7 @@ export default function ProductPage() {
   const discountTitle = variant?.discountTitle ?? product.discountTitle;
   const currency = variant?.currency ?? product.currency;
   const soldOut = variant ? !variant.available : !product.available;
-  const stockLabel = soldOut
-    ? 'Sold out'
-    : variant?.quantityAvailable != null
-      ? `${variant.quantityAvailable} in stock`
-      : 'In stock';
+  const stockLabel = soldOut ? 'Sold out' : 'In stock';
 
   const onAdd = async () => {
     if (!variant || soldOut) return;
