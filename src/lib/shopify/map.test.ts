@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { ageCode, ageLabel, ageRangeLabel, applyCartDiscounts, expandProductsByAge, hasSelectableSizeOption, htmlToText, mapProduct, mapShopRules, matchingVariant, productMatchesFilters, productRequiresSizeSelection, productSizeLabels, toMinorUnits } from './map';
+import { ageCode, ageLabel, ageRangeLabel, applyCartDiscounts, expandProductsByAge, hasSelectableSizeOption, htmlToText, mapProduct, mapShopRules, matchingVariant, productMatchesFilters, productRequiresSizeSelection, productSizeLabels, toMinorUnits, variantForSelection } from './map';
 
 describe('shopify product mapping', () => {
   it('keeps photos and video on the same product', () => {
@@ -303,5 +303,70 @@ describe('shopify product mapping', () => {
     expect(hasSelectableSizeOption(product)).toBe(true);
     expect(productRequiresSizeSelection(product)).toBe(true);
     expect(productSizeLabels(product)).toEqual(['6-12 months', '12-18 months']);
+  });
+
+  it('keeps colour swatches and the matching photo on the same product', () => {
+    const product = mapProduct({
+      id: 'gid://shopify/Product/color',
+      handle: 'checked-romper',
+      title: 'Checked romper',
+      tags: [],
+      availableForSale: true,
+      options: [{
+        name: 'Color',
+        optionValues: [
+          { name: 'Navy', swatch: { color: '#1e3a5f' } },
+          { name: 'Pink', swatch: { color: '#e7a0b4', image: { previewImage: { url: 'https://cdn.example/pink-swatch.jpg' } } } },
+        ],
+      }],
+      variants: {
+        nodes: [
+          {
+            id: 'gid://shopify/ProductVariant/navy',
+            title: 'Navy',
+            availableForSale: true,
+            price: { amount: '1299.00', currencyCode: 'INR' },
+            selectedOptions: [{ name: 'Color', value: 'Navy' }],
+            image: { url: 'https://cdn.example/navy.jpg' },
+          },
+          {
+            id: 'gid://shopify/ProductVariant/pink',
+            title: 'Pink',
+            availableForSale: false,
+            price: { amount: '1299.00', currencyCode: 'INR' },
+            selectedOptions: [{ name: 'Color', value: 'Pink' }],
+            image: { url: 'https://cdn.example/pink.jpg' },
+          },
+        ],
+      },
+    });
+
+    expect(product.options[0]?.values).toEqual(['Navy', 'Pink']);
+    expect(product.options[0]?.swatches?.[1]).toEqual({
+      name: 'Pink',
+      swatchColor: '#e7a0b4',
+      swatchImage: 'https://cdn.example/pink-swatch.jpg',
+    });
+    expect(variantForSelection(product, { Color: 'Pink' })?.image).toBe('https://cdn.example/pink.jpg');
+    expect(variantForSelection(product, { Color: 'Navy' })?.id).toBe('gid://shopify/ProductVariant/navy');
+  });
+
+  it('reads category color metafield chips', () => {
+    const product = mapProduct({
+      id: 'gid://shopify/Product/bunny',
+      handle: 'baby-bunny-checkered-romper-set',
+      title: 'Baby Bunny Checkered Romper Set',
+      tags: [],
+      availableForSale: true,
+      colorMetafield: {
+        value: '["gid://shopify/Metaobject/428477481045","gid://shopify/Metaobject/428477448277"]',
+      },
+      variants: { nodes: [] },
+    });
+
+    expect(product.colors).toEqual([
+      { name: 'Beige', hex: '#EAD8AB' },
+      { name: 'Navy', hex: '#282099' },
+    ]);
   });
 });

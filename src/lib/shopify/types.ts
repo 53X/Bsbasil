@@ -11,9 +11,16 @@ export interface StoreMedia {
   alt: string;
 }
 
+export interface StoreOptionSwatch {
+  name: string;
+  swatchColor?: string;
+  swatchImage?: string;
+}
+
 export interface StoreOption {
   name: string;
   values: string[];
+  swatches?: StoreOptionSwatch[];
 }
 
 export interface StoreVariant {
@@ -63,6 +70,8 @@ export interface StoreProduct {
   media: StoreMedia[];
   options: StoreOption[];
   variants: StoreVariant[];
+  /** Colours from the Shopify category metafield (shopify.color-pattern). */
+  colors: { name: string; hex?: string }[];
 }
 
 export interface StoreCatalog {

@@ -218,6 +218,16 @@ const SIZE_METAOBJECT_LABELS: Record<string, string> = {
 };
 
 /**
+ * Shopify category Color metafield (shopify.color-pattern).
+ * Storefront returns metaobject GIDs unless metaobject read is enabled.
+ * Labels and swatches match the chips on the product page in Shopify admin.
+ */
+const COLOR_METAOBJECTS: Record<string, { name: string; hex?: string }> = {
+  "gid://shopify/Metaobject/428477481045": { name: "Beige", hex: "#EAD8AB" },
+  "gid://shopify/Metaobject/428477448277": { name: "Navy", hex: "#282099" },
+};
+
+/**
  * Ages for catalog filters come from Category metafields → Size (shopify.size).
  * Fall back to variant Size options / age tags only when Size metafield is empty.
  */
@@ -284,6 +294,41 @@ function sizeMetafieldLabels(
   }
 }
 
+type MetaobjectFieldNode = {
+  handle?: string | null;
+  fields?: Array<{ key: string; value: string }> | null;
+};
+
+function colorMetafieldColors(
+  metafield?: {
+    value?: string | null;
+    references?: { nodes?: Array<MetaobjectFieldNode | null> | null } | null;
+  } | null,
+): { name: string; hex?: string }[] {
+  const fromRefs = (metafield?.references?.nodes ?? [])
+    .filter((node): node is MetaobjectFieldNode => Boolean(node))
+    .map((node) => {
+      const label = node.fields?.find((field) => field.key === "label")?.value;
+      const hex = node.fields?.find((field) => field.key === "color")?.value;
+      const name = label || node.handle?.replace(/-/g, " ") || "";
+      return name ? { name, hex: hex || undefined } : null;
+    })
+    .filter((color): color is { name: string; hex?: string } => Boolean(color));
+  if (fromRefs.length > 0) return fromRefs;
+
+  const raw = metafield?.value?.trim();
+  if (!raw) return [];
+  try {
+    const parsed = JSON.parse(raw) as unknown;
+    if (!Array.isArray(parsed)) return [];
+    return parsed
+      .map((id) => (typeof id === "string" ? COLOR_METAOBJECTS[id] : null))
+      .filter((color): color is { name: string; hex?: string } => Boolean(color));
+  } catch {
+    return [];
+  }
+}
+
 interface RawImage {
   url: string;
   altText?: string | null;
@@ -328,8 +373,27 @@ export interface RawProductNode {
   tags: string[];
   availableForSale: boolean;
   featuredImage?: RawImage | null;
-  options?: { name: string; values: string[] }[];
+  options?: {
+    name: string;
+    values?: string[];
+    optionValues?: {
+      name: string;
+      swatch?: {
+        color?: string | null;
+        image?: { previewImage?: { url?: string | null } | null } | null;
+      } | null;
+    }[];
+  }[];
   sizeMetafield?: {
+    value?: string | null;
+    references?: {
+      nodes?: Array<{
+        handle?: string | null;
+        fields?: Array<{ key: string; value: string }> | null;
+      } | null> | null;
+    } | null;
+  } | null;
+  colorMetafield?: {
     value?: string | null;
     references?: {
       nodes?: Array<{
@@ -464,15 +528,47 @@ export function mapProduct(node: RawProductNode): StoreProduct {
     alt: node.featuredImage?.altText || node.title,
     available: node.availableForSale,
     media: media.length > 0 ? media : image ? [{ kind: "image", url: image, alt: node.title }] : [],
-    options: node.options ?? [],
+    options: mapOptions(node.options),
     variants,
+    colors: colorMetafieldColors(node.colorMetafield),
   };
+}
+
+function mapOptions(options: RawProductNode["options"]): StoreProduct["options"] {
+  return (options ?? []).map((option) => {
+    const fromValues = option.optionValues?.map((value) => value.name).filter(Boolean);
+    return {
+      name: option.name,
+      values: fromValues && fromValues.length > 0 ? fromValues : option.values ?? [],
+      swatches: option.optionValues?.map((value) => ({
+        name: value.name,
+        swatchColor: value.swatch?.color || undefined,
+        swatchImage: value.swatch?.image?.previewImage?.url || undefined,
+      })),
+    };
+  });
 }
 
 export function matchingVariant(product: StoreProduct, selected: Record<string, string>): StoreVariant | undefined {
   return product.variants.find((variant) =>
     variant.selectedOptions.every((option) => selected[option.name] === option.value),
   );
+}
+
+/** Prefer the exact size and colour. Otherwise keep the colour photo even before a size is chosen. */
+export function variantForSelection(product: StoreProduct, selected: Record<string, string>): StoreVariant | undefined {
+  const exact = matchingVariant(product, selected);
+  if (exact) return exact;
+  let best: StoreVariant | undefined;
+  let bestScore = -1;
+  for (const variant of product.variants) {
+    const score = variant.selectedOptions.filter((option) => selected[option.name] === option.value).length;
+    if (score > bestScore) {
+      best = variant;
+      bestScore = score;
+    }
+  }
+  return best ?? product.variants[0];
 }
 
 /** Keep a valid size and colour together when one of them changes. */

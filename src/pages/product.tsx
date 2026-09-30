@@ -3,7 +3,7 @@ import { Link, useLoaderData, useSearchParams } from 'react-router';
 import { Helmet } from '@dr.pogodin/react-helmet';
 import { ShoppingBag } from 'lucide-react';
 import { useCart } from '@/contexts/use-cart';
-import { ageLabel, hasSelectableSizeOption, matchingVariant, productRequiresSizeSelection, productSizeLabels, selectionForOption } from '@/lib/shopify/map';
+import { ageLabel, hasSelectableSizeOption, productRequiresSizeSelection, productSizeLabels, selectionForOption, variantForSelection } from '@/lib/shopify/map';
 import PriceTag from '@/components/PriceTag';
 import type { StoreMedia, StoreProduct, StoreCatalog } from '@/lib/shopify/types';
 
@@ -22,6 +22,125 @@ const COLOR_DOTS: Record<string, string> = {
 
 function isColorOption(name: string): boolean {
   return /colou?r/i.test(name);
+}
+
+function ColorChoices({
+  product,
+  option,
+  selected,
+  onSelect,
+}: {
+  product: StoreProduct;
+  option: StoreProduct['options'][number];
+  selected: Record<string, string>;
+  onSelect: (value: string) => void;
+}) {
+  const currentColor = selected[option.name] ?? option.values[0];
+  return (
+    <div className="mb-base">
+      <p className="text-sm mb-xs" style={{ color: 'hsl(var(--foreground))' }}>
+        Colour: <span className="font-semibold">{currentColor}</span>
+      </p>
+      <div className="flex flex-wrap gap-2" role="listbox" aria-label="Colour">
+        {option.values.map((value) => {
+          const active = currentColor === value;
+          const offered = product.variants.some((item) =>
+            item.selectedOptions.some((entry) => entry.name === option.name && entry.value === value),
+          );
+          const available = product.variants.some(
+            (item) =>
+              item.available &&
+              item.selectedOptions.some((entry) => entry.name === option.name && entry.value === value) &&
+              item.selectedOptions.every((entry) => {
+                if (entry.name === option.name) return true;
+                const chosen = selected[entry.name];
+                return !chosen || chosen === entry.value;
+              }),
+          );
+          const photo = product.variants.find(
+            (item) =>
+              item.image &&
+              item.selectedOptions.some((entry) => entry.name === option.name && entry.value === value),
+          )?.image;
+          const swatch = option.swatches?.find((item) => item.name === value);
+          const fill = swatch?.swatchColor || COLOR_DOTS[value.trim().toLowerCase()];
+          return (
+            <button
+              key={value}
+              type="button"
+              role="option"
+              aria-selected={active}
+              aria-label={`Colour ${value}${available ? '' : ', sold out'}`}
+              disabled={!offered}
+              onClick={() => onSelect(value)}
+              className="relative w-16 h-16 rounded-lg border-2 overflow-hidden shrink-0 disabled:opacity-40"
+              style={{
+                borderColor: active ? 'hsl(var(--foreground))' : 'hsl(var(--border))',
+                padding: 2,
+              }}
+            >
+              {photo || swatch?.swatchImage ? (
+                <img src={photo || swatch?.swatchImage} alt="" className="w-full h-full object-cover rounded-md" />
+              ) : (
+                <span className="block w-full h-full rounded-md" style={{ background: fill || 'hsl(var(--muted))' }} />
+              )}
+              {!available ? (
+                <span
+                  aria-hidden="true"
+                  className="absolute inset-1 pointer-events-none"
+                  style={{
+                    background:
+                      'linear-gradient(to top left, transparent calc(50% - 1px), hsl(var(--foreground) / 0.7) calc(50% - 1px), hsl(var(--foreground) / 0.7) calc(50% + 1px), transparent calc(50% + 1px))',
+                  }}
+                />
+              ) : null}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function CategoryColors({
+  colors,
+  value,
+  onSelect,
+}: {
+  colors: { name: string; hex?: string }[];
+  value: string | null;
+  onSelect: (name: string) => void;
+}) {
+  const current = value ?? colors[0]?.name ?? '';
+  return (
+    <div className="mb-base">
+      <p className="text-sm mb-xs" style={{ color: 'hsl(var(--foreground))' }}>
+        Colour: <span className="font-semibold">{current}</span>
+      </p>
+      <div className="flex flex-wrap gap-2" role="listbox" aria-label="Colour">
+        {colors.map((color) => {
+          const active = current === color.name;
+          return (
+            <button
+              key={color.name}
+              type="button"
+              role="option"
+              aria-selected={active}
+              aria-label={`Colour ${color.name}`}
+              onClick={() => onSelect(color.name)}
+              className="w-16 h-16 rounded-lg border-2 shrink-0 p-0.5"
+              style={{ borderColor: active ? 'hsl(var(--foreground))' : 'hsl(var(--border))' }}
+            >
+              <span
+                className="block w-full h-full rounded-md border"
+                style={{ background: color.hex || 'hsl(var(--muted))', borderColor: 'hsl(var(--border))' }}
+              />
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
 }
 
 const SIZE_GUIDE = [
@@ -124,16 +243,18 @@ export default function ProductPage() {
   }, [product, preferredSizeFromUrl]);
   const [selected, setSelected] = useState<Record<string, string>>(initialSelection);
   const [chosenSize, setChosenSize] = useState<string | null>(preferredSizeFromUrl);
+  const [chosenColor, setChosenColor] = useState<string | null>(product?.colors[0]?.name ?? null);
 
   useEffect(() => {
     setSelected(initialSelection);
     setChosenSize(preferredSizeFromUrl);
+    setChosenColor(product?.colors[0]?.name ?? null);
     setMediaIndex(0);
     setQuantity(1);
     setMessage(null);
-  }, [product?.id, initialSelection, preferredSizeFromUrl]);
+  }, [product?.id, product?.colors, initialSelection, preferredSizeFromUrl]);
 
-  const variant = product ? matchingVariant(product, selected) ?? product.variants[0] : undefined;
+  const variant = product ? variantForSelection(product, selected) : undefined;
   const gallery = useMemo(() => {
     if (!product) return [];
     if (!variant?.image) return product.media;
@@ -173,8 +294,11 @@ export default function ProductPage() {
     }
     setAdding(true);
     setMessage(null);
-    const attributes = chosenSize ? [{ key: 'Size', value: chosenSize }] : undefined;
-    const result = await addVariant(variant.id, quantity, attributes);
+    const attributes = [
+      ...(chosenSize ? [{ key: 'Size', value: chosenSize }] : []),
+      ...(chosenColor ? [{ key: 'Color', value: chosenColor }] : []),
+    ];
+    const result = await addVariant(variant.id, quantity, attributes.length ? attributes : undefined);
     setAdding(false);
     setMessage(result.success ? 'Added to your bag' : result.error ?? 'Could not add this item');
   };
@@ -187,8 +311,11 @@ export default function ProductPage() {
     }
     setBuying(true);
     setMessage(null);
-    const attributes = chosenSize ? [{ key: 'Size', value: chosenSize }] : undefined;
-    const result = await addVariant(variant.id, quantity, attributes);
+    const attributes = [
+      ...(chosenSize ? [{ key: 'Size', value: chosenSize }] : []),
+      ...(chosenColor ? [{ key: 'Color', value: chosenColor }] : []),
+    ];
+    const result = await addVariant(variant.id, quantity, attributes.length ? attributes : undefined);
     if (result.success && result.checkoutUrl) {
       window.location.href = result.checkoutUrl;
       return;
@@ -275,8 +402,32 @@ export default function ProductPage() {
                   !/size|age/i.test(option.name),
               );
 
+              const hasColorOption = otherOptions.some((option) => isColorOption(option.name));
+
               return (
                 <>
+                  {otherOptions.filter((option) => isColorOption(option.name)).map((option) => (
+                    <ColorChoices
+                      key={option.name}
+                      product={product}
+                      option={option}
+                      selected={selected}
+                      onSelect={(value) => {
+                        setMessage(null);
+                        setSelected((current) => selectionForOption(product, current, option.name, value));
+                      }}
+                    />
+                  ))}
+                  {!hasColorOption && product.colors.length > 0 ? (
+                    <CategoryColors
+                      colors={product.colors}
+                      value={chosenColor}
+                      onSelect={(name) => {
+                        setChosenColor(name);
+                        setMessage(null);
+                      }}
+                    />
+                  ) : null}
                   {sizeLabels.length > 0 ? (
                     <div className="mb-base">
                       <p className="text-xs font-semibold uppercase tracking-wide mb-xs" style={{ color: 'hsl(var(--muted-foreground))' }}>
@@ -336,7 +487,7 @@ export default function ProductPage() {
                     </div>
                   ) : null}
 
-                  {otherOptions.map((option) => (
+                  {otherOptions.filter((option) => !isColorOption(option.name)).map((option) => (
                     <div key={option.name} className="mb-base">
                       <p className="text-xs font-semibold uppercase tracking-wide mb-xs" style={{ color: 'hsl(var(--muted-foreground))' }}>{option.name}</p>
                       <div className="flex flex-wrap gap-2">
@@ -345,7 +496,6 @@ export default function ProductPage() {
                           const offered = product.variants.some((item) =>
                             item.selectedOptions.some((entry) => entry.name === option.name && entry.value === value),
                           );
-                          const dot = isColorOption(option.name) ? COLOR_DOTS[value.trim().toLowerCase()] : undefined;
                           return (
                             <button
                               key={value}
@@ -359,12 +509,6 @@ export default function ProductPage() {
                                 borderColor: active ? 'hsl(var(--primary))' : 'hsl(var(--border))',
                               }}
                             >
-                              {dot ? (
-                                <span
-                                  className="w-3.5 h-3.5 rounded-full border"
-                                  style={{ background: dot, borderColor: active ? 'hsl(var(--primary-foreground))' : 'hsl(var(--border))' }}
-                                />
-                              ) : null}
                               {value}
                             </button>
                           );

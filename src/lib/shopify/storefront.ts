@@ -13,8 +13,29 @@ const PRODUCT_FIELDS = `
   tags
   availableForSale
   featuredImage { url altText }
-  options { name values }
+  options {
+    name
+    optionValues {
+      name
+      swatch {
+        color
+        image { previewImage { url } }
+      }
+    }
+  }
   sizeMetafield: metafield(namespace: "shopify", key: "size") {
+    type
+    value
+    references(first: 20) {
+      nodes {
+        ... on Metaobject {
+          handle
+          fields { key value }
+        }
+      }
+    }
+  }
+  colorMetafield: metafield(namespace: "shopify", key: "color-pattern") {
     type
     value
     references(first: 20) {
