@@ -22,6 +22,12 @@ export default function ContactPage() {
     const subject = String(formData.get('subject') ?? '').trim();
     const message = String(formData.get('message') ?? '').trim();
 
+    if (!name) {
+      setStatus('error');
+      setErrorMsg('Please enter your name.');
+      return;
+    }
+
     if (!phone) {
       setStatus('error');
       setErrorMsg('Please enter a phone or WhatsApp number.');
@@ -34,39 +40,29 @@ export default function ContactPage() {
       return;
     }
 
-    setStatus('sending');
-    setErrorMsg('');
-
-    try {
-      // Field mapping: only the message textarea goes in messages_attributes[0].body.
-      // All other fields (dropdowns, radios, checkboxes) must be added to conversation.data as { "Label": value } pairs.
-      const res = await fetch('/api/contact/contact-us', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          conversation: {
-            messages_attributes: [{ body: message || 'New contact form submission' }],
-            data: {
-              __gd_contact_form_title: 'Contact Bsbasil',
-              'Phone': phone,
-              'Subject': subject,
-            },
-          },
-          user: { name, mobile: phone, ...(email ? { email } : {}) },
-        }),
-      });
-
-      const json = await res.json();
-      if (json.success) {
-        setStatus('success');
-        form.reset();
-      } else {
-        throw new Error(json.error || 'Something went wrong.');
-      }
-    } catch (err) {
+    if (!message) {
       setStatus('error');
-      setErrorMsg(err instanceof Error ? err.message : 'Something went wrong. Please try again.');
+      setErrorMsg('Please enter a message.');
+      return;
     }
+
+    const lines = [
+      'Hello Bsbasil,',
+      '',
+      `Name: ${name}`,
+      `Phone: ${phone}`,
+      ...(email ? [`Email: ${email}`] : []),
+      `Subject: ${subject}`,
+      '',
+      message,
+    ];
+    const whatsappNumber = contact.details.phoneHref.replace(/\D/g, '');
+    const url = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(lines.join('\n'))}`;
+    const opened = window.open(url, '_blank', 'noopener,noreferrer');
+    if (!opened) window.location.assign(url);
+
+    setStatus('success');
+    form.reset();
   }
 
   return (
@@ -433,7 +429,7 @@ export default function ContactPage() {
                         ) : (
                           <>
                             <Send size={16} />
-                            Send message
+                            Send on WhatsApp
                           </>
                         )}
                       </button>

@@ -20,8 +20,8 @@
   },
   "form": {
     "heading": "Send us a message",
-    "successHeading": "Message sent!",
-    "successBody": "Thank you for reaching out. We'll get back to you within 24 hours.",
+    "successHeading": "Continue on WhatsApp",
+    "successBody": "Your message is ready in WhatsApp. Tap send there and we'll get back to you within 24 hours.",
     "successCta": "Send another message"
   }
 }
