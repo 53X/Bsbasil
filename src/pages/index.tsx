@@ -1,8 +1,10 @@
+import { useCallback, useState } from 'react';
 import { Helmet } from '@dr.pogodin/react-helmet';
 import { Link, useLoaderData } from 'react-router';
 import { motion } from 'motion/react';
 import { ArrowRight, ShoppingBag } from 'lucide-react';
 import { home } from 'virtual:content';
+import HeroCube, { HERO_FACES, type HeroFace } from '@/components/HeroCube';
 import ProductCard from '@/components/ProductCard';
 import type { StoreCatalog } from '@/lib/shopify/types';
 
@@ -18,6 +20,8 @@ const stagger = {
 export default function HomePage() {
   const siteUrl = 'https://bsbasil.com';
   const store = useLoaderData() as StoreCatalog;
+  const [face, setFace] = useState<HeroFace>(HERO_FACES[0]);
+  const onFaceChange = useCallback((next: HeroFace) => setFace(next), []);
 
   const jsonLd = {
     '@context': 'https://schema.org',
@@ -102,22 +106,9 @@ export default function HomePage() {
 
       <main>
         {/* ── Hero ── */}
-        <section className="relative overflow-hidden min-h-[85vh] flex items-center">
-          <div className="absolute inset-0 pointer-events-none">
-            <img
-              src="/airo-assets/images/pages/home/hero"
-              alt=""
-              className="w-full h-full object-cover"
-              width={1400}
-              height={700}
-              loading="eager"
-              fetchPriority="high" />
-            
-            <div className="absolute inset-0 bg-gradient-to-r from-white/90 via-white/70 to-white/10" />
-          </div>
-
-          <div className="relative max-w-content mx-auto px-4 py-xxxl w-full">
-            <motion.div initial="hidden" animate="visible" variants={stagger} className="max-w-xl">
+        <section className="relative flex items-center py-10 sm:py-14 lg:min-h-[85vh] lg:py-xxl" style={{ background: 'hsl(var(--background))' }}>
+          <div className="relative max-w-content mx-auto px-4 w-full min-w-0 grid grid-cols-1 lg:grid-cols-2 items-center gap-8 sm:gap-10 lg:gap-xl">
+            <motion.div initial="hidden" animate="visible" variants={stagger} className="max-w-xl min-w-0 order-2 lg:order-1">
               <motion.p
                 variants={fadeUp}
                 className="inline-block px-base py-xs rounded-full text-sm font-semibold mb-base"
@@ -125,30 +116,33 @@ export default function HomePage() {
                 {home.hero.eyebrow}
               </motion.p>
 
-              <motion.h1
-                variants={fadeUp}
-                className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-xl"
-                style={{ color: 'hsl(var(--foreground))' }}>
-                {home.hero.title}
-              </motion.h1>
+              <h1
+                className="font-bold leading-tight mb-6 sm:mb-xl min-h-[2.6em] text-[clamp(1.75rem,4.8vw,3.75rem)]"
+                style={{ color: 'hsl(var(--foreground))' }}
+                aria-live="polite">
+                {face.headline}
+              </h1>
 
-              <motion.div variants={fadeUp} className="flex flex-wrap gap-base">
+              <motion.div variants={fadeUp} className="flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-base">
                 <Link
-                  to="/catalog"
-                  className="flex items-center gap-2 px-xl py-base rounded-full font-bold text-base transition-transform hover:scale-105"
+                  to={face.href}
+                  className="flex w-full sm:w-auto items-center justify-center gap-2 px-xl py-base rounded-full font-bold text-base transition-transform hover:scale-105"
                   style={{ background: 'hsl(var(--primary))', color: 'hsl(var(--primary-foreground))' }}>
                   <ShoppingBag size={18} />
                   {home.hero.cta}
                 </Link>
                 <Link
                   to="/about"
-                  className="flex items-center gap-2 px-xl py-base rounded-full font-bold text-base border transition-colors hover:bg-muted"
+                  className="flex w-full sm:w-auto items-center justify-center gap-2 px-xl py-base rounded-full font-bold text-base border transition-colors hover:bg-muted"
                   style={{ borderColor: 'hsl(var(--border))', color: 'hsl(var(--foreground))' }}>
                   {home.hero.ctaSecondary}
                   <ArrowRight size={16} />
                 </Link>
               </motion.div>
             </motion.div>
+            <div className="order-1 lg:order-2 flex justify-center min-w-0 px-2 sm:px-4 py-4">
+              <HeroCube onFaceChange={onFaceChange} />
+            </div>
           </div>
         </section>
 
