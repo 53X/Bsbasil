@@ -22,6 +22,18 @@ export default function ContactPage() {
     const subject = String(formData.get('subject') ?? '').trim();
     const message = String(formData.get('message') ?? '').trim();
 
+    if (!phone) {
+      setStatus('error');
+      setErrorMsg('Please enter a phone or WhatsApp number.');
+      return;
+    }
+
+    if (!subject) {
+      setStatus('error');
+      setErrorMsg('Please select a subject.');
+      return;
+    }
+
     setStatus('sending');
     setErrorMsg('');
 
@@ -36,11 +48,11 @@ export default function ContactPage() {
             messages_attributes: [{ body: message || 'New contact form submission' }],
             data: {
               __gd_contact_form_title: 'Contact Bsbasil',
-              'Phone': phone || 'Not provided',
-              'Subject': subject || 'General Enquiry',
+              'Phone': phone,
+              'Subject': subject,
             },
           },
-          user: { email, name },
+          user: { name, mobile: phone, ...(email ? { email } : {}) },
         }),
       });
 
@@ -291,13 +303,12 @@ export default function ContactPage() {
                             className="text-sm font-semibold"
                             style={{ color: 'hsl(var(--foreground))' }}
                           >
-                            Email address <span style={{ color: 'hsl(var(--brand-ink))' }}>*</span>
+                            Email address
                           </label>
                           <input
                             id="email"
                             name="email"
                             type="email"
-                            required
                             placeholder="priya@example.com"
                             className="w-full px-4 py-3 rounded-xl border text-sm outline-none transition-colors"
                             style={{
@@ -317,12 +328,13 @@ export default function ContactPage() {
                             className="text-sm font-semibold"
                             style={{ color: 'hsl(var(--foreground))' }}
                           >
-                            Phone / WhatsApp
+                            Phone / WhatsApp <span style={{ color: 'hsl(var(--brand-ink))' }}>*</span>
                           </label>
                           <input
                             id="phone"
                             name="phone"
                             type="tel"
+                            required
                             placeholder="+91 98765 43210"
                             className="w-full px-4 py-3 rounded-xl border text-sm outline-none transition-colors"
                             style={{
@@ -340,11 +352,13 @@ export default function ContactPage() {
                             className="text-sm font-semibold"
                             style={{ color: 'hsl(var(--foreground))' }}
                           >
-                            Subject
+                            Subject <span style={{ color: 'hsl(var(--brand-ink))' }}>*</span>
                           </label>
                           <select
                             id="subject"
                             name="subject"
+                            required
+                            defaultValue=""
                             className="w-full px-4 py-3 rounded-xl border text-sm outline-none transition-colors appearance-none"
                             style={{
                               background: 'hsl(var(--background))',
@@ -352,6 +366,9 @@ export default function ContactPage() {
                               color: 'hsl(var(--foreground))',
                             }}
                           >
+                            <option value="" disabled>
+                              Select a subject
+                            </option>
                             <option value="General Enquiry">General Enquiry</option>
                             <option value="Order Status">Order Status</option>
                             <option value="Sizing Help">Sizing Help</option>

@@ -127,17 +127,10 @@ export default function HomePage() {
 
               <motion.h1
                 variants={fadeUp}
-                className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-lg"
+                className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-xl"
                 style={{ color: 'hsl(var(--foreground))' }}>
                 {home.hero.title}
               </motion.h1>
-
-              <motion.p
-                variants={fadeUp}
-                className="text-base md:text-lg mb-xl leading-relaxed"
-                style={{ color: 'hsl(var(--muted-foreground))' }}>
-                {home.hero.subtitle}
-              </motion.p>
 
               <motion.div variants={fadeUp} className="flex flex-wrap gap-base">
                 <Link
