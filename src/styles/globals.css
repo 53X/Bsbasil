@@ -387,3 +387,36 @@ html {
       );
   }
 }
+
+/* Quiet press and lift on buttons and pill links. Age tiles lift a touch more. */
+@media (prefers-reduced-motion: no-preference) {
+  button:not(:disabled),
+  a.rounded-full,
+  .motion-tile {
+    transition:
+      transform 180ms cubic-bezier(0.22, 1, 0.36, 1),
+      box-shadow 180ms ease,
+      background-color 180ms ease,
+      color 180ms ease,
+      border-color 180ms ease;
+  }
+
+  button.rounded-full:not(:disabled):hover,
+  a.rounded-full:hover {
+    transform: translateY(-1px);
+  }
+
+  button:not(:disabled):active,
+  a.rounded-full:active {
+    transform: translateY(0) scale(0.985);
+  }
+
+  .motion-tile:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px hsl(151 30% 14% / 0.06);
+  }
+
+  .motion-tile:active {
+    transform: translateY(0) scale(0.985);
+  }
+}
