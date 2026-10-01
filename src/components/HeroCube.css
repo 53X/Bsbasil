@@ -1,13 +1,11 @@
 .hero-cube-scene {
-  --cube: clamp(9.5rem, 58vw, 16.5rem);
+  --cube: clamp(8.75rem, 58vw, 16.5rem);
   width: min(var(--cube), 100%);
   height: var(--cube);
   max-width: 100%;
   perspective: calc(var(--cube) * 4);
   margin-inline: auto;
   transform-style: preserve-3d;
-  /* 25% of the cube. On a narrow phone, stop short of the viewport so the tilted faces stay fully visible. */
-  translate: max(0px, min(25%, calc(50vw - 68% - 0.75rem))) 0;
 }
 
 .hero-cube-tilt,
@@ -86,17 +84,26 @@
 
 @media (min-width: 640px) {
   .hero-cube-scene {
-    --cube: clamp(13rem, 42vw, 18rem);
+    --cube: clamp(12rem, 34vw, 18rem);
   }
 }
 
 @media (min-width: 1024px) {
   .hero-cube-scene {
-    --cube: clamp(15rem, 26vw, 22rem);
+    --cube: clamp(14rem, min(26vw, 34vh), 22rem);
+    /* 25% of the cube, desktop only. Phones keep the cube centered. Stop short of the screen edge. */
+    translate: max(0px, min(25%, calc(50vw - 78% - 2rem))) 0;
   }
 
   .hero-cube-tilt {
     transform: rotateX(-14deg) rotateY(18deg);
+  }
+}
+
+@media (min-width: 1024px) and (max-width: 1180px) {
+  .hero-cube-scene {
+    --cube: min(20vw, 15rem);
+    translate: 12% 0;
   }
 }
 
