@@ -299,3 +299,77 @@ html {
     animation: none;
   }
 }
+
+/* Light hero collage. Photos are clustered on the left of a wide cream frame;
+   scale that cluster to fill the pale area above the hero copy, then wash it out. */
+.home-page {
+  position: relative;
+  background: hsl(var(--background));
+}
+
+.home-collage {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.home-collage img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  /* Left ~56% of the frame is the photo cluster; 178% width makes that cluster fill the hero. */
+  width: 178%;
+  max-width: none;
+  height: auto;
+  opacity: 0.62;
+  filter: saturate(0.42) brightness(1.2) contrast(0.95);
+  -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 46%, transparent 72%);
+  mask-image: linear-gradient(to bottom, #000 0%, #000 46%, transparent 72%);
+}
+
+.home-collage::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(
+      to bottom,
+      hsl(var(--background) / 0.32) 0%,
+      hsl(var(--background) / 0.4) 34%,
+      hsl(var(--background) / 0.78) 50%,
+      hsl(var(--background) / 0.96) 62%,
+      hsl(var(--background)) 72%
+    );
+}
+
+@media (min-width: 1024px) {
+  .home-collage img {
+    /* Shift the left-hand photo cluster behind the cube, clear of the headline. */
+    top: -6%;
+    left: 46%;
+    width: 158%;
+    opacity: 0.5;
+    filter: saturate(0.4) brightness(1.22) contrast(0.95);
+    -webkit-mask-image:
+      linear-gradient(to right, transparent 0%, #000 10%, #000 100%),
+      linear-gradient(to bottom, #000 0%, #000 68%, transparent 96%);
+    -webkit-mask-composite: source-in;
+    mask-image:
+      linear-gradient(to right, transparent 0%, #000 10%, #000 100%),
+      linear-gradient(to bottom, #000 0%, #000 68%, transparent 96%);
+    mask-composite: intersect;
+  }
+
+  .home-collage::after {
+    background:
+      linear-gradient(
+        to bottom,
+        hsl(var(--background) / 0.28) 0%,
+        hsl(var(--background) / 0.38) 30%,
+        hsl(var(--background) / 0.7) 62%,
+        hsl(var(--background)) 84%
+      );
+  }
+}

@@ -6,6 +6,8 @@ import { readFileSync } from "node:fs";
 // <api-imports>
 import contact_formName_post_0 from "./api/contact/[formName]/POST";
 import health_get_1 from "./api/health/GET";
+import restock_post_4 from "./api/restock/POST";
+import restock_sweep_get_5 from "./api/restock/sweep/GET";
 import stripe_create_checkout_session_post_2 from "./api/stripe/create-checkout-session/POST";
 import stripe_session_sessionId_get_3 from "./api/stripe/session/[sessionId]/GET";
 // </api-imports>
@@ -90,6 +92,8 @@ app.use(express.urlencoded({ extended: true }));
 // <api-registrations>
 app.post("/api/contact/:formName", contact_formName_post_0);
 app.get("/api/health", health_get_1);
+app.post("/api/restock", restock_post_4);
+app.get("/api/restock-sweep", restock_sweep_get_5);
 app.post("/api/stripe/create-checkout-session", stripe_create_checkout_session_post_2);
 app.get("/api/stripe/session/:sessionId", stripe_session_sessionId_get_3);
 // </api-registrations>

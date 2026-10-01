@@ -7,6 +7,7 @@ import { useCart } from '@/contexts/use-cart';
 import { savePendingPurchase } from '@/lib/pending-purchase';
 import { ageLabel, hasSelectableSizeOption, productRequiresSizeSelection, productSizeLabels, selectionForOption, variantForSelection } from '@/lib/shopify/map';
 import PriceTag from '@/components/PriceTag';
+import NotifyMe from '@/components/NotifyMe';
 import type { StoreMedia, StoreProduct, StoreCatalog } from '@/lib/shopify/types';
 
 const COLOR_DOTS: Record<string, string> = {
@@ -563,6 +564,11 @@ export default function ProductPage() {
               </button>
             </div>
             {message ? <p className="text-sm mb-base" style={{ color: 'hsl(var(--muted-foreground))' }}>{message}</p> : null}
+            <NotifyMe
+              handle={product.handle}
+              variantId={variant?.id ?? ''}
+              selection={[chosenColor, chosenSize].filter(Boolean).join(', ')}
+            />
           </div>
         </div>
 
