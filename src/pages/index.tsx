@@ -242,7 +242,7 @@ export default function HomePage() {
               <motion.div key={group.id} variants={fadeUp}>
                   <Link
                   to={`/catalog?age=${group.range}`}
-                  className="flex flex-col items-center justify-center gap-sm p-lg rounded-2xl border text-center transition-transform hover:scale-105 hover:shadow-md"
+                  className="motion-tile flex flex-col items-center justify-center gap-sm p-lg rounded-2xl border text-center"
                   style={{ background: 'hsl(var(--background))', borderColor: 'hsl(var(--border))' }}>
                     <span className="text-4xl">{group.emoji}</span>
                     <span className="text-base font-bold" style={{ color: 'hsl(var(--foreground))' }}>
