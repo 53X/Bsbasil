@@ -1,9 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate, useSearchParams } from 'react-router';
 import { Helmet } from '@dr.pogodin/react-helmet';
-import { Phone } from 'lucide-react';
 import { getSupabase } from '@/lib/supabase';
-import { toE164 } from '@/lib/phone';
 import { takePendingPurchase } from '@/lib/pending-purchase';
 import { useAuth } from '@/contexts/auth-context';
 import { useCart } from '@/contexts/use-cart';
@@ -19,10 +17,6 @@ function GoogleLogo() {
   );
 }
 
-function missingAccount(message: string): boolean {
-  return /not found|signups not allowed|does not exist|no user|otp_disabled/i.test(message);
-}
-
 export default function SignInPage() {
   const { user, ready, configured } = useAuth();
   const { addVariant, attachBuyer } = useCart();
@@ -31,10 +25,6 @@ export default function SignInPage() {
   const [params] = useSearchParams();
   const mode = location.pathname === '/sign-up' || params.get('mode') === 'signup' ? 'signup' : 'signin';
   const signingUp = mode === 'signup';
-  const [phone, setPhone] = useState(params.get('phone') ?? '');
-  const [code, setCode] = useState('');
-  const [phoneOpen, setPhoneOpen] = useState(Boolean(params.get('phone')));
-  const [codeSent, setCodeSent] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [needsSignup, setNeedsSignup] = useState(false);
@@ -77,51 +67,6 @@ export default function SignInPage() {
     };
   }, [addVariant, attachBuyer, navigate, needsSignup, next, ready, signingUp, user]);
 
-  const sendCode = async () => {
-    const supabase = getSupabase();
-    const e164 = toE164(phone);
-    if (!supabase || !e164) {
-      setError('Enter a valid phone number.');
-      return;
-    }
-    setBusy(true);
-    setError(null);
-    setNeedsSignup(false);
-    const { error: otpError } = await supabase.auth.signInWithOtp({
-      phone: e164,
-      options: { shouldCreateUser: signingUp },
-    });
-    setBusy(false);
-    if (otpError) {
-      if (!signingUp && missingAccount(otpError.message)) setNeedsSignup(true);
-      else setError(otpError.message);
-      return;
-    }
-    setPhone(e164);
-    setCodeSent(true);
-  };
-
-  const verifyCode = async () => {
-    const supabase = getSupabase();
-    const e164 = toE164(phone);
-    if (!supabase || !e164 || code.trim().length < 4) {
-      setError('Enter the code from the text message.');
-      return;
-    }
-    setBusy(true);
-    setError(null);
-    const { error: verifyError } = await supabase.auth.verifyOtp({
-      phone: e164,
-      token: code.trim(),
-      type: 'sms',
-    });
-    setBusy(false);
-    if (verifyError) {
-      if (!signingUp && missingAccount(verifyError.message)) setNeedsSignup(true);
-      else setError(verifyError.message);
-    }
-  };
-
   const continueWithGoogle = async () => {
     const supabase = getSupabase();
     if (!supabase) return;
@@ -156,8 +101,8 @@ export default function SignInPage() {
         </h1>
         <p className="text-sm mb-lg" style={{ color: 'hsl(var(--muted-foreground))' }}>
           {signingUp
-            ? 'Create an account with Google or your phone number before you buy.'
-            : 'Sign in with Google or your phone number to continue to checkout.'}
+            ? 'Create an account with Google before you buy.'
+            : 'Sign in with Google to continue to checkout.'}
         </p>
         {!configured ? (
           <p className="text-sm" style={{ color: 'hsl(var(--muted-foreground))' }}>Sign-in is not connected yet.</p>
@@ -175,75 +120,10 @@ export default function SignInPage() {
               </span>
               Continue with Google
             </button>
-            <button
-              type="button"
-              onClick={() => { setPhoneOpen(true); setError(null); }}
-              disabled={busy}
-              className="relative w-full flex items-center justify-center py-3 rounded-full font-semibold border disabled:opacity-60"
-              style={buttonStyle}
-            >
-              <span className="absolute left-4 inline-flex h-5 w-5 items-center justify-center">
-                <Phone size={20} aria-hidden="true" />
-              </span>
-              Continue with phone number
-            </button>
-            {phoneOpen ? (
-              <div className="rounded-2xl border p-4" style={{ borderColor: 'hsl(var(--border))' }}>
-                <label className="block text-sm font-medium mb-2" htmlFor="phone" style={{ color: 'hsl(var(--foreground))' }}>
-                  Phone number
-                </label>
-                <input
-                  id="phone"
-                  type="tel"
-                  inputMode="tel"
-                  autoComplete="tel"
-                  placeholder="10-digit mobile number"
-                  value={phone}
-                  onChange={(event) => setPhone(event.target.value)}
-                  className="w-full rounded-xl border px-3 py-2 text-sm mb-3"
-                  style={{ borderColor: 'hsl(var(--border))', background: 'hsl(var(--background))' }}
-                />
-                {codeSent ? (
-                  <>
-                    <label className="block text-sm font-medium mb-2" htmlFor="code" style={{ color: 'hsl(var(--foreground))' }}>
-                      Text message code
-                    </label>
-                    <input
-                      id="code"
-                      inputMode="numeric"
-                      autoComplete="one-time-code"
-                      value={code}
-                      onChange={(event) => setCode(event.target.value)}
-                      className="w-full rounded-xl border px-3 py-2 text-sm mb-3"
-                      style={{ borderColor: 'hsl(var(--border))', background: 'hsl(var(--background))' }}
-                    />
-                    <button
-                      type="button"
-                      onClick={verifyCode}
-                      disabled={busy}
-                      className="w-full py-3 rounded-full font-semibold disabled:opacity-60"
-                      style={{ background: 'hsl(var(--primary))', color: 'hsl(var(--primary-foreground))' }}
-                    >
-                      {busy ? 'Checking' : signingUp ? 'Create account' : 'Sign in'}
-                    </button>
-                  </>
-                ) : (
-                  <button
-                    type="button"
-                    onClick={sendCode}
-                    disabled={busy}
-                    className="w-full py-3 rounded-full font-semibold disabled:opacity-60"
-                    style={{ background: 'hsl(var(--primary))', color: 'hsl(var(--primary-foreground))' }}
-                  >
-                    {busy ? 'Sending' : 'Send code'}
-                  </button>
-                )}
-              </div>
-            ) : null}
             {needsSignup ? (
               <p className="text-sm" style={{ color: 'hsl(var(--foreground))' }}>
                 No account found.{' '}
-                <Link to={`${otherPath}${phone ? `&phone=${encodeURIComponent(phone)}` : ''}`} style={{ color: 'hsl(var(--brand-ink))' }}>
+                <Link to={otherPath} style={{ color: 'hsl(var(--brand-ink))' }}>
                   Sign up
                 </Link>
               </p>
