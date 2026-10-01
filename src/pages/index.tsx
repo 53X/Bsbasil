@@ -104,9 +104,12 @@ export default function HomePage() {
         </script>
       </Helmet>
 
-      <main>
+      <main className="home-page">
         {/* ── Hero ── */}
-        <section className="relative flex items-center overflow-hidden py-10 sm:py-14 lg:min-h-[85vh] lg:py-xxl" style={{ background: 'hsl(var(--background))' }}>
+        <section className="relative flex items-center overflow-hidden py-10 sm:py-14 lg:min-h-[85vh] lg:py-xxl">
+          <div className="home-collage" aria-hidden="true">
+            <img src="/home-collage.jpg" alt="" />
+          </div>
           <div className="hero-orbs" aria-hidden="true">
             <span />
             <span />

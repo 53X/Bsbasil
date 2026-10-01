@@ -5,6 +5,9 @@
   max-width: 100%;
   perspective: calc(var(--cube) * 4);
   margin-inline: auto;
+  transform-style: preserve-3d;
+  /* 25% of the cube. On a narrow phone, stop short of the viewport so the tilted faces stay fully visible. */
+  translate: max(0px, min(25%, calc(50vw - 68% - 0.75rem))) 0;
 }
 
 .hero-cube-tilt,
