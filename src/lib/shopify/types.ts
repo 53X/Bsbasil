@@ -74,6 +74,19 @@ export interface StoreProduct {
   colors: { name: string; hex?: string }[];
 }
 
+export interface StorePromotion {
+  id: string;
+  heading: string;
+  message: string;
+  offer: string;
+  buttonLabel: string;
+  href: string;
+  imageUrl: string | null;
+  imageAlt: string;
+  videoUrl: string | null;
+  posterUrl: string | null;
+}
+
 export interface StoreCatalog {
   configured: boolean;
   products: StoreProduct[];

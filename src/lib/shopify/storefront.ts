@@ -1,6 +1,6 @@
 import { shopifyConfig } from "./config";
 import { applyCartDiscounts, htmlToText, mapProduct, mapShopRules, type RawProductNode } from "./map";
-import type { ShopRules, StoreCart, StoreCatalog, StorePolicy, StoreProduct } from "./types";
+import type { ShopRules, StoreCart, StoreCatalog, StorePolicy, StoreProduct, StorePromotion } from "./types";
 
 const PRODUCT_FIELDS = `
   id
@@ -483,13 +483,73 @@ export async function catalogLoader() {
   return loadCatalog();
 }
 
+interface PromotionField {
+  key: string;
+  value: string | null;
+  reference?: {
+    image?: { url: string; altText?: string | null } | null;
+    sources?: { url: string; mimeType?: string | null }[];
+    previewImage?: { url: string } | null;
+  } | null;
+}
+
+function fieldValue(fields: PromotionField[], key: string) {
+  return fields.find((field) => field.key === key)?.value?.trim() || "";
+}
+
+function fieldReference(fields: PromotionField[], key: string) {
+  return fields.find((field) => field.key === key)?.reference ?? null;
+}
+
+export async function loadPromotions(): Promise<StorePromotion[]> {
+  if (!shopifyConfig()) return [];
+  try {
+    const data = await storefront<{ metaobjects: { nodes: { id: string; fields: PromotionField[] }[] } }>(
+      `query Promotions {
+        metaobjects(type: "homepage_promotion", first: 12) {
+          nodes {
+            id
+            fields {
+              key
+              value
+              reference {
+                ... on MediaImage { image { url altText } }
+                ... on Video { sources { url mimeType } previewImage { url } }
+              }
+            }
+          }
+        }
+      }`,
+    );
+    return data.metaobjects.nodes.flatMap((node) => {
+      const fields = node.fields;
+      const heading = fieldValue(fields, "heading");
+      if (!heading) return [];
+      const picture = fieldReference(fields, "picture");
+      const clip = fieldReference(fields, "clip");
+      const video = clip?.sources?.find((source) => source.url)?.url || null;
+      return [{
+        id: node.id,
+        heading,
+        message: fieldValue(fields, "message"),
+        offer: fieldValue(fields, "offer"),
+        buttonLabel: fieldValue(fields, "button_label") || "Shop now",
+        href: fieldValue(fields, "link") || "/catalog",
+        imageUrl: picture?.image?.url || null,
+        imageAlt: picture?.image?.altText || heading,
+        videoUrl: video,
+        posterUrl: clip?.previewImage?.url || picture?.image?.url || null,
+      }];
+    });
+  } catch {
+    return [];
+  }
+}
+
 export async function homeLoader() {
   const catalog = await loadCatalog();
-  const featured = catalog.products.filter((product) => product.featured);
-  return {
-    ...catalog,
-    products: featured.length > 0 ? featured.slice(0, 8) : catalog.products.slice(0, 4),
-  };
+  const promotions = await loadPromotions();
+  return { ...catalog, promotions };
 }
 
 export async function productLoader({ params }: { params: { handle?: string } }) {
