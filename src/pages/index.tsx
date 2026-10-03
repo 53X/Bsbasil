@@ -181,21 +181,26 @@ export default function HomePage() {
               <p className="text-center text-sm" style={{ color: 'hsl(var(--muted-foreground))' }}>
                 Add a Homepage promotion in Shopify and it will show up here.
               </p>
-            ) : (
-              <motion.div
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true }}
-                variants={stagger}
-                className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-base">
-                {promotions.map((promotion) => (
-                  <motion.div key={promotion.id} variants={fadeUp}>
-                    <PromotionCard promotion={promotion} />
-                  </motion.div>
-                ))}
-              </motion.div>
-            )}
+            ) : null}
 
+          </div>
+
+          {store.configured && promotions.length > 0 ? (
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              variants={stagger}
+              className="flex flex-col">
+              {promotions.map((promotion) => (
+                <motion.div key={promotion.id} variants={fadeUp}>
+                  <PromotionCard promotion={promotion} />
+                </motion.div>
+              ))}
+            </motion.div>
+          ) : null}
+
+          <div className="max-w-content mx-auto px-4">
             <motion.div
               initial="hidden"
               whileInView="visible"
@@ -308,13 +313,22 @@ function PromotionCard({ promotion }: { promotion: StorePromotion }) {
   const internal = to.startsWith('/');
   const actionClass = 'inline-flex items-center gap-2 px-lg py-sm rounded-full font-bold text-sm';
   const actionStyle = { background: 'hsl(var(--primary))', color: 'hsl(var(--primary-foreground))' };
+  const action = internal ? (
+    <Link to={to} className={actionClass} style={actionStyle}>
+      {promotion.buttonLabel}
+      <ArrowRight size={14} />
+    </Link>
+  ) : (
+    <a href={to} className={actionClass} style={actionStyle}>
+      {promotion.buttonLabel}
+      <ArrowRight size={14} />
+    </a>
+  );
   return (
-    <article
-      className="h-full flex flex-col overflow-hidden rounded-2xl border"
-      style={{ borderColor: 'hsl(var(--border))', background: 'hsl(var(--card))' }}>
+    <article className="w-full" style={{ background: 'hsl(var(--card))' }}>
       {promotion.videoUrl ? (
         <video
-          className="w-full aspect-[4/3] object-cover bg-muted"
+          className="w-full aspect-[3/2] md:aspect-[21/9] object-cover bg-muted"
           controls
           playsInline
           poster={promotion.posterUrl || undefined}
@@ -324,36 +338,28 @@ function PromotionCard({ promotion }: { promotion: StorePromotion }) {
         <img
           src={promotion.imageUrl}
           alt={promotion.imageAlt}
-          className="w-full aspect-[4/3] object-cover"
+          className="w-full aspect-[3/2] md:aspect-[21/9] object-cover"
         />
       ) : null}
-      <div className="flex flex-col flex-1 gap-sm p-lg">
-        {promotion.offer ? (
-          <span
-            className="self-start text-xs font-bold uppercase tracking-wide px-sm py-1 rounded-full"
-            style={{ background: 'hsl(var(--primary) / 0.18)', color: 'hsl(var(--brand-ink))' }}>
-            {promotion.offer}
-          </span>
-        ) : null}
-        <h3 className="text-xl font-bold" style={{ color: 'hsl(var(--foreground))' }}>
-          {promotion.heading}
-        </h3>
-        {promotion.message ? (
-          <p className="text-sm flex-1" style={{ color: 'hsl(var(--muted-foreground))' }}>
-            {promotion.message}
-          </p>
-        ) : null}
-        {internal ? (
-          <Link to={to} className={actionClass} style={actionStyle}>
-            {promotion.buttonLabel}
-            <ArrowRight size={14} />
-          </Link>
-        ) : (
-          <a href={to} className={actionClass} style={actionStyle}>
-            {promotion.buttonLabel}
-            <ArrowRight size={14} />
-          </a>
-        )}
+      <div className="w-full px-4 md:px-10 py-lg flex flex-col md:flex-row md:items-center gap-base">
+        <div className="flex flex-col gap-sm flex-1 min-w-0">
+          {promotion.offer ? (
+            <span
+              className="self-start text-xs font-bold uppercase tracking-wide px-sm py-1 rounded-full"
+              style={{ background: 'hsl(var(--primary) / 0.18)', color: 'hsl(var(--brand-ink))' }}>
+              {promotion.offer}
+            </span>
+          ) : null}
+          <h3 className="text-2xl md:text-3xl font-bold" style={{ color: 'hsl(var(--foreground))' }}>
+            {promotion.heading}
+          </h3>
+          {promotion.message ? (
+            <p className="text-base" style={{ color: 'hsl(var(--muted-foreground))' }}>
+              {promotion.message}
+            </p>
+          ) : null}
+        </div>
+        <div className="shrink-0">{action}</div>
       </div>
     </article>
   );
