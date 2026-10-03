@@ -308,10 +308,30 @@ function promotionPath(href: string) {
   return href;
 }
 
+function PromoStamp({ offer }: { offer: string }) {
+  const alreadyUrgent = /24 hours/i.test(offer);
+  return (
+    <div className="absolute top-3 left-3 sm:top-4 sm:left-4 flex flex-col items-start gap-1.5">
+      <span
+        className="px-3 py-1.5 rounded-full text-sm sm:text-base font-bold uppercase tracking-wide"
+        style={{ background: 'hsl(var(--primary))', color: 'hsl(var(--brand-ink))' }}>
+        {offer}
+      </span>
+      {alreadyUrgent ? null : (
+        <span
+          className="px-3 py-1 rounded-full text-[11px] sm:text-xs font-bold uppercase tracking-wide"
+          style={{ background: 'hsl(var(--background))', color: 'hsl(var(--brand-ink))' }}>
+          Sale ends in 24 hours
+        </span>
+      )}
+    </div>
+  );
+}
+
 function PromotionCard({ promotion }: { promotion: StorePromotion }) {
   const to = promotionPath(promotion.href);
   const internal = to.startsWith('/');
-  const actionClass = 'inline-flex items-center gap-2 px-lg py-sm rounded-full font-bold text-sm';
+  const actionClass = 'inline-flex w-[220px] items-center justify-center gap-2 px-lg py-sm rounded-full font-bold text-sm';
   const actionStyle = { background: 'hsl(var(--primary))', color: 'hsl(var(--primary-foreground))' };
   const action = internal ? (
     <Link to={to} className={actionClass} style={actionStyle}>
@@ -325,41 +345,42 @@ function PromotionCard({ promotion }: { promotion: StorePromotion }) {
     </a>
   );
   return (
-    <article className="w-full" style={{ background: 'hsl(var(--card))' }}>
-      {promotion.videoUrl ? (
-        <video
-          className="w-full aspect-[3/2] md:aspect-[21/9] object-cover bg-muted"
-          controls
-          playsInline
-          poster={promotion.posterUrl || undefined}
-          src={promotion.videoUrl}
-        />
-      ) : promotion.imageUrl ? (
-        <img
-          src={promotion.imageUrl}
-          alt={promotion.imageAlt}
-          className="w-full aspect-[3/2] md:aspect-[21/9] object-cover"
-        />
-      ) : null}
-      <div className="w-full px-4 md:px-10 py-lg flex flex-col md:flex-row md:items-center gap-base">
-        <div className="flex flex-col gap-sm flex-1 min-w-0">
-          {promotion.offer ? (
-            <span
-              className="self-start text-xs font-bold uppercase tracking-wide px-sm py-1 rounded-full"
-              style={{ background: 'hsl(var(--primary) / 0.18)', color: 'hsl(var(--brand-ink))' }}>
-              {promotion.offer}
-            </span>
-          ) : null}
-          <h3 className="text-2xl md:text-3xl font-bold" style={{ color: 'hsl(var(--foreground))' }}>
-            {promotion.heading}
-          </h3>
-          {promotion.message ? (
-            <p className="text-base" style={{ color: 'hsl(var(--muted-foreground))' }}>
-              {promotion.message}
-            </p>
-          ) : null}
-        </div>
-        <div className="shrink-0">{action}</div>
+    <article className="grid w-full sm:grid-cols-[minmax(280px,0.85fr)_minmax(0,1.15fr)]" style={{ background: 'hsl(var(--background))' }}>
+      <div className="order-2 sm:order-1 flex flex-col justify-center gap-sm px-5 py-5 sm:px-10 sm:py-8">
+        {promotion.offer ? (
+          <span
+            className="self-start text-xs font-bold uppercase tracking-wide px-sm py-1 rounded-full"
+            style={{ background: 'hsl(var(--primary))', color: 'hsl(var(--brand-ink))' }}>
+            {promotion.offer}
+          </span>
+        ) : null}
+        <h3 className="text-2xl sm:text-3xl font-bold leading-tight" style={{ color: 'hsl(var(--foreground))' }}>
+          {promotion.heading}
+        </h3>
+        {promotion.message ? (
+          <p className="text-sm sm:text-base" style={{ color: 'hsl(var(--muted-foreground))' }}>
+            {promotion.message}
+          </p>
+        ) : null}
+        <div className="pt-1">{action}</div>
+      </div>
+      <div className="order-1 sm:order-2 relative">
+        {promotion.videoUrl ? (
+          <video
+            className="w-full h-[210px] sm:h-[280px] object-cover object-[center_18%] bg-muted"
+            controls
+            playsInline
+            poster={promotion.posterUrl || undefined}
+            src={promotion.videoUrl}
+          />
+        ) : promotion.imageUrl ? (
+          <img
+            src={promotion.imageUrl}
+            alt={promotion.imageAlt}
+            className="w-full h-[210px] sm:h-[280px] object-cover object-[center_18%]"
+          />
+        ) : null}
+        {promotion.offer ? <PromoStamp offer={promotion.offer} /> : null}
       </div>
     </article>
   );

@@ -307,6 +307,7 @@ export default function CatalogPage() {
               {catalogCards.map(({ product, ageCode }, i) => (
                   <motion.div
                     key={product.id}
+                    className="h-full"
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ duration: 0.3, delay: Math.min(i, 8) * 0.04, ease: 'easeOut' as const }}

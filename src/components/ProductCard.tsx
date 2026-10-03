@@ -23,7 +23,7 @@ export default function ProductCard({
 
   return (
     <article
-      className="group relative rounded-2xl overflow-hidden border flex flex-col"
+      className="group relative rounded-2xl overflow-hidden border flex flex-col h-full"
       style={{ background: 'hsl(var(--card))', borderColor: 'hsl(var(--border))' }}
     >
       <Link to={href} className="absolute inset-0 z-[1]" aria-label={product.name} />
@@ -62,12 +62,10 @@ export default function ProductCard({
       </div>
 
       <div className="p-base flex flex-col flex-1 gap-xs pointer-events-none">
-        {product.category ? (
-          <p className="text-xs font-semibold uppercase tracking-wide" style={{ color: 'hsl(var(--brand-ink))' }}>
-            {product.category}
-          </p>
-        ) : null}
-        <p className="text-base font-bold leading-snug" style={{ color: 'hsl(var(--foreground))' }}>
+        <p className="text-xs font-semibold uppercase tracking-wide min-h-4" style={{ color: 'hsl(var(--brand-ink))' }}>
+          {product.category || '\u00a0'}
+        </p>
+        <p className="text-base font-bold leading-snug line-clamp-2 min-h-[2.75rem]" style={{ color: 'hsl(var(--foreground))' }}>
           {product.name}
         </p>
         <div className="flex items-center justify-between mt-auto pt-sm gap-2">
@@ -76,12 +74,12 @@ export default function ProductCard({
             compareAt={product.compareAtPrice}
             currency={product.currency}
             discount={product.discountTitle}
-            priceClassName="text-lg font-bold"
+            priceClassName="text-lg font-bold whitespace-nowrap"
           />
-          <div className="relative z-[2] flex items-center gap-2 pointer-events-auto">
+          <div className="relative z-[2] flex items-center shrink-0 pointer-events-auto">
             <Link
               to={href}
-              className="flex items-center gap-2 px-base py-xs rounded-full text-sm font-semibold transition-transform hover:scale-105"
+              className="flex items-center gap-2 px-base py-xs rounded-full text-sm font-semibold whitespace-nowrap transition-transform hover:scale-105"
               style={{ background: 'hsl(var(--primary))', color: 'hsl(var(--primary-foreground))' }}
             >
               <ShoppingBag size={14} />
