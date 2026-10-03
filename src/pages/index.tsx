@@ -345,8 +345,8 @@ function PromotionCard({ promotion }: { promotion: StorePromotion }) {
     </a>
   );
   return (
-    <article className="grid w-full sm:grid-cols-[minmax(280px,0.85fr)_minmax(0,1.15fr)]" style={{ background: 'hsl(var(--background))' }}>
-      <div className="order-2 sm:order-1 flex flex-col justify-center gap-sm px-5 py-5 sm:px-10 sm:py-8">
+    <article className="grid w-full items-center lg:grid-cols-[minmax(300px,1fr)_minmax(280px,1.15fr)]" style={{ background: 'hsl(var(--background))' }}>
+      <div className="order-2 lg:order-1 flex flex-col justify-center gap-sm px-5 py-5 sm:px-10 lg:py-8">
         {promotion.offer ? (
           <span
             className="self-start text-xs font-bold uppercase tracking-wide px-sm py-1 rounded-full"
@@ -364,23 +364,25 @@ function PromotionCard({ promotion }: { promotion: StorePromotion }) {
         ) : null}
         <div className="pt-1">{action}</div>
       </div>
-      <div className="order-1 sm:order-2 relative">
-        {promotion.videoUrl ? (
-          <video
-            className="w-full h-[210px] sm:h-[280px] object-cover object-[center_18%] bg-muted"
-            controls
-            playsInline
-            poster={promotion.posterUrl || undefined}
-            src={promotion.videoUrl}
-          />
-        ) : promotion.imageUrl ? (
-          <img
-            src={promotion.imageUrl}
-            alt={promotion.imageAlt}
-            className="w-full h-[210px] sm:h-[280px] object-cover object-[center_18%]"
-          />
-        ) : null}
-        {promotion.offer ? <PromoStamp offer={promotion.offer} /> : null}
+      <div className="order-1 lg:order-2 flex w-full justify-center px-4 py-4 sm:px-8 lg:px-8 lg:py-8">
+        <div className="relative inline-block max-w-full">
+          {promotion.videoUrl ? (
+            <video
+              className="block w-auto max-w-full h-auto max-h-[42vh] sm:max-h-[48vh] lg:max-h-[64vh] object-contain bg-muted"
+              controls
+              playsInline
+              poster={promotion.posterUrl || undefined}
+              src={promotion.videoUrl}
+            />
+          ) : promotion.imageUrl ? (
+            <img
+              src={promotion.imageUrl}
+              alt={promotion.imageAlt}
+              className="block w-auto max-w-full h-auto max-h-[42vh] sm:max-h-[48vh] lg:max-h-[64vh] object-contain"
+            />
+          ) : null}
+          {promotion.offer ? <PromoStamp offer={promotion.offer} /> : null}
+        </div>
       </div>
     </article>
   );
