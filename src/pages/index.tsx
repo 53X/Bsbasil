@@ -5,8 +5,7 @@ import { motion } from 'motion/react';
 import { ArrowRight, ShoppingBag } from 'lucide-react';
 import { home } from 'virtual:content';
 import HeroCube, { HERO_FACES, type HeroFace } from '@/components/HeroCube';
-import ProductCard from '@/components/ProductCard';
-import type { StoreCatalog } from '@/lib/shopify/types';
+import type { StoreCatalog, StorePromotion } from '@/lib/shopify/types';
 
 const fadeUp = {
   hidden: { opacity: 0, y: 28 },
@@ -19,7 +18,8 @@ const stagger = {
 
 export default function HomePage() {
   const siteUrl = 'https://bsbasil.com';
-  const store = useLoaderData() as StoreCatalog;
+  const store = useLoaderData() as StoreCatalog & { promotions: StorePromotion[] };
+  const promotions = store.promotions ?? [];
   const [face, setFace] = useState<HeroFace>(HERO_FACES[0]);
   const onFaceChange = useCallback((next: HeroFace) => setFace(next), []);
 
@@ -154,7 +154,7 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* ── Featured Products ── */}
+        {/* ── Promotions from Shopify ── */}
         <section className="py-xxl" style={{ background: 'hsl(var(--background))' }}>
           <div className="max-w-content mx-auto px-4">
             <motion.div
@@ -175,11 +175,11 @@ export default function HomePage() {
 
             {!store.configured ? (
               <p className="text-center text-sm" style={{ color: 'hsl(var(--muted-foreground))' }}>
-                Featured clothes will appear here once Shopify is connected.
+                Promotions will appear here once Shopify is connected.
               </p>
-            ) : store.products.length === 0 ? (
+            ) : promotions.length === 0 ? (
               <p className="text-center text-sm" style={{ color: 'hsl(var(--muted-foreground))' }}>
-                The Shopify store is connected. Featured clothes will appear here once products are added.
+                Add a Homepage promotion in Shopify and it will show up here.
               </p>
             ) : (
               <motion.div
@@ -187,10 +187,10 @@ export default function HomePage() {
                 whileInView="visible"
                 viewport={{ once: true }}
                 variants={stagger}
-                className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-base">
-                {store.products.map((product) => (
-                  <motion.div key={product.id} variants={fadeUp}>
-                    <ProductCard product={product} />
+                className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-base">
+                {promotions.map((promotion) => (
+                  <motion.div key={promotion.id} variants={fadeUp}>
+                    <PromotionCard promotion={promotion} />
                   </motion.div>
                 ))}
               </motion.div>
@@ -289,4 +289,72 @@ export default function HomePage() {
       </main>
     </>);
 
+}
+
+function promotionPath(href: string) {
+  try {
+    const url = new URL(href, 'https://bsbasil.vercel.app');
+    if (url.hostname === 'bsbasil.vercel.app' || url.hostname === 'bsbasil.com' || url.hostname === 'www.bsbasil.com') {
+      return `${url.pathname}${url.search}`;
+    }
+  } catch {
+    return href;
+  }
+  return href;
+}
+
+function PromotionCard({ promotion }: { promotion: StorePromotion }) {
+  const to = promotionPath(promotion.href);
+  const internal = to.startsWith('/');
+  const actionClass = 'inline-flex items-center gap-2 px-lg py-sm rounded-full font-bold text-sm';
+  const actionStyle = { background: 'hsl(var(--primary))', color: 'hsl(var(--primary-foreground))' };
+  return (
+    <article
+      className="h-full flex flex-col overflow-hidden rounded-2xl border"
+      style={{ borderColor: 'hsl(var(--border))', background: 'hsl(var(--card))' }}>
+      {promotion.videoUrl ? (
+        <video
+          className="w-full aspect-[4/3] object-cover bg-muted"
+          controls
+          playsInline
+          poster={promotion.posterUrl || undefined}
+          src={promotion.videoUrl}
+        />
+      ) : promotion.imageUrl ? (
+        <img
+          src={promotion.imageUrl}
+          alt={promotion.imageAlt}
+          className="w-full aspect-[4/3] object-cover"
+        />
+      ) : null}
+      <div className="flex flex-col flex-1 gap-sm p-lg">
+        {promotion.offer ? (
+          <span
+            className="self-start text-xs font-bold uppercase tracking-wide px-sm py-1 rounded-full"
+            style={{ background: 'hsl(var(--primary) / 0.18)', color: 'hsl(var(--brand-ink))' }}>
+            {promotion.offer}
+          </span>
+        ) : null}
+        <h3 className="text-xl font-bold" style={{ color: 'hsl(var(--foreground))' }}>
+          {promotion.heading}
+        </h3>
+        {promotion.message ? (
+          <p className="text-sm flex-1" style={{ color: 'hsl(var(--muted-foreground))' }}>
+            {promotion.message}
+          </p>
+        ) : null}
+        {internal ? (
+          <Link to={to} className={actionClass} style={actionStyle}>
+            {promotion.buttonLabel}
+            <ArrowRight size={14} />
+          </Link>
+        ) : (
+          <a href={to} className={actionClass} style={actionStyle}>
+            {promotion.buttonLabel}
+            <ArrowRight size={14} />
+          </a>
+        )}
+      </div>
+    </article>
+  );
 }
