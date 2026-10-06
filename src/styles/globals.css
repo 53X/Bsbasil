@@ -1,4 +1,12 @@
-@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@1,9..144,560&family=Oswald:wght@500;600&family=Outfit:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@500;600&family=Outfit:wght@400;500;600;700&display=swap');
+
+@font-face {
+  font-family: "Sunlight Memories Script";
+  src: url("/fonts/SunlightMemoriesScript.otf") format("opentype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
 
 @tailwind base;
 @tailwind components;
@@ -70,7 +78,7 @@
     /* Typography */
     --font-sans: "Outfit", -apple-system, BlinkMacSystemFont, sans-serif;
     --font-heading: "Oswald", "Arial Narrow", sans-serif;
-    --font-italic: "Fraunces", Georgia, serif;
+    --font-italic: "Sunlight Memories Script", cursive;
     --font-serif: ui-serif, Georgia, "Times New Roman", serif;
     --font-mono: ui-monospace, "SF Mono", Monaco, "Cascadia Code", "Roboto Mono", Consolas, "Courier New", monospace;
 
@@ -124,9 +132,9 @@
 
   h1 em, h2 em, h3 em, .italic-accent {
     font-family: var(--font-italic) !important;
-    font-style: italic;
-    font-weight: 560;
-    letter-spacing: -0.03em;
+    font-style: normal !important;
+    font-weight: 400;
+    letter-spacing: 0;
     color: hsl(var(--logo));
   }
 }
