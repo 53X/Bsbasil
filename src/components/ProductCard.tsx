@@ -3,7 +3,7 @@ import PriceTag from '@/components/PriceTag';
 import { ageLabel, discountBadge } from '@/lib/shopify/map';
 import type { StoreProduct } from '@/lib/shopify/types';
 
-const PANELS = ['#1F4A28', '#62A848', '#E7F0C8', '#0E2414', '#DCE8C4', '#8FBF55'];
+const PANELS = ['#62A848'];
 
 export default function ProductCard({
   product,
@@ -15,7 +15,7 @@ export default function ProductCard({
   index?: number;
 }) {
   const href = `/products/${product.handle}`;
-  const sizes = product.ageRanges.slice(0, 4);
+  const sizes = product.ageRanges;
   const sale = discountBadge(product.price, product.compareAtPrice, product.discountTitle);
 
   return (
@@ -54,7 +54,7 @@ export default function ProductCard({
         <p className="text-[11px] font-semibold uppercase tracking-[0.18em]" style={{ color: 'hsl(var(--brand-ink))' }}>
           {product.category || 'Bsbasil'}
         </p>
-        <Link to={href} className="font-sans text-lg font-semibold leading-snug">
+        <Link to={href} className="break-words font-sans text-base font-semibold leading-snug sm:text-lg">
           {product.name}
         </Link>
         <PriceTag

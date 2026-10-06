@@ -96,30 +96,28 @@ export default function MoodRail() {
     <section ref={sectionRef} className="relative bg-background">
       <div
         data-mood-stage
-        className="sticky top-[6.25rem] flex h-[calc(100dvh-6.25rem)] items-center overflow-hidden"
+        className="sticky top-[6.25rem] flex h-[calc(100svh-6.25rem)] items-center overflow-hidden lg:h-[calc(100dvh-6.25rem)]"
       >
         <div ref={trackRef} className="flex w-max items-end gap-4 px-4 py-6 sm:gap-6 lg:gap-8 lg:px-10">
-          <div className="w-[min(82vw,26rem)] shrink-0 pr-2">
-            <p className="mb-4 text-xs font-semibold uppercase tracking-[0.22em]" style={{ color: 'hsl(var(--brand-ink))' }}>
+          <div className="w-[min(78vw,26rem)] shrink-0 pr-2">
+            <p className="mb-3 text-xs font-semibold uppercase tracking-[0.22em] sm:mb-4" style={{ color: 'hsl(var(--brand-ink))' }}>
               The Bsbasil archive
             </p>
-            <h2 className="text-[clamp(2.6rem,7vw,6.5rem)] leading-[0.82]">
-              FIVE
-              <br />
-              KINDS.
-              <br />
-              <em className="text-[0.62em]">one wardrobe</em>
+            <h2 className="text-[clamp(1.85rem,8vw,4.15rem)] leading-none">
+              <span className="block leading-[1.05]">Creating little styles</span>
+              <em className="mt-[0.55em] block text-[0.92em] leading-[1.15]">for big personality</em>
             </h2>
-            <p className="mt-5 max-w-xs text-sm leading-relaxed sm:text-base" style={{ color: 'hsl(var(--muted-foreground))' }}>
-              Keep scrolling. This row moves sideways through every kind we make.
+            <p data-subhead className="mt-5 max-w-sm text-sm leading-relaxed sm:text-base" style={{ color: 'hsl(var(--muted-foreground))' }}>
+              Rompers, sets, sleepwear, winter wear, and accessories, made for a baby with{' '}
+              <span className="italic-accent text-[1.45em] leading-none">a point of view</span>.
             </p>
             <div className="mt-6 h-px w-32 origin-left bg-foreground/15 sm:w-40">
               <div data-mood-bar className="h-px origin-left scale-x-0 bg-[#62A848]" />
             </div>
           </div>
           {KINDS.map((kind, index) => (
-            <Link key={kind.label} to={kind.href} className="group w-[min(74vw,420px)] shrink-0">
-              <div className="arch-frame relative flex h-[min(56vh,34rem)] items-end overflow-hidden bg-[#16301A]">
+            <Link key={kind.label} to={kind.href} className="group w-[min(72vw,420px)] shrink-0">
+              <div className="arch-frame relative flex h-[min(46svh,34rem)] items-end overflow-hidden bg-[#62A848] sm:h-[min(56vh,34rem)]">
                 {kind.src ? (
                   <img
                     src={kind.src}
@@ -129,7 +127,7 @@ export default function MoodRail() {
                     height={640}
                   />
                 ) : (
-                  <span className="relative z-10 p-8 text-4xl uppercase leading-none text-[#F6F3EA]">Accessories</span>
+                  <span className="relative z-10 p-8 text-4xl uppercase leading-none text-[#122117]">Accessories</span>
                 )}
               </div>
               <p className="mt-3 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em]">

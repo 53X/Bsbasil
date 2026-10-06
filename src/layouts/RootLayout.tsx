@@ -3,6 +3,7 @@ import { type ReactElement } from 'react';
 import { ScrollRestoration } from 'react-router';
 
 import HomepageSameAsJsonLd from '@/components/HomepageSameAsJsonLd';
+import HeadlineMotion from '@/components/motion/HeadlineMotion';
 import SilkIntro from '@/components/motion/SilkIntro';
 import SmoothScroll from '@/components/motion/SmoothScroll';
 import Footer from '@/layouts/parts/Footer';
@@ -38,10 +39,11 @@ export default function RootLayout({ children }: RootLayoutProps) {
         <HomepageSameAsJsonLd />
         <ScrollRestoration />
         <SilkIntro />
+        <HeadlineMotion />
         <SmoothScroll>
           <>
             <Header />
-            <div id="content" className="flex-1">
+            <div id="content" className="min-w-0 flex-1 overflow-x-clip">
               {children}
             </div>
             <Footer />

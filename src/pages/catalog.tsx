@@ -1,8 +1,7 @@
 import { Helmet } from '@dr.pogodin/react-helmet';
-import { useState } from 'react';
 import { useLoaderData, useSearchParams } from 'react-router';
 import { motion } from 'motion/react';
-import { SlidersHorizontal, X } from 'lucide-react';
+import { X } from 'lucide-react';
 import ProductCard from '@/components/ProductCard';
 import { ageLabel, expandProductsByAge, productMatchesFilters } from '@/lib/shopify/map';
 import type { StoreCatalog, StorePromotion } from '@/lib/shopify/types';
@@ -40,7 +39,6 @@ export default function CatalogPage() {
     (CATEGORY_FILTERS as readonly string[]).includes(categoryFromUrl)
       ? categoryFromUrl
       : 'All Categories';
-  const [showFilters, setShowFilters] = useState(false);
   const products = store.products;
 
   const setFilters = (age: string, category: string) => {
@@ -159,49 +157,18 @@ export default function CatalogPage() {
           className="sticky top-[6.25rem] z-40 border-b py-sm"
           style={{ background: 'hsl(var(--background))', borderColor: 'hsl(var(--border))' }}>
           <div className="max-w-content mx-auto px-4">
-            {/* Mobile filter toggle */}
-            <div className="flex items-center justify-between md:hidden mb-sm">
-              <button
-                onClick={() => setShowFilters(!showFilters)}
-                className="flex items-center gap-2 px-base py-xs rounded-full text-sm font-medium border transition-colors"
-                style={{
-                  borderColor: 'hsl(var(--border))',
-                  color: 'hsl(var(--foreground))',
-                  background: showFilters ? 'hsl(var(--muted))' : 'transparent'
-                }}>
-                <SlidersHorizontal size={16} />
-                Filters
-                {hasActiveFilters && (
-                  <span
-                    className="w-5 h-5 rounded-full text-xs flex items-center justify-center font-bold"
-                    style={{ background: 'hsl(var(--primary))', color: 'hsl(var(--primary-foreground))' }}>
-                    !
-                  </span>
-                )}
-              </button>
-              {hasActiveFilters && (
-                <button
-                  onClick={clearFilters}
-                  className="flex items-center gap-1 text-sm"
-                  style={{ color: 'hsl(var(--brand-ink))' }}>
-                  <X size={14} />
-                  Clear
-                </button>
-              )}
-            </div>
-
-            <div className={`${showFilters ? 'block' : 'hidden'} md:block`}>
+            <div>
               {/* Age filter */}
               <div role="group" aria-label="Filter by age" className="mb-sm">
                 <p className="text-xs font-semibold mb-xs uppercase tracking-wide" style={{ color: 'hsl(var(--muted-foreground))' }}>
                   Age
                 </p>
-                <div className="flex flex-wrap gap-2">
+                <div className="flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] md:flex-wrap md:overflow-visible [&::-webkit-scrollbar]:hidden">
                   {AGE_FILTERS.map((age) => (
                     <button
                       key={age.value}
                       onClick={() => setFilters(age.value, selectedCategory)}
-                      className="min-h-11 px-4 rounded-full text-sm font-semibold border transition-all"
+                      className="min-h-11 shrink-0 px-4 rounded-full text-sm font-semibold border transition-all"
                       style={{
                         background: selectedAge === age.value ? 'hsl(var(--primary))' : 'hsl(var(--background))',
                         color: selectedAge === age.value ? 'hsl(var(--primary-foreground))' : 'hsl(var(--foreground))',
@@ -218,12 +185,12 @@ export default function CatalogPage() {
                 <p className="text-xs font-semibold mb-xs uppercase tracking-wide" style={{ color: 'hsl(var(--muted-foreground))' }}>
                   Category
                 </p>
-                <div className="flex flex-wrap gap-2">
+                <div className="flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] md:flex-wrap md:overflow-visible [&::-webkit-scrollbar]:hidden">
                   {CATEGORY_FILTERS.map((cat) => (
                     <button
                       key={cat}
                       onClick={() => setFilters(selectedAge, cat)}
-                      className="min-h-11 px-4 rounded-full text-sm font-semibold border transition-all"
+                      className="min-h-11 shrink-0 px-4 rounded-full text-sm font-semibold border transition-all"
                       style={{
                         background: selectedCategory === cat ? 'hsl(var(--accent))' : 'hsl(var(--background))',
                         color: selectedCategory === cat ? 'hsl(var(--accent-foreground))' : 'hsl(var(--foreground))',
@@ -242,8 +209,8 @@ export default function CatalogPage() {
         <section className="py-xl" style={{ background: 'hsl(var(--background))' }}>
           <div className="max-w-content mx-auto px-4">
             {/* Results count */}
-            <div className="flex items-center justify-between mb-lg gap-4">
-              <p className="text-sm" style={{ color: 'hsl(var(--muted-foreground))' }}>
+            <div className="mb-lg flex flex-wrap items-center justify-between gap-4">
+              <p className="min-w-0 text-sm" style={{ color: 'hsl(var(--muted-foreground))' }}>
                 Showing{' '}
                 <span className="font-semibold" style={{ color: 'hsl(var(--foreground))' }}>
                   {visibleCount}
@@ -262,7 +229,7 @@ export default function CatalogPage() {
               {hasActiveFilters &&
               <button
                 onClick={clearFilters}
-                className="hidden md:flex items-center gap-1 text-sm font-medium"
+                className="flex shrink-0 items-center gap-1 text-sm font-medium"
                 style={{ color: 'hsl(var(--brand-ink))' }}>
                 
                   <X size={14} />

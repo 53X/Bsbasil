@@ -16,6 +16,7 @@ export default function SilkIntro() {
     if (!panel) return;
     let kill = () => {};
     let cancelled = false;
+    const failSafe = window.setTimeout(() => setDone(true), 2200);
     void import('gsap').then((mod) => {
       if (cancelled) return;
       const tween = mod.default.to(panel, {
@@ -32,6 +33,7 @@ export default function SilkIntro() {
     });
     return () => {
       cancelled = true;
+      window.clearTimeout(failSafe);
       kill();
     };
   }, []);
@@ -39,9 +41,9 @@ export default function SilkIntro() {
   if (done) return null;
 
   return (
-    <div ref={panelRef} className="fixed inset-0 z-[80] overflow-hidden" aria-hidden="true">
+    <div ref={panelRef} data-silk-intro className="fixed inset-0 z-[80] overflow-hidden" aria-hidden="true">
       <ColorWash className="absolute inset-0 h-full w-full" />
-      <div className="relative flex h-full flex-col items-center justify-center text-[#F6F3EA]">
+      <div className="relative flex h-full flex-col items-center justify-center text-[#122117]">
         <p className="text-xs uppercase tracking-[0.42em]">Bsbasil</p>
         <p className="mt-4 font-[family-name:var(--font-heading)] text-6xl leading-none md:text-8xl">The edit</p>
       </div>

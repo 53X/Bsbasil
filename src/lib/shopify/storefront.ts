@@ -242,7 +242,8 @@ export async function loadCatalog(force = false): Promise<StoreCatalog> {
     let cursor: string | null = null;
     let details = shopDetails(null);
 
-    for (let page = 0; page < 4; page += 1) {
+    // Page until Shopify says the catalog is finished. A stalled cursor stops the loop.
+    for (let page = 0; page < 40; page += 1) {
       const data: ProductsData = await storefront<ProductsData>(
         `query Products($cursor: String) {
           products(first: 50, after: $cursor) { pageInfo { hasNextPage endCursor } nodes { ${PRODUCT_FIELDS} } }
@@ -252,8 +253,9 @@ export async function loadCatalog(force = false): Promise<StoreCatalog> {
       );
       products.push(...data.products.nodes.map(mapProduct));
       details = shopDetails(data.shop);
-      if (!data.products.pageInfo.hasNextPage) break;
-      cursor = data.products.pageInfo.endCursor;
+      const nextCursor = data.products.pageInfo.endCursor;
+      if (!data.products.pageInfo.hasNextPage || !nextCursor || nextCursor === cursor) break;
+      cursor = nextCursor;
     }
 
     const priced = await previewProductDiscounts(products);
@@ -339,64 +341,71 @@ function mapCart(cart: NonNullable<CartPayload["cart"]>): StoreCart {
   };
 }
 
-async function previewProductDiscounts(products: StoreProduct[]): Promise<StoreProduct[]> {
-  const variantIds = products
-    .flatMap((product) => product.variants.filter((variant) => variant.available).map((variant) => variant.id))
-    .slice(0, 50);
-  if (variantIds.length === 0) return products;
+const DISCOUNT_PREVIEW_CHUNK = 50;
 
-  try {
-    const data = await storefront<{
-      cartCreate: {
-        cart: {
-          lines: {
-            nodes: Array<{
-              quantity: number;
-              merchandise: { id: string };
-              cost: { totalAmount: { amount: string }; subtotalAmount: { amount: string } };
-              discountAllocations: Array<{ title?: string; code?: string }>;
-            }>;
-          };
-        } | null;
-      };
-    }>(
-      `mutation Preview($lines: [CartLineInput!]!) {
-        cartCreate(input: { lines: $lines }) {
-          cart {
-            lines(first: 50) {
-              nodes {
-                quantity
-                merchandise { ... on ProductVariant { id } }
-                cost {
-                  totalAmount { amount }
-                  subtotalAmount { amount }
-                }
-                discountAllocations {
-                  ... on CartAutomaticDiscountAllocation { title }
-                  ... on CartCodeDiscountAllocation { code }
-                }
+async function previewDiscountChunk(variantIds: string[]) {
+  const data = await storefront<{
+    cartCreate: {
+      cart: {
+        lines: {
+          nodes: Array<{
+            quantity: number;
+            merchandise: { id: string };
+            cost: { totalAmount: { amount: string }; subtotalAmount: { amount: string } };
+            discountAllocations: Array<{ title?: string; code?: string }>;
+          }>;
+        };
+      } | null;
+    };
+  }>(
+    `mutation Preview($lines: [CartLineInput!]!) {
+      cartCreate(input: { lines: $lines }) {
+        cart {
+          lines(first: ${DISCOUNT_PREVIEW_CHUNK}) {
+            nodes {
+              quantity
+              merchandise { ... on ProductVariant { id } }
+              cost {
+                totalAmount { amount }
+                subtotalAmount { amount }
+              }
+              discountAllocations {
+                ... on CartAutomaticDiscountAllocation { title }
+                ... on CartCodeDiscountAllocation { code }
               }
             }
           }
         }
-      }`,
-      { lines: variantIds.map((merchandiseId) => ({ merchandiseId, quantity: 1 })) },
-    );
-    const nodes = data.cartCreate.cart?.lines.nodes;
-    if (!nodes?.length) return products;
-    return applyCartDiscounts(
-      products,
-      nodes.map((line) => ({
-        variantId: line.merchandise.id,
-        quantity: line.quantity,
-        totalAmount: line.cost.totalAmount.amount,
-        subtotalAmount: line.cost.subtotalAmount.amount,
-        title: line.discountAllocations.map((allocation) => allocation.title || allocation.code).filter(Boolean).join(", ") || null,
-      })),
-    );
-  } catch {
-    return products;
+      }
+    }`,
+    { lines: variantIds.map((merchandiseId) => ({ merchandiseId, quantity: 1 })) },
+  );
+  return (data.cartCreate.cart?.lines.nodes ?? []).map((line) => ({
+    variantId: line.merchandise.id,
+    quantity: line.quantity,
+    totalAmount: line.cost.totalAmount.amount,
+    subtotalAmount: line.cost.subtotalAmount.amount,
+    title: line.discountAllocations.map((allocation) => allocation.title || allocation.code).filter(Boolean).join(", ") || null,
+  }));
+}
+
+async function previewProductDiscounts(products: StoreProduct[]): Promise<StoreProduct[]> {
+  const variantIds = products.flatMap((product) =>
+    product.variants.filter((variant) => variant.available).map((variant) => variant.id),
+  );
+  if (variantIds.length === 0) return products;
+
+  const lines = [];
+  for (let index = 0; index < variantIds.length; index += DISCOUNT_PREVIEW_CHUNK) {
+    const chunk = variantIds.slice(index, index + DISCOUNT_PREVIEW_CHUNK);
+    try {
+      lines.push(...(await previewDiscountChunk(chunk)));
+    } catch {
+      // A failed preview chunk leaves those variants at their Shopify price.
+    }
   }
+  if (lines.length === 0) return products;
+  return applyCartDiscounts(products, lines);
 }
 
 async function withPromotionPrices(cart: StoreCart): Promise<StoreCart> {
@@ -527,48 +536,65 @@ function fieldReference(fields: PromotionField[], key: string) {
   return fields.find((field) => field.key === key)?.reference ?? null;
 }
 
+function mapPromotion(node: { id: string; fields: PromotionField[] }): StorePromotion[] {
+  const fields = node.fields;
+  const heading = fieldValue(fields, "heading");
+  if (!heading) return [];
+  const picture = fieldReference(fields, "picture");
+  const clip = fieldReference(fields, "clip");
+  const video = clip?.sources?.find((source) => source.url)?.url || null;
+  return [{
+    id: node.id,
+    heading,
+    message: fieldValue(fields, "message"),
+    offer: fieldValue(fields, "offer"),
+    buttonLabel: fieldValue(fields, "button_label") || "Shop now",
+    href: fieldValue(fields, "link") || "/catalog",
+    imageUrl: picture?.image?.url || null,
+    imageAlt: picture?.image?.altText || heading,
+    videoUrl: video,
+    posterUrl: clip?.previewImage?.url || picture?.image?.url || null,
+  }];
+}
+
 export async function loadPromotions(): Promise<StorePromotion[]> {
   if (!shopifyConfig()) return [];
+  const promotions: StorePromotion[] = [];
+  let cursor: string | null = null;
   try {
-    const data = await storefront<{ metaobjects: { nodes: { id: string; fields: PromotionField[] }[] } }>(
-      `query Promotions {
-        metaobjects(type: "homepage_promotion", first: 12) {
-          nodes {
-            id
-            fields {
-              key
-              value
-              reference {
-                ... on MediaImage { image { url altText } }
-                ... on Video { sources { url mimeType } previewImage { url } }
+    for (let page = 0; page < 20; page += 1) {
+      const data = await storefront<{
+        metaobjects: {
+          pageInfo: { hasNextPage: boolean; endCursor: string | null };
+          nodes: { id: string; fields: PromotionField[] }[];
+        };
+      }>(
+        `query Promotions($cursor: String) {
+          metaobjects(type: "homepage_promotion", first: 50, after: $cursor) {
+            pageInfo { hasNextPage endCursor }
+            nodes {
+              id
+              fields {
+                key
+                value
+                reference {
+                  ... on MediaImage { image { url altText } }
+                  ... on Video { sources { url mimeType } previewImage { url } }
+                }
               }
             }
           }
-        }
-      }`,
-    );
-    return data.metaobjects.nodes.flatMap((node) => {
-      const fields = node.fields;
-      const heading = fieldValue(fields, "heading");
-      if (!heading) return [];
-      const picture = fieldReference(fields, "picture");
-      const clip = fieldReference(fields, "clip");
-      const video = clip?.sources?.find((source) => source.url)?.url || null;
-      return [{
-        id: node.id,
-        heading,
-        message: fieldValue(fields, "message"),
-        offer: fieldValue(fields, "offer"),
-        buttonLabel: fieldValue(fields, "button_label") || "Shop now",
-        href: fieldValue(fields, "link") || "/catalog",
-        imageUrl: picture?.image?.url || null,
-        imageAlt: picture?.image?.altText || heading,
-        videoUrl: video,
-        posterUrl: clip?.previewImage?.url || picture?.image?.url || null,
-      }];
-    });
+        }`,
+        { cursor },
+      );
+      promotions.push(...data.metaobjects.nodes.flatMap(mapPromotion));
+      const nextCursor = data.metaobjects.pageInfo.endCursor;
+      if (!data.metaobjects.pageInfo.hasNextPage || !nextCursor || nextCursor === cursor) break;
+      cursor = nextCursor;
+    }
+    return promotions;
   } catch {
-    return [];
+    return promotions;
   }
 }
 

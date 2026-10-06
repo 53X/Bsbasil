@@ -380,7 +380,7 @@ export default function ProductPage() {
             {product.badge ? (
               <p className="text-xs font-bold uppercase tracking-wide mb-xs" style={{ color: 'hsl(var(--brand-ink))' }}>{product.badge}</p>
             ) : null}
-            <h1 className="text-3xl md:text-4xl font-bold mb-sm" style={{ color: 'hsl(var(--foreground))' }}>{product.name}</h1>
+            <h1 className="mb-sm break-words text-[clamp(1.75rem,6vw,2.5rem)] font-bold" style={{ color: 'hsl(var(--foreground))' }}>{product.name}</h1>
             <p className="mb-xs">
               <PriceTag price={price} compareAt={compareAt} currency={currency} discount={discountTitle} priceClassName="text-2xl font-bold" />
             </p>
@@ -602,15 +602,17 @@ export default function ProductPage() {
         </section>
       </main>
       <div
-        className="fixed bottom-0 inset-x-0 z-40 border-t p-3 md:hidden flex items-center gap-3"
+        className="fixed bottom-0 inset-x-0 z-40 flex items-center gap-3 border-t p-3 md:hidden"
         style={{ background: 'hsl(var(--background))', borderColor: 'hsl(var(--border))' }}
       >
-        <PriceTag price={price} compareAt={compareAt} currency={currency} discount={discountTitle} />
+        <div className="min-w-0">
+          <PriceTag price={price} compareAt={compareAt} currency={currency} discount={discountTitle} />
+        </div>
         <button
           type="button"
           onClick={onAdd}
           disabled={adding || soldOut || (requiresSize && !chosenSize)}
-          className="flex-1 py-sm rounded-full font-semibold disabled:opacity-60"
+          className="min-h-12 flex-1 shrink-0 rounded-full px-4 font-semibold disabled:opacity-60"
           style={{ background: 'hsl(var(--primary))', color: 'hsl(var(--primary-foreground))' }}
         >
           {soldOut ? 'Sold out' : 'Add to bag'}

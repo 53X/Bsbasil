@@ -1,18 +1,8 @@
+import { useEffect } from 'react';
 import { about } from 'virtual:content';
 import { Helmet } from '@dr.pogodin/react-helmet';
 import { Link } from 'react-router';
-import { motion } from 'motion/react';
 import { Leaf, Heart, Globe, ShieldCheck, Sparkles, Baby, Recycle } from 'lucide-react';
-
-const fadeUp = {
-  hidden: { opacity: 0, y: 32 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.55, ease: 'easeOut' as const } },
-};
-
-const stagger = {
-  hidden: {},
-  visible: { transition: { staggerChildren: 0.15 } },
-};
 
 const valuesMeta = [
   {
@@ -80,6 +70,7 @@ export default function AboutPage() {
         }).replace(/</g, '\\u003c')}</script>
       </Helmet>
       <main>
+        <AboutReveal />
         {/* ── Hero ── */}
         <section className="relative overflow-hidden" style={{ background: 'hsl(var(--muted))' }}>
           <div className="absolute inset-0 pointer-events-none">
@@ -94,78 +85,63 @@ export default function AboutPage() {
             />
           </div>
           <div className="relative max-w-content mx-auto px-4 py-xxxl text-center">
-            <motion.div
-              initial="hidden"
-              animate="visible"
-              variants={stagger}
-            >
-              <motion.p
-                variants={fadeUp}
+            <div>
+              <p
+                data-about-reveal
                 className="text-sm font-semibold tracking-wide mb-sm"
                 style={{ color: 'hsl(var(--brand-ink))' }}
               >
                 Our Story
-              </motion.p>
-              <motion.h1
-                variants={fadeUp}
-                className="text-4xl md:text-5xl lg:text-6xl font-bold mb-lg"
+              </p>
+              <h1
+                data-about-reveal
+                className="text-4xl md:text-5xl lg:text-6xl font-bold mb-lg leading-[1.05]"
                 style={{ color: 'hsl(var(--foreground))' }}
               >
-                Made with Love,<br />
-                <span style={{ color: 'hsl(var(--brand-ink))' }}>Worn with Joy</span>
-              </motion.h1>
-              <motion.p
-                variants={fadeUp}
+                Made with Love,
+                <em className="mt-[0.55em] block text-[0.92em] leading-[1.15]">Worn with Joy</em>
+              </h1>
+              <p
+                data-about-reveal
                 className="text-lg md:text-xl max-w-2xl mx-auto mb-lg"
                 style={{ color: 'hsl(var(--mutedForeground, var(--muted-foreground)))' }}
               >
                 Bsbasil was born from a simple belief — every little one deserves clothes that are
                 as gentle as they are adorable.
-              </motion.p>
-              <motion.p
-                variants={fadeUp}
+              </p>
+              <p
+                data-about-reveal
                 className="text-base max-w-xl mx-auto"
                 style={{ color: 'hsl(var(--muted-foreground))' }}
               >
                 Founded by parents, for parents. We design every piece with tiny humans in mind —
                 soft fabrics, safe dyes, and thoughtful fits that grow with your baby.
-              </motion.p>
-            </motion.div>
+              </p>
+            </div>
           </div>
         </section>
 
         {/* ── Our Values ── */}
         <section className="py-xxl" style={{ background: 'hsl(var(--background))' }}>
           <div className="max-w-content mx-auto px-4">
-            <motion.div
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true }}
-              variants={fadeUp}
-              className="text-center mb-xl"
-            >
-              <h2 className="text-3xl md:text-4xl font-bold mb-sm" style={{ color: 'hsl(var(--foreground))' }}>
-                What We Stand For
+            <div data-about-reveal className="text-center mb-xl">
+              <h2 className="text-3xl md:text-4xl font-bold mb-sm leading-[1.05]" style={{ color: 'hsl(var(--foreground))' }}>
+                What We
+                <em className="mt-[0.55em] block text-[0.92em] leading-[1.15]">Stand For</em>
               </h2>
               <p className="text-base" style={{ color: 'hsl(var(--muted-foreground))' }}>
                 Every Bsbasil piece is guided by three core promises.
               </p>
-            </motion.div>
+            </div>
 
-            <motion.div
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true }}
-              variants={stagger}
-              className="grid grid-cols-1 md:grid-cols-3 gap-base"
-            >
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-base">
               {about.values.map((v, _airoIdx) => {
                 const Icon = valuesMeta[_airoIdx].icon;
 
                 return (
-                  <motion.div
+                  <div
                     key={v.title}
-                    variants={fadeUp}
+                    data-about-reveal
                     className="rounded-2xl p-lg flex flex-col items-center text-center border"
                     style={{ background: v.bg, borderColor: 'hsl(var(--border))' }}
                   >
@@ -181,54 +157,46 @@ export default function AboutPage() {
                     <p className="text-sm leading-relaxed" style={{ color: 'hsl(var(--muted-foreground))' }}>
                       {v.description}
                     </p>
-                  </motion.div>
+                  </div>
                 );
               })}
-            </motion.div>
+            </div>
           </div>
         </section>
 
         {/* ── Safety Promise ── */}
         <section className="py-xxl" style={{ background: 'hsl(var(--muted))' }}>
           <div className="max-w-content mx-auto px-4">
-            <motion.div
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true }}
-              variants={stagger}
-              className="text-center"
-            >
-              <motion.div variants={fadeUp} className="mb-sm">
+            <div className="text-center">
+              <div data-about-reveal className="mb-sm">
                 <ShieldCheck size={48} style={{ color: 'hsl(var(--brand-ink))', margin: '0 auto' }} />
-              </motion.div>
-              <motion.h2
-                variants={fadeUp}
-                className="text-3xl md:text-4xl font-bold mb-base"
+              </div>
+              <h2
+                data-about-reveal
+                className="text-3xl md:text-4xl font-bold mb-base leading-[1.05]"
                 style={{ color: 'hsl(var(--foreground))' }}
               >
-                Our Safety Promise
-              </motion.h2>
-              <motion.p
-                variants={fadeUp}
+                Our Safety
+                <em className="mt-[0.55em] block text-[0.92em] leading-[1.15]">Promise</em>
+              </h2>
+              <p
+                data-about-reveal
                 className="text-base md:text-lg max-w-2xl mx-auto mb-xl leading-relaxed"
                 style={{ color: 'hsl(var(--muted-foreground))' }}
               >
                 Every Bsbasil garment is tested to meet international baby safety standards. We use
                 only OEKO-TEX® certified fabrics — free from harmful chemicals, dyes, and
                 irritants. Because your baby's skin deserves nothing less.
-              </motion.p>
+              </p>
 
-              <motion.div
-                variants={stagger}
-                className="flex flex-wrap justify-center gap-base"
-              >
+              <div className="flex flex-wrap justify-center gap-base">
                 {about.badges.map((b, _airoIdx) => {
                   const Icon = badgesMeta[_airoIdx].icon;
 
                   return (
-                    <motion.div
+                    <div
                       key={b.label}
-                      variants={fadeUp}
+                      data-about-reveal
                       className="flex items-center gap-sm px-lg py-sm rounded-full border font-medium text-sm"
                       style={{
                         background: 'hsl(var(--background))',
@@ -238,25 +206,19 @@ export default function AboutPage() {
                     >
                       <Icon size={18} style={{ color: 'hsl(var(--brand-ink))' }} />
                       <span>{b.label}</span>
-                    </motion.div>
+                    </div>
                   );
                 })}
-              </motion.div>
-            </motion.div>
+              </div>
+            </div>
           </div>
         </section>
 
         {/* ── Founder Note ── */}
         <section className="py-xxl" style={{ background: 'hsl(var(--background))' }}>
           <div className="max-w-content mx-auto px-4">
-            <motion.div
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true }}
-              variants={stagger}
-              className="flex flex-col md:flex-row items-center gap-xl"
-            >
-              <motion.div variants={fadeUp} className="flex-shrink-0">
+            <div className="flex flex-col md:flex-row items-center gap-xl">
+              <div data-about-reveal className="flex-shrink-0">
                 <img
                   src="/airo-assets/images/pages/about/founder"
                   alt="Bsbasil founder with her baby"
@@ -266,13 +228,16 @@ export default function AboutPage() {
                   height={256}
                   loading="lazy"
                 />
-              </motion.div>
-              <motion.div variants={fadeUp} className="text-center md:text-left">
+              </div>
+              <div data-about-reveal className="text-center md:text-left">
                 <p className="text-sm font-semibold mb-sm" style={{ color: 'hsl(var(--brand-ink))' }}>
                   A note from our founder
                 </p>
+                <p className="italic-accent mb-base text-[clamp(1.7rem,3.2vw,2.45rem)] leading-[1.3]">
+                  my love letter
+                </p>
                 <blockquote
-                  className="text-xl md:text-2xl font-medium leading-relaxed mb-base italic"
+                  className="text-xl md:text-2xl font-medium leading-relaxed mb-base"
                   style={{ color: 'hsl(var(--foreground))' }}
                 >
                   "When my daughter was born, I couldn't find clothes that were truly soft, safe,
@@ -282,35 +247,30 @@ export default function AboutPage() {
                 <p className="font-semibold" style={{ color: 'hsl(var(--muted-foreground))' }}>
                   — Founder, Bsbasil
                 </p>
-              </motion.div>
-            </motion.div>
+              </div>
+            </div>
           </div>
         </section>
 
         {/* ── CTA Banner ── */}
         <section className="py-xxl" style={{ background: 'hsl(var(--blush))' }}>
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            variants={stagger}
-            className="max-w-content mx-auto px-4 text-center"
-          >
-            <motion.h2
-              variants={fadeUp}
-              className="text-3xl md:text-4xl font-bold mb-base"
+          <div className="max-w-content mx-auto px-4 text-center">
+            <h2
+              data-about-reveal
+              className="text-3xl md:text-4xl font-bold mb-base leading-[1.05]"
               style={{ color: 'hsl(var(--foreground))' }}
             >
-              Dress your little one in love
-            </motion.h2>
-            <motion.p
-              variants={fadeUp}
+              Dress your little one
+              <em className="mt-[0.55em] block text-[0.92em] leading-[1.15]">in love</em>
+            </h2>
+            <p
+              data-about-reveal
               className="text-lg mb-lg"
               style={{ color: 'hsl(var(--muted-foreground))' }}
             >
               Explore our collection of soft, safe, and adorable clothes for ages 0–3.
-            </motion.p>
-            <motion.div variants={fadeUp}>
+            </p>
+            <div data-about-reveal>
               <Link
                 to="/catalog"
                 className="inline-block px-xl py-base rounded-full font-bold text-base transition-transform hover:scale-105"
@@ -321,10 +281,77 @@ export default function AboutPage() {
               >
                 Shop Now
               </Link>
-            </motion.div>
-          </motion.div>
+            </div>
+          </div>
         </section>
       </main>
     </>
   );
+}
+
+/** About page only: each block stays hidden until it enters the screen, then slides in from the left. */
+function AboutReveal() {
+  useEffect(() => {
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const nodes = [...document.querySelectorAll<HTMLElement>('[data-about-reveal]')];
+    if (reduced) {
+      nodes.forEach((el) => { el.dataset.shown = '1'; });
+      return;
+    }
+
+    let frame = 0;
+    const reveal = (batch: HTMLElement[]) => {
+      const ordered = [...batch].sort((a, b) => {
+        const aa = a.getBoundingClientRect();
+        const bb = b.getBoundingClientRect();
+        return aa.top - bb.top || aa.left - bb.left;
+      });
+      ordered.forEach((el, index) => {
+        el.style.transitionDelay = `${index * 0.08}s`;
+        el.dataset.shown = '1';
+      });
+    };
+
+    const tick = () => {
+      frame = 0;
+      if (document.querySelector('[data-silk-intro]')) {
+        frame = window.requestAnimationFrame(tick);
+        return;
+      }
+      const vh = window.innerHeight;
+      const entered: HTMLElement[] = [];
+      nodes.forEach((el) => {
+        if (el.dataset.shown === '1') return;
+        const box = el.getBoundingClientRect();
+        if (box.height < 2) return;
+        if (box.bottom < 48 && box.top < 0) {
+          el.style.transition = 'none';
+          el.dataset.shown = '1';
+          return;
+        }
+        if (box.top < vh - 32 && box.bottom > 64) entered.push(el);
+      });
+      if (entered.length) reveal(entered);
+      if (nodes.some((el) => el.dataset.shown !== '1')) {
+        frame = window.requestAnimationFrame(tick);
+      }
+    };
+
+    const kick = () => {
+      if (frame) return;
+      frame = window.requestAnimationFrame(tick);
+    };
+
+    kick();
+    window.addEventListener('scroll', kick, { passive: true });
+    window.addEventListener('bs-motion-refresh', kick);
+
+    return () => {
+      window.removeEventListener('scroll', kick);
+      window.removeEventListener('bs-motion-refresh', kick);
+      if (frame) window.cancelAnimationFrame(frame);
+    };
+  }, []);
+
+  return null;
 }

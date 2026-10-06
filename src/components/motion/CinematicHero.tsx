@@ -3,19 +3,71 @@ import { Link } from 'react-router';
 import { ArrowRight } from 'lucide-react';
 
 const KINDS = [
-  { src: '/hero-cube/romper.jpg', label: 'Rompers', href: '/catalog?category=Romper' },
-  { src: '/hero-cube/sets.jpg', label: 'Sets', href: '/catalog?category=Sets' },
-  { src: '/hero-cube/sleepwear.jpg', label: 'Sleepwear', href: '/catalog?category=Sleepwear' },
-  { src: '/hero-cube/winter-wear.jpg', label: 'Winter wear', href: '/catalog?category=Winter%20wear' },
-  { src: '', label: 'Accessories', href: '/catalog?category=Accessories' },
+  {
+    src: '/hero-cube/romper.jpg',
+    label: 'Rompers',
+    href: '/catalog?category=Romper',
+    lead: 'Premium comfort',
+    script: 'for precious little ones',
+    sub: 'Soft all day, from the first feed to the last cuddle.',
+  },
+  {
+    src: '/hero-cube/sets.jpg',
+    label: 'Sets',
+    href: '/catalog?category=Sets',
+    lead: 'Tiny elegance',
+    script: 'for big celebration',
+    sub: 'A dressed-up set for parties, photos, and everyone waiting to see them.',
+  },
+  {
+    src: '/hero-cube/sleepwear.jpg',
+    label: 'Sleepwear',
+    href: '/catalog?category=Sleepwear',
+    lead: 'Cute comfort',
+    script: 'for every little journey',
+    sub: 'For naps, nights, and every small trip in between.',
+  },
+  {
+    src: '/hero-cube/winter-wear.jpg',
+    label: 'Winter wear',
+    href: '/catalog?category=Winter%20wear',
+    lead: 'Cozy warmth',
+    script: 'for chilly mornings',
+    sub: 'A warm layer that still lets them play.',
+  },
+  {
+    src: '',
+    label: 'Accessories',
+    href: '/catalog?category=Accessories',
+    lead: 'Sweet details',
+    script: 'for tiny looks',
+    sub: 'The little extras that finish a romper, a set, or a sleepy night.',
+  },
 ];
 const STILLS = KINDS.filter((kind) => kind.src);
+
+/** Replace a hero line without wiping a matching word animation already on screen. */
+function paintLine(el: Element | null, text: string) {
+  if (!(el instanceof HTMLElement)) return;
+  const next = text.replace(/\s+/g, ' ').trim();
+  if (el.dataset.raw === next) return;
+  el.dataset.raw = next;
+  el.textContent = text;
+  delete el.dataset.words;
+  delete el.dataset.played;
+  const heading = el.closest('h1, h2, h3');
+  if (heading instanceof HTMLElement) {
+    delete heading.dataset.words;
+    delete heading.dataset.played;
+  }
+  el.dispatchEvent(new CustomEvent('bs-line-change', { bubbles: true }));
+}
 
 /**
  * Sticky hero. Scrolling plays all six clothing types: the photograph
  * crossfades through each still while the matching name lights up.
  */
-export default function CinematicHero({ eyebrow, subtitle }: { eyebrow: string; subtitle: string }) {
+export default function CinematicHero({ eyebrow }: { eyebrow: string }) {
   const rootRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
@@ -32,17 +84,28 @@ export default function CinematicHero({ eyebrow, subtitle }: { eyebrow: string; 
       const gsap = gsapMod.default;
       const ScrollTrigger = scrollMod.ScrollTrigger;
       gsap.registerPlugin(ScrollTrigger);
-      const narrow = window.matchMedia('(max-width: 767px)').matches;
+      const wide = window.matchMedia('(min-width: 1024px)').matches;
 
       const ctx = gsap.context(() => {
         const stills = gsap.utils.toArray<HTMLElement>('[data-still]');
         const labels = gsap.utils.toArray<HTMLElement>('[data-type]');
         const caption = root.querySelector('[data-still-name]');
+        const lead = root.querySelector('[data-hero-lead]');
+        const script = root.querySelector('[data-hero-script]');
+        const sub = root.querySelector('[data-hero-sub]');
         const bar = root.querySelector('[data-film-bar]');
         const mark = (progress: number) => {
           const index = Math.min(KINDS.length - 1, Math.floor(progress * KINDS.length));
+          const kind = KINDS[index];
+          const stillIndex = Math.min(stills.length - 1, index);
           labels.forEach((label, i) => label.classList.toggle('is-on', i === index));
-          if (caption) caption.textContent = KINDS[index]?.label ?? '';
+          stills.forEach((still, i) => {
+            still.style.opacity = i === stillIndex ? '1' : '0';
+          });
+          if (caption) caption.textContent = kind?.label ?? '';
+          paintLine(lead, kind?.lead ?? '');
+          paintLine(script, kind?.script ?? '');
+          paintLine(sub, kind?.sub ?? '');
         };
 
         const timeline = gsap.timeline({
@@ -56,26 +119,24 @@ export default function CinematicHero({ eyebrow, subtitle }: { eyebrow: string; 
           },
         });
 
-        timeline.fromTo('[data-hero-photo]', { scale: 1.14 }, { scale: 1, ease: 'none', duration: 1 }, 0);
-        if (!narrow) {
-          timeline.fromTo('[data-line="a"]', { x: 0 }, { x: -16, ease: 'none', duration: 1 }, 0);
-          timeline.fromTo('[data-line="b"]', { x: 0 }, { x: 12, ease: 'none', duration: 1 }, 0);
+        if (wide) {
+          timeline.fromTo('[data-hero-photo]', { scale: 1.14 }, { scale: 1, ease: 'none', duration: 1 }, 0);
         }
         timeline.fromTo('[data-watermark]', { xPercent: -4 }, { xPercent: 8, ease: 'none', duration: 1 }, 0);
 
-        const slot = 1 / Math.max(1, stills.length - 1);
-        stills.forEach((still, index) => {
-          if (index === 0) return;
-          const at = (index - 1) * slot;
-          timeline.fromTo(still, { opacity: 0 }, { opacity: 1, ease: 'none', duration: slot * 0.5 }, at + slot * 0.28);
-          timeline.to(stills[index - 1], { opacity: 0, ease: 'none', duration: slot * 0.4 }, at + slot * 0.55);
-        });
         if (bar) timeline.fromTo(bar, { scaleX: 0 }, { scaleX: 1, ease: 'none', duration: 1 }, 0);
         mark(0);
       }, root);
 
       revert = () => ctx.revert();
+      const refresh = () => ScrollTrigger.refresh();
+      window.addEventListener('resize', refresh);
       ScrollTrigger.refresh();
+      const previousRevert = revert;
+      revert = () => {
+        window.removeEventListener('resize', refresh);
+        previousRevert();
+      };
     });
 
     return () => {
@@ -85,29 +146,29 @@ export default function CinematicHero({ eyebrow, subtitle }: { eyebrow: string; 
   }, []);
 
   return (
-    <section ref={rootRef} className="relative bg-background lg:h-[380vh]">
-      <div className="mx-auto grid max-w-content items-center gap-4 overflow-visible px-4 py-6 lg:sticky lg:top-[6.25rem] lg:h-[calc(100dvh-6.25rem)] lg:grid-cols-[1.05fr_0.95fr] lg:gap-8 lg:overflow-hidden lg:py-5">
+    <section ref={rootRef} className="relative h-[280svh] bg-background sm:h-[340svh] lg:h-[380vh]">
+      <div className="sticky top-[6.25rem] mx-auto grid h-[calc(100svh-6.25rem)] max-w-content grid-rows-[auto_minmax(0,1fr)] items-stretch gap-3 overflow-hidden px-4 py-3 sm:gap-4 sm:py-5 lg:h-[calc(100dvh-6.25rem)] lg:grid-cols-[minmax(0,0.82fr)_minmax(0,1.18fr)] lg:grid-rows-none lg:items-stretch lg:gap-8">
         <p data-watermark className="watermark" aria-hidden="true">
           COLOUR
         </p>
-        <div className="relative z-10 min-w-0">
-          <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.18em] sm:mb-5 sm:text-xs sm:tracking-[0.24em]" style={{ color: 'hsl(var(--brand-ink))' }}>
+        <div className="relative z-10 min-h-0 min-w-0">
+          <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.16em] sm:mb-5 sm:text-xs sm:tracking-[0.24em]" style={{ color: 'hsl(var(--brand-ink))' }}>
             {eyebrow}
           </p>
-          <h1 className="text-[clamp(2.35rem,5.4vw,4.8rem)] leading-[0.88]">
-            <span data-line="a" className="block">
-              Loud colour,
+          <h1 className="max-w-full pr-4 text-[clamp(1.7rem,8vw,4.15rem)] leading-none sm:pr-8">
+            <span data-line="a" data-hero-lead className="block leading-[1.05]">
+              {KINDS[0].lead}
             </span>
-            <em data-line="b" className="block">
-              quiet comfort.
+            <em data-line="b" data-hero-script className="mt-[0.55em] block max-w-[32rem] text-[0.92em] leading-[1.25] lg:mt-[0.72em]">
+              {KINDS[0].script}
             </em>
           </h1>
-          <p className="mt-3 max-w-md text-sm leading-relaxed sm:mt-5 sm:text-base md:text-lg" style={{ color: 'hsl(var(--foreground) / 0.78)' }}>
-            {subtitle}
+          <p data-hero-sub className="mt-2 line-clamp-2 max-w-md text-sm leading-relaxed sm:mt-5 sm:text-base md:text-lg lg:line-clamp-none" style={{ color: 'hsl(var(--foreground) / 0.78)' }}>
+            {KINDS[0].sub}
           </p>
-          <ul className="mt-4 flex flex-wrap gap-x-2 gap-y-1.5 sm:mt-5" aria-label="Clothing types">
+          <ul className="mt-3 flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] sm:mt-5 lg:flex-wrap lg:overflow-visible [&::-webkit-scrollbar]:hidden" aria-label="Clothing types">
             {KINDS.map((kind, index) => (
-              <li key={kind.label}>
+              <li key={kind.label} className="shrink-0">
                 <Link
                   data-type
                   to={kind.href}
@@ -118,25 +179,19 @@ export default function CinematicHero({ eyebrow, subtitle }: { eyebrow: string; 
               </li>
             ))}
           </ul>
-          <div className="mt-4 flex flex-col gap-3 sm:mt-6 sm:flex-row">
+          <div className="mt-3 flex flex-col gap-3 sm:mt-6 sm:flex-row">
             <Link
               to="/catalog"
-              className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-primary px-6 text-sm font-semibold uppercase tracking-[0.14em] text-primary-foreground sm:px-7"
+              className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-primary px-6 text-sm font-semibold uppercase tracking-[0.14em] text-primary-foreground sm:w-auto sm:px-7"
             >
               Explore the collection
               <ArrowRight size={16} />
             </Link>
-            <a
-              href="#moods"
-              className="inline-flex min-h-12 items-center justify-center rounded-full border border-foreground/20 px-6 text-sm font-semibold uppercase tracking-[0.14em] sm:px-7"
-            >
-              Watch the edit
-            </a>
           </div>
         </div>
-        <div className="relative z-10 flex min-h-0 flex-col">
+        <div className="relative z-10 flex min-h-0 flex-col lg:h-full">
           <div className="absolute -left-4 top-8 hidden h-[78%] w-16 bg-[#62A848] xl:block" aria-hidden="true" />
-          <div data-hero-photo className="relative mx-auto aspect-[3/4] w-full max-w-[34rem] overflow-hidden rounded-[1.25rem] bg-muted will-change-transform lg:aspect-auto lg:h-[min(68vh,40rem)] lg:rounded-[999px_999px_18px_18px]">
+          <div data-hero-photo className="relative min-h-[9rem] w-full flex-1 overflow-hidden rounded-[1.25rem] bg-muted will-change-transform lg:rounded-[999px_999px_18px_18px]">
             {STILLS.map((still, index) => (
               <img
                 key={still.src}
@@ -152,7 +207,7 @@ export default function CinematicHero({ eyebrow, subtitle }: { eyebrow: string; 
           </div>
           <p className="mt-2 flex items-center justify-between gap-3 text-[11px] font-semibold uppercase tracking-[0.16em] sm:text-xs sm:tracking-[0.2em]">
             <span data-still-name>{KINDS[0].label}</span>
-            <span>Scroll — the edit plays</span>
+            <span className="italic-accent normal-case tracking-normal text-base">the edit</span>
           </p>
         </div>
         <div className="absolute bottom-2 left-4 right-4 z-10 h-px bg-foreground/15 sm:bottom-4">

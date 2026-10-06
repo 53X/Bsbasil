@@ -174,7 +174,7 @@ export default function CartPage() {
                   </div>
 
                   {/* Subtotal */}
-                  <div className="text-right min-w-[100px]">
+                  <div className="min-w-0 text-left sm:min-w-[100px] sm:text-right">
                     <p className="font-bold" style={{ color: 'hsl(var(--foreground))' }}>
                       {formatPrice(item.price * item.quantity, item.currency)}
                     </p>

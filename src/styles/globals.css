@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@500;600&family=Outfit:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600&display=swap');
 
 @font-face {
   font-family: "Sunlight Memories Script";
@@ -24,12 +24,12 @@
     --card-foreground: 140 18% 8%;
     --popover: 42 38% 96%;
     --popover-foreground: 140 18% 8%;
-    --primary: 108 42% 30%;
-    --primary-foreground: 48 40% 96%;
-    --brand-ink: 104 48% 32%;
+    --primary: 104 40% 47%;
+    --primary-foreground: 140 18% 8%;
+    --brand-ink: 104 40% 47%;
     --logo: 104 40% 47%;
-    --secondary: 108 28% 18%;
-    --secondary-foreground: 48 40% 96%;
+    --secondary: 104 40% 47%;
+    --secondary-foreground: 140 18% 8%;
     --muted: 42 24% 92%;
     --muted-foreground: 140 8% 28%;
     --accent: 104 40% 47%;
@@ -38,12 +38,12 @@
     --butter: 48 46% 90%;
     --sky: 104 18% 93%;
     --mint: 104 32% 88%;
-    --lilac: 90 28% 90%;
+    --lilac: 104 36% 92%;
     --peach: 36 40% 90%;
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
-    --success: 160 84% 39%;
-    --success-foreground: 0 0% 100%;
+    --success: 104 40% 47%;
+    --success-foreground: 140 18% 8%;
     --warning: 38 92% 50%;
     --warning-foreground: 0 0% 100%;
     --info: 217 91% 60%;
@@ -59,24 +59,24 @@
     --social-fg: 0 0% 100%;
 
     /* Extended Colors */
-    --chart-1: 147 45% 88%;
-    --chart-2: 147 48% 72%;
-    --chart-3: 147.13 56.65% 60.2%;
-    --chart-4: 147 42% 40%;
-    --chart-5: 151 40% 28%;
+    --chart-1: 104 40% 47%;
+    --chart-2: 104 40% 47%;
+    --chart-3: 104 40% 47%;
+    --chart-4: 104 40% 47%;
+    --chart-5: 104 40% 47%;
 
     /* Sidebar Colors */
-    --sidebar: 147 30% 93%;
-    --sidebar-foreground: 151 30% 14%;
-    --sidebar-primary: 147.13 56.65% 60.2%;
-    --sidebar-primary-foreground: 151 45% 14%;
-    --sidebar-accent: 147.13 56.65% 60.2%;
-    --sidebar-accent-foreground: 151 45% 14%;
-    --sidebar-border: 147 28% 84%;
-    --sidebar-ring: 147.13 56.65% 60.2%;
+    --sidebar: 104 36% 92%;
+    --sidebar-foreground: 140 18% 8%;
+    --sidebar-primary: 104 40% 47%;
+    --sidebar-primary-foreground: 140 18% 8%;
+    --sidebar-accent: 104 40% 47%;
+    --sidebar-accent-foreground: 140 18% 8%;
+    --sidebar-border: 104 40% 47%;
+    --sidebar-ring: 104 40% 47%;
 
     /* Typography */
-    --font-sans: "Outfit", -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-sans: "Oswald", "Arial Narrow", sans-serif;
     --font-heading: "Oswald", "Arial Narrow", sans-serif;
     --font-italic: "Sunlight Memories Script", cursive;
     --font-serif: ui-serif, Georgia, "Times New Roman", serif;
@@ -315,7 +315,7 @@ html.lenis {
   height: min(34rem, 70vw);
   left: -12%;
   top: 8%;
-  background: radial-gradient(circle, hsl(147 56% 72% / 0.55), transparent 68%);
+  background: radial-gradient(circle, hsl(104 40% 47% / 0.45), transparent 68%);
 }
 
 .hero-orbs span:nth-child(2) {
@@ -333,7 +333,7 @@ html.lenis {
   height: min(22rem, 46vw);
   left: 38%;
   top: 28%;
-  background: radial-gradient(circle, hsl(147 42% 84% / 0.5), transparent 70%);
+  background: radial-gradient(circle, hsl(104 40% 47% / 0.28), transparent 70%);
   animation-duration: 36s;
   animation-delay: -18s;
 }
@@ -495,6 +495,43 @@ html.lenis {
 
 .arch-frame {
   border-radius: 999px 999px 18px 18px;
+}
+
+.word-in {
+  display: inline-block;
+}
+
+@keyframes slide-left {
+  from { opacity: 0; transform: translate3d(-3.75rem, 0, 0); }
+  to { opacity: 1; transform: translate3d(0, 0, 0); }
+}
+
+@keyframes slide-right {
+  from { opacity: 0; transform: translate3d(3.75rem, 0, 0); }
+  to { opacity: 1; transform: translate3d(0, 0, 0); }
+}
+
+.slide-left,
+.slide-right {
+  animation-duration: 1.2s;
+  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+  animation-fill-mode: both;
+}
+
+.slide-left { animation-name: slide-left; }
+.slide-right { animation-name: slide-right; }
+
+@media (prefers-reduced-motion: no-preference) {
+  [data-about-reveal]:not([data-shown]) {
+    opacity: 0;
+    transform: translate3d(-4.5rem, 0, 0);
+  }
+
+  [data-about-reveal][data-shown] {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+    transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  }
 }
 
 .watermark {

@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from 'react';
+import { useEffect, useState, type FormEvent } from 'react';
 import { Helmet } from '@dr.pogodin/react-helmet';
 import { Mail, Phone, MapPin, Clock, Send, CheckCircle } from 'lucide-react';
 import { contact } from 'virtual:content';
@@ -98,19 +98,30 @@ export default function ContactPage() {
       </Helmet>
 
       <main>
+        <ContactReveal />
         {/* Hero */}
         <section className="py-xxl text-center" style={{ background: 'hsl(var(--butter))' }}>
           <div className="max-w-content mx-auto px-4">
             <p
+              data-about-reveal
               className="text-sm font-semibold mb-sm tracking-wide uppercase"
               style={{ color: 'hsl(var(--brand-ink))' }}
             >
               {contact.hero.eyebrow}
             </p>
-            <h1 className="text-4xl md:text-5xl font-bold mb-base" style={{ color: 'hsl(var(--foreground))' }}>
-              {contact.hero.heading}
+            <h1
+              data-about-reveal
+              className="text-4xl md:text-5xl font-bold mb-base leading-[1.05]"
+              style={{ color: 'hsl(var(--foreground))' }}
+            >
+              {contact.hero.heading.replace(/\s*hear from you\s*$/i, '')}
+              <em className="mt-[0.55em] block text-[0.92em] leading-[1.15]">hear from you</em>
             </h1>
-            <p className="text-lg max-w-xl mx-auto" style={{ color: 'hsl(var(--muted-foreground))' }}>
+            <p
+              data-about-reveal
+              className="text-lg max-w-xl mx-auto"
+              style={{ color: 'hsl(var(--muted-foreground))' }}
+            >
               {contact.hero.subheading}
             </p>
           </div>
@@ -124,17 +135,25 @@ export default function ContactPage() {
               {/* Left — Contact Details */}
               <div className="lg:col-span-2 flex flex-col gap-lg">
                 <div>
-                  <h2 className="text-2xl font-bold mb-base" style={{ color: 'hsl(var(--foreground))' }}>
+                  <h2
+                    data-about-reveal
+                    className="text-2xl font-bold mb-base"
+                    style={{ color: 'hsl(var(--foreground))' }}
+                  >
                     {contact.details.heading}
                   </h2>
-                  <p className="text-base" style={{ color: 'hsl(var(--muted-foreground))' }}>
+                  <p
+                    data-about-reveal
+                    className="text-base"
+                    style={{ color: 'hsl(var(--muted-foreground))' }}
+                  >
                     {contact.details.body}
                   </p>
                 </div>
 
                 <div className="flex flex-col gap-base">
                   {/* Email */}
-                  <div className="flex items-start gap-base">
+                  <div data-about-reveal className="flex items-start gap-base">
                     <div
                       className="w-11 h-11 rounded-2xl flex items-center justify-center shrink-0"
                       style={{ background: 'hsl(var(--primary) / 0.12)' }}
@@ -154,7 +173,7 @@ export default function ContactPage() {
                   </div>
 
                   {/* Phone */}
-                  <div className="flex items-start gap-base">
+                  <div data-about-reveal className="flex items-start gap-base">
                     <div
                       className="w-11 h-11 rounded-2xl flex items-center justify-center shrink-0"
                       style={{ background: 'hsl(var(--primary) / 0.12)' }}
@@ -174,7 +193,7 @@ export default function ContactPage() {
                   </div>
 
                   {/* Location */}
-                  <div className="flex items-start gap-base">
+                  <div data-about-reveal className="flex items-start gap-base">
                     <div
                       className="w-11 h-11 rounded-2xl flex items-center justify-center shrink-0"
                       style={{ background: 'hsl(var(--primary) / 0.12)' }}
@@ -188,7 +207,7 @@ export default function ContactPage() {
                   </div>
 
                   {/* Hours */}
-                  <div className="flex items-start gap-base">
+                  <div data-about-reveal className="flex items-start gap-base">
                     <div
                       className="w-11 h-11 rounded-2xl flex items-center justify-center shrink-0"
                       style={{ background: 'hsl(var(--primary) / 0.12)' }}
@@ -208,6 +227,7 @@ export default function ContactPage() {
 
                 {/* Trust note */}
                 <div
+                  data-about-reveal
                   className="rounded-2xl p-base mt-auto"
                   style={{
                     background: 'hsl(var(--primary) / 0.08)',
@@ -263,11 +283,16 @@ export default function ContactPage() {
                         aria-hidden="true"
                       />
 
-                      <h2 className="text-2xl font-bold mb-lg" style={{ color: 'hsl(var(--foreground))' }}>
-                        {contact.form.heading}
+                      <h2
+                        data-about-reveal
+                        className="text-2xl font-bold mb-lg leading-[1.05]"
+                        style={{ color: 'hsl(var(--foreground))' }}
+                      >
+                        {contact.form.heading.replace(/\s*a message\s*$/i, '')}
+                        <em className="mt-[0.55em] block text-[1.05em] leading-[1.15]">a message</em>
                       </h2>
 
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-base mb-base">
+                      <div data-about-reveal className="grid grid-cols-1 sm:grid-cols-2 gap-base mb-base">
                         {/* Name */}
                         <div className="flex flex-col gap-xs">
                           <label
@@ -316,7 +341,7 @@ export default function ContactPage() {
                         </div>
                       </div>
 
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-base mb-base">
+                      <div data-about-reveal className="grid grid-cols-1 sm:grid-cols-2 gap-base mb-base">
                         {/* Phone */}
                         <div className="flex flex-col gap-xs">
                           <label
@@ -376,7 +401,7 @@ export default function ContactPage() {
                       </div>
 
                       {/* Message */}
-                      <div className="flex flex-col gap-xs mb-lg">
+                      <div data-about-reveal className="flex flex-col gap-xs mb-lg">
                         <label
                           htmlFor="message"
                           className="text-sm font-semibold"
@@ -413,6 +438,7 @@ export default function ContactPage() {
                       )}
 
                       <button
+                        data-about-reveal
                         type="submit"
                         disabled={status === 'sending'}
                         className="w-full flex items-center justify-center gap-2 py-4 px-6 rounded-full font-bold text-base transition-all disabled:opacity-60"
@@ -443,4 +469,71 @@ export default function ContactPage() {
       </main>
     </>
   );
+}
+
+/** Contact page only: each block stays hidden until it enters the screen, then slides in from the left. */
+function ContactReveal() {
+  useEffect(() => {
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const nodes = [...document.querySelectorAll<HTMLElement>('[data-about-reveal]')];
+    if (reduced) {
+      nodes.forEach((el) => { el.dataset.shown = '1'; });
+      return;
+    }
+
+    let frame = 0;
+    const reveal = (batch: HTMLElement[]) => {
+      const ordered = [...batch].sort((a, b) => {
+        const aa = a.getBoundingClientRect();
+        const bb = b.getBoundingClientRect();
+        return aa.top - bb.top || aa.left - bb.left;
+      });
+      ordered.forEach((el, index) => {
+        el.style.transitionDelay = `${index * 0.08}s`;
+        el.dataset.shown = '1';
+      });
+    };
+
+    const tick = () => {
+      frame = 0;
+      if (document.querySelector('[data-silk-intro]')) {
+        frame = window.requestAnimationFrame(tick);
+        return;
+      }
+      const vh = window.innerHeight;
+      const entered: HTMLElement[] = [];
+      nodes.forEach((el) => {
+        if (el.dataset.shown === '1') return;
+        const box = el.getBoundingClientRect();
+        if (box.height < 2) return;
+        if (box.bottom < 48 && box.top < 0) {
+          el.style.transition = 'none';
+          el.dataset.shown = '1';
+          return;
+        }
+        if (box.top < vh - 32 && box.bottom > 64) entered.push(el);
+      });
+      if (entered.length) reveal(entered);
+      if (nodes.some((el) => el.dataset.shown !== '1')) {
+        frame = window.requestAnimationFrame(tick);
+      }
+    };
+
+    const kick = () => {
+      if (frame) return;
+      frame = window.requestAnimationFrame(tick);
+    };
+
+    kick();
+    window.addEventListener('scroll', kick, { passive: true });
+    window.addEventListener('bs-motion-refresh', kick);
+
+    return () => {
+      window.removeEventListener('scroll', kick);
+      window.removeEventListener('bs-motion-refresh', kick);
+      if (frame) window.cancelAnimationFrame(frame);
+    };
+  }, []);
+
+  return null;
 }

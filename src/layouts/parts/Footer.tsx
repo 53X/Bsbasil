@@ -44,7 +44,7 @@ export default function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="mt-auto bg-[#122117] text-[#F6F3EA]">
+    <footer className="mt-auto bg-[#62A848] text-[#122117]">
       <div className="mx-auto grid max-w-content gap-10 px-4 py-14 md:grid-cols-[1.3fr_1fr_1fr]">
         <div>
           <img
@@ -54,7 +54,7 @@ export default function Footer() {
             width={140}
             height={36}
           />
-          <p className="max-w-xs text-sm leading-relaxed text-[#FFF6EE]/75">
+          <p className="max-w-xs text-sm leading-relaxed text-[#122117]/80">
             Soft, safe clothes for ages 0–3. Pick an age, choose a size, and we’ll take care of the rest.
           </p>
           <div className="mt-5 flex items-center gap-2">
@@ -65,7 +65,7 @@ export default function Footer() {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label={s.label}
-                className="flex h-11 w-11 items-center justify-center rounded-full bg-white/10 transition-colors hover:bg-[#62A848] hover:text-[#122117]"
+                className="flex h-11 w-11 items-center justify-center rounded-full bg-[#F6F3EA]/35 transition-colors hover:bg-[#F6F3EA]"
               >
                 {s.icon}
               </a>
@@ -74,11 +74,11 @@ export default function Footer() {
         </div>
 
         <nav aria-label="Shop">
-          <p className="mb-3 text-xs font-semibold uppercase tracking-[0.16em] text-[#62A848]">Shop</p>
+          <p className="mb-3 text-xs font-semibold uppercase tracking-[0.16em] text-[#122117]">Shop</p>
           <ul className="space-y-2">
             {SHOP_LINKS.map((item) => (
               <li key={item.href}>
-                <Link to={item.href} className="text-sm text-[#FFF6EE]/85 hover:text-white">
+                <Link to={item.href} className="text-sm text-[#122117]/85 hover:text-[#122117]">
                   {item.label}
                 </Link>
               </li>
@@ -87,38 +87,38 @@ export default function Footer() {
         </nav>
 
         <div>
-          <p className="mb-3 text-xs font-semibold uppercase tracking-[0.16em] text-[#62A848]">Help</p>
+          <p className="mb-3 text-xs font-semibold uppercase tracking-[0.16em] text-[#122117]">Help</p>
           <ul className="space-y-2">
             <li>
-              <Link to="/about" className="text-sm text-[#FFF6EE]/85 hover:text-white">
+              <Link to="/about" className="text-sm text-[#122117]/85 hover:text-[#122117]">
                 Our story
               </Link>
             </li>
             <li>
-              <Link to="/faq" className="text-sm text-[#FFF6EE]/85 hover:text-white">
+              <Link to="/faq" className="text-sm text-[#122117]/85 hover:text-[#122117]">
                 FAQ
               </Link>
             </li>
             <li>
-              <Link to="/contact" className="text-sm text-[#FFF6EE]/85 hover:text-white">
+              <Link to="/contact" className="text-sm text-[#122117]/85 hover:text-[#122117]">
                 Contact
               </Link>
             </li>
             <li>
-              <Link to="/privacy-policy" className="text-sm text-[#FFF6EE]/85 hover:text-white">
+              <Link to="/privacy-policy" className="text-sm text-[#122117]/85 hover:text-[#122117]">
                 Privacy Policy
               </Link>
             </li>
             <li>
-              <Link to="/terms-of-use" className="text-sm text-[#FFF6EE]/85 hover:text-white">
+              <Link to="/terms-of-use" className="text-sm text-[#122117]/85 hover:text-[#122117]">
                 Terms of Use
               </Link>
             </li>
           </ul>
         </div>
       </div>
-      <div className="border-t border-white/10">
-        <p className="mx-auto max-w-content px-4 py-5 text-xs text-[#FFF6EE]/60">
+      <div className="border-t border-[#122117]/15">
+        <p className="mx-auto max-w-content px-4 py-5 text-xs text-[#122117]/70">
           © {currentYear} Bsbasil. All rights reserved.
         </p>
       </div>

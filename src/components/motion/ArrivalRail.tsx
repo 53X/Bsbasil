@@ -3,7 +3,7 @@ import { Link } from 'react-router';
 import ProductCard from '@/components/ProductCard';
 import type { StoreProduct } from '@/lib/shopify/types';
 
-/** Product rail. On a wide screen, scroll carries the cards sideways. The title stays put. */
+/** Product rail. Vertical scroll carries the cards sideways and reveals them one by one. */
 export default function ArrivalRail({ products }: { products: StoreProduct[] }) {
   const rootRef = useRef<HTMLElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
@@ -13,10 +13,22 @@ export default function ArrivalRail({ products }: { products: StoreProduct[] }) 
     const track = trackRef.current;
     if (!root || !track || products.length === 0) return;
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const narrow = window.matchMedia('(max-width: 1023px)').matches;
     if (reduced) return;
 
-    let revert = () => {};
+    const cardNodes = () => Array.from(track.querySelectorAll<HTMLElement>('[data-card]'));
+    const clearCardMotion = () => {
+      cardNodes().forEach((card) => {
+        card.style.opacity = '';
+        card.style.visibility = '';
+        card.style.transform = '';
+      });
+    };
+    cardNodes().forEach((card) => {
+      card.style.opacity = '0';
+      card.style.transform = 'translateY(32px)';
+    });
+
+    let revert = clearCardMotion;
     let cancelled = false;
 
     void Promise.all([import('gsap'), import('gsap/ScrollTrigger')]).then(([gsapMod, scrollMod]) => {
@@ -24,43 +36,38 @@ export default function ArrivalRail({ products }: { products: StoreProduct[] }) 
       const gsap = gsapMod.default;
       const ScrollTrigger = scrollMod.ScrollTrigger;
       gsap.registerPlugin(ScrollTrigger);
-      const cards = track.querySelectorAll<HTMLElement>('[data-card]');
+      const cards = cardNodes();
+      const count = Math.max(cards.length, 1);
 
-      const bend = () => {
-        cards.forEach((card) => {
+      const pose = (progress: number) => {
+        cards.forEach((card, index) => {
+          const start = index / count;
+          const span = 1 / count;
+          const revealed = gsap.utils.clamp(0, 1, (progress - start) / span);
           const box = card.getBoundingClientRect();
           const delta = box.left + box.width / 2 - window.innerWidth / 2;
           const rotate = gsap.utils.clamp(-18, 18, delta / 28);
-          gsap.set(card, { rotateY: rotate, z: -Math.abs(rotate) * 2 });
+          gsap.set(card, {
+            autoAlpha: revealed,
+            y: (1 - revealed) * 32,
+            rotateY: rotate,
+            z: -Math.abs(rotate) * 2,
+          });
         });
       };
 
       const ctx = gsap.context(() => {
-        const photos = track.querySelectorAll('[data-reveal]');
-        if (photos.length) {
-          gsap.from(photos, {
-            autoAlpha: 0,
-            y: 40,
-            stagger: 0.12,
-            ease: 'none',
-            scrollTrigger: {
-              trigger: root,
-              start: 'top 85%',
-              end: 'top 45%',
-              scrub: 0.6,
-            },
-          });
-        }
-        if (narrow) return;
-        const distance = () => Math.max(0, track.scrollWidth - window.innerWidth + 48);
+        const slide = () => Math.max(0, track.scrollWidth - window.innerWidth + 48);
         const applyHeight = () => {
           const stage = root.querySelector('[data-arrival-stage]') as HTMLElement | null;
           const stageHeight = stage?.offsetHeight ?? 0;
-          root.style.height = `${Math.max(window.innerHeight * 0.85, stageHeight) + distance()}px`;
+          const perCard = Math.round(window.innerHeight * 0.42);
+          const span = Math.max(slide(), count * perCard);
+          root.style.height = `${Math.max(window.innerHeight * 0.85, stageHeight) + span}px`;
         };
         applyHeight();
         gsap.to(track, {
-          x: () => -distance(),
+          x: () => -slide(),
           ease: 'none',
           scrollTrigger: {
             trigger: root,
@@ -68,13 +75,28 @@ export default function ArrivalRail({ products }: { products: StoreProduct[] }) 
             end: 'bottom bottom',
             scrub: 0.7,
             invalidateOnRefresh: true,
-            onRefresh: applyHeight,
-            onUpdate: bend,
+            onRefresh: (self) => {
+              applyHeight();
+              pose(self.progress);
+            },
+            onUpdate: (self) => pose(self.progress),
+            onLeave: () => pose(1),
+            onLeaveBack: () => pose(0),
           },
         });
-        bend();
       }, root);
-      revert = () => ctx.revert();
+
+      const refresh = () => ScrollTrigger.refresh();
+      window.addEventListener('resize', refresh);
+      track.querySelectorAll('img').forEach((img) => {
+        if (!img.complete) img.addEventListener('load', refresh, { once: true });
+      });
+      requestAnimationFrame(refresh);
+      revert = () => {
+        window.removeEventListener('resize', refresh);
+        ctx.revert();
+        clearCardMotion();
+      };
     });
 
     return () => {
@@ -89,10 +111,9 @@ export default function ArrivalRail({ products }: { products: StoreProduct[] }) 
     <section ref={rootRef} id="arrivals" className="bg-background">
       <div data-arrival-stage className="sticky top-[6.25rem] overflow-hidden py-6 sm:py-8">
         <div className="mx-auto mb-5 flex w-full max-w-content items-end justify-between gap-4 px-4">
-          <h2 className="max-w-full text-[clamp(2.2rem,4vw,3.75rem)] leading-[0.92]">
-            NEW
-            <br />
-            ARRIVALS
+          <h2 className="max-w-full text-[clamp(2.2rem,4vw,3.75rem)] leading-none">
+            <span className="align-baseline">NEW</span>{' '}
+            <em className="ml-[0.12em] inline-block align-baseline text-[1.05em] leading-none">ARRIVALS</em>
           </h2>
           <Link
             to="/catalog"
@@ -102,13 +123,13 @@ export default function ArrivalRail({ products }: { products: StoreProduct[] }) 
             View all
           </Link>
         </div>
-        <div className="overflow-x-auto lg:overflow-hidden" data-lenis-prevent>
-          <div ref={trackRef} className="flex w-max items-stretch gap-4 px-4 sm:gap-6" style={{ perspective: '1400px' }}>
+        <div className="overflow-hidden">
+          <div ref={trackRef} className="flex w-max items-stretch gap-4 px-4 pb-8 sm:gap-6" style={{ perspective: '1400px' }}>
             {products.map((product, index) => (
               <div
                 key={product.id}
                 data-card
-                className="w-[min(78vw,240px)] shrink-0 sm:w-[260px]"
+                className="w-[min(68vw,280px)] shrink-0 sm:w-[260px]"
                 style={{ transformStyle: 'preserve-3d' }}
               >
                 <ProductCard product={product} index={index} />

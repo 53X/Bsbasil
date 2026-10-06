@@ -26,8 +26,8 @@ export default function Header() {
       >
         Skip to content
       </a>
-      <div className="border-b border-foreground/10 bg-[#16301A] text-[#F6F3EA]">
-        <p className="mx-auto flex min-h-8 max-w-content items-center justify-center px-3 py-1 text-center text-[10px] font-semibold uppercase tracking-[0.12em] sm:text-[11px] sm:tracking-[0.2em]">
+      <div className="border-b border-[#122117]/15 bg-[#62A848] text-[#122117]">
+        <p className="mx-auto flex h-8 max-w-content items-center justify-center whitespace-nowrap px-3 text-[9px] font-semibold uppercase tracking-[0.08em] sm:text-[11px] sm:tracking-[0.2em]">
           Soft cotton · Ages 0–3 · Pan-India delivery
         </p>
       </div>
@@ -37,7 +37,7 @@ export default function Header() {
             <img
               src="/logo-horizontal.png"
               alt="Bsbasil"
-              className="block h-auto max-h-11 w-auto max-w-[180px] object-contain"
+              className="block h-auto max-h-9 w-auto max-w-[9.5rem] object-contain sm:max-h-11 sm:max-w-[180px]"
               width={180}
               height={48}
             />
@@ -111,6 +111,26 @@ export default function Header() {
                 {item.label}
               </Link>
             ))}
+            {ready && user ? (
+              <button
+                type="button"
+                className="rounded-xl px-2 py-3 text-left text-lg font-medium uppercase tracking-[0.14em]"
+                onClick={() => {
+                  setIsMobileMenuOpen(false);
+                  signOut();
+                }}
+              >
+                Sign out
+              </button>
+            ) : (
+              <Link
+                to="/sign-in"
+                className="rounded-xl px-2 py-3 text-lg font-medium uppercase tracking-[0.14em]"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                Sign in
+              </Link>
+            )}
             <Link
               to="/catalog"
               className="mt-2 flex min-h-12 items-center justify-center rounded-full bg-primary text-sm font-semibold uppercase tracking-[0.16em] text-primary-foreground"

@@ -16,10 +16,10 @@ void main() {
   float t = uTime * 0.15;
   float a = sin(uv.x * 3.2 + t) * cos(uv.y * 2.4 - t);
   float b = sin((uv.x + uv.y) * 4.0 - t * 1.3);
-  vec3 leaf = vec3(0.38, 0.66, 0.28);
-  vec3 deep = vec3(0.08, 0.18, 0.10);
+  vec3 leaf = vec3(0.384, 0.659, 0.282);
+  vec3 deep = vec3(0.384, 0.659, 0.282);
   vec3 cream = vec3(0.96, 0.94, 0.88);
-  vec3 lime = vec3(0.72, 0.86, 0.36);
+  vec3 lime = vec3(0.384, 0.659, 0.282);
   vec3 color = mix(deep, leaf, smoothstep(-0.4, 0.75, a));
   color = mix(color, lime, smoothstep(0.1, 0.95, b) * 0.45);
   color = mix(color, cream, smoothstep(0.55, 1.0, uv.y) * 0.35);
