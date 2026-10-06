@@ -5,7 +5,7 @@ import { motion } from 'motion/react';
 import { SlidersHorizontal, X } from 'lucide-react';
 import ProductCard from '@/components/ProductCard';
 import { ageLabel, expandProductsByAge, productMatchesFilters } from '@/lib/shopify/map';
-import type { StoreCatalog } from '@/lib/shopify/types';
+import type { StoreCatalog, StorePromotion } from '@/lib/shopify/types';
 
 const AGE_FILTERS = [
   { value: 'All Ages', label: 'All Ages' },
@@ -20,7 +20,15 @@ const AGE_FILTERS = [
 const CATEGORY_FILTERS = ['All Categories', 'Romper', 'Sleepwear', 'Sets', 'Winter wear', 'Accessories'] as const;
 
 export default function CatalogPage() {
-  const store = useLoaderData() as StoreCatalog;
+  const store = useLoaderData() as StoreCatalog & { promotions?: StorePromotion[] };
+  const shopOffer = (store.promotions ?? []).find((promo) => {
+    try {
+      const path = new URL(promo.href, 'https://bsbasil.com').pathname.replace(/\/$/, '');
+      return path === '/catalog' && promo.offer;
+    } catch {
+      return false;
+    }
+  })?.offer;
   const [params, setSearchParams] = useSearchParams();
   const ageFromUrl = params.get('age');
   const categoryFromUrl = params.get('category');
@@ -65,18 +73,18 @@ export default function CatalogPage() {
         <title>Baby Clothes Online India — Bsbasil | Ages 0–3 Years</title>
         <meta
           name="description"
-          content="Shop 23+ baby clothes online in India at Bsbasil — rompers, onesies, ethnic wear, sleepwear & gift sets for ages 0–3. Soft, safe fabrics. Pan-India delivery." />
+          content="Shop baby clothes online in India at Bsbasil — rompers, sets, sleepwear, winter wear and accessories for ages 0–3. Soft, safe fabrics. Pan-India delivery." />
         <link rel="canonical" href="https://bsbasil.com/catalog" />
         <meta property="og:title" content="Baby Clothes Online India — Bsbasil | Ages 0–3 Years" />
         <meta
           property="og:description"
-          content="Shop 23+ baby clothes online in India — rompers, onesies, ethnic wear, sleepwear & gift sets for ages 0–3. Soft, safe fabrics with pan-India delivery." />
+          content="Shop baby clothes online in India — rompers, sets, sleepwear, winter wear and accessories for ages 0–3. Soft, safe fabrics with pan-India delivery." />
         <meta property="og:url" content="https://bsbasil.com/catalog" />
         <meta property="og:image" content="https://bsbasil.com/og-image.png" />
-        <meta property="og:image:alt" content="Bsbasil baby clothes catalog — rompers, onesies, ethnic wear for ages 0–3" />
+        <meta property="og:image:alt" content="Bsbasil baby clothes — rompers, sets, sleepwear, winter wear and accessories" />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="Baby Clothes Online India — Bsbasil | Ages 0–3 Years" />
-        <meta name="twitter:description" content="Shop 23+ baby clothes online in India — rompers, onesies, ethnic wear & gift sets for ages 0–3." />
+        <meta name="twitter:description" content="Shop baby clothes online in India — rompers, sets, sleepwear, winter wear and accessories for ages 0–3." />
         <meta name="twitter:image" content="https://bsbasil.com/og-image.png" />
         <meta property="og:type" content="website" />
         <script type="application/ld+json">{JSON.stringify({
@@ -87,7 +95,7 @@ export default function CatalogPage() {
               '@id': 'https://bsbasil.com/catalog#webpage',
               name: 'Baby Clothes Online India — Bsbasil | Ages 0–3 Years',
               url: 'https://bsbasil.com/catalog',
-              description: "Shop 23+ baby clothes online in India — rompers, onesies, ethnic wear, sleepwear & gift sets for ages 0–3.",
+              description: "Shop baby clothes online in India — rompers, sets, sleepwear, winter wear and accessories for ages 0–3.",
               isPartOf: { '@id': 'https://bsbasil.com/#website' },
               about: { '@id': 'https://bsbasil.com/#organization' },
               inLanguage: 'en-IN',
@@ -123,28 +131,32 @@ export default function CatalogPage() {
 
       <main>
         {/* ── Hero Banner ── */}
-        <section className="py-xl text-center" style={{ background: 'hsl(var(--muted))' }}>
+        <section className="relative overflow-hidden px-4 pb-6 pt-12 md:pt-16">
+          <p className="watermark" aria-hidden="true">SHOP</p>
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, ease: 'easeOut' as const }}
-            className="max-w-content mx-auto px-4">
-            <h1
-              className="text-4xl md:text-5xl font-bold mb-sm"
-              style={{ color: 'hsl(var(--foreground))' }}>
-              Baby Clothes for Ages 0–3
-            </h1>
-            <p
-              className="text-base md:text-lg max-w-xl mx-auto"
-              style={{ color: 'hsl(var(--muted-foreground))' }}>
-              Soft, safe &amp; adorable — browse our full collection of baby &amp; toddler wear.
+            className="relative z-10 mx-auto max-w-content">
+            <p className="mb-3 text-xs font-semibold uppercase tracking-[0.22em]" style={{ color: 'hsl(var(--brand-ink))' }}>
+              The collection · ages 0–3
             </p>
+            <h1 className="max-w-4xl text-[clamp(2.4rem,7vw,5.6rem)] leading-[0.9]">
+              Baby clothes,
+              <br />
+              <em>chosen by age.</em>
+            </h1>
+            {shopOffer ? (
+              <p className="mt-4 inline-flex min-h-9 items-center rounded-full bg-[#62A848] px-4 text-sm font-semibold uppercase tracking-[0.14em] text-[#122117]">
+                {shopOffer}
+              </p>
+            ) : null}
           </motion.div>
         </section>
 
         {/* ── Filters ── */}
         <section
-          className="sticky top-16 z-40 border-b py-sm"
+          className="sticky top-[6.25rem] z-40 border-b py-sm"
           style={{ background: 'hsl(var(--background))', borderColor: 'hsl(var(--border))' }}>
           <div className="max-w-content mx-auto px-4">
             {/* Mobile filter toggle */}
@@ -189,7 +201,7 @@ export default function CatalogPage() {
                     <button
                       key={age.value}
                       onClick={() => setFilters(age.value, selectedCategory)}
-                      className="px-base py-xs rounded-full text-sm font-medium border transition-all"
+                      className="min-h-11 px-4 rounded-full text-sm font-semibold border transition-all"
                       style={{
                         background: selectedAge === age.value ? 'hsl(var(--primary))' : 'hsl(var(--background))',
                         color: selectedAge === age.value ? 'hsl(var(--primary-foreground))' : 'hsl(var(--foreground))',
@@ -211,7 +223,7 @@ export default function CatalogPage() {
                     <button
                       key={cat}
                       onClick={() => setFilters(selectedAge, cat)}
-                      className="px-base py-xs rounded-full text-sm font-medium border transition-all"
+                      className="min-h-11 px-4 rounded-full text-sm font-semibold border transition-all"
                       style={{
                         background: selectedCategory === cat ? 'hsl(var(--accent))' : 'hsl(var(--background))',
                         color: selectedCategory === cat ? 'hsl(var(--accent-foreground))' : 'hsl(var(--foreground))',
@@ -274,7 +286,6 @@ export default function CatalogPage() {
             {/* Empty state */}
             {store.configured && products.length === 0 && !store.error &&
             <div className="text-center py-xxxl">
-                <p className="text-5xl mb-base">🧸</p>
                 <h3 className="text-xl font-bold mb-sm" style={{ color: 'hsl(var(--foreground))' }}>
                   The store is connected
                 </h3>
@@ -285,7 +296,6 @@ export default function CatalogPage() {
             }
             {store.configured && products.length > 0 && visibleCount === 0 && !store.error &&
             <div className="text-center py-xxxl">
-                <p className="text-5xl mb-base">🧸</p>
                 <h3 className="text-xl font-bold mb-sm" style={{ color: 'hsl(var(--foreground))' }}>
                   No items found
                 </h3>
@@ -303,7 +313,7 @@ export default function CatalogPage() {
             }
 
             {/* Grid — one card per product; age filter only limits which products appear */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-base">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
               {catalogCards.map(({ product, ageCode }, i) => (
                   <motion.div
                     key={product.id}
@@ -315,6 +325,7 @@ export default function CatalogPage() {
                     <ProductCard
                       product={product}
                       ageHighlight={ageCode || undefined}
+                      index={i}
                     />
                   </motion.div>
               ))}

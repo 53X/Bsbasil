@@ -462,6 +462,84 @@ export function refreshDisplayedPrice(product: StoreProduct): StoreProduct {
   };
 }
 
+/** Percent off when a compare-at or an offer string gives a real discount. */
+export function discountBadge(price: number, compareAt?: number | null, title?: string | null): string | null {
+  if (compareAt != null && compareAt > price) {
+    const pct = Math.round(((compareAt - price) / compareAt) * 100);
+    if (pct > 0 && pct < 100) return `${pct}% off`;
+  }
+  const fromTitle = title?.match(/(\d+)\s*%/);
+  if (fromTitle) return `${fromTitle[1]}% off`;
+  const trimmed = title?.trim();
+  return trimmed || null;
+}
+
+/** A product offer such as "40% off". "Up to 40% off" is a collection line, not a price. */
+export function offerPercent(offer: string): number | null {
+  if (/\bup to\b/i.test(offer)) return null;
+  const match = offer.match(/(\d+(?:\.\d+)?)\s*%/);
+  if (!match) return null;
+  const pct = Number(match[1]);
+  if (!Number.isFinite(pct) || pct <= 0 || pct >= 100) return null;
+  return pct;
+}
+
+export function promotionOfferForHandle(
+  promotions: { href: string; offer: string }[],
+  handle: string,
+): string | null {
+  const wanted = handle.toLowerCase();
+  for (const promo of promotions) {
+    const offer = promo.offer?.trim();
+    if (!offer || offerPercent(offer) == null) continue;
+    const match = promo.href.match(/\/products\/([^/?#]+)/);
+    if (!match?.[1]) continue;
+    if (decodeURIComponent(match[1]).toLowerCase() === wanted) return offer;
+  }
+  return null;
+}
+
+/** Turn a homepage offer into the price the customer pays, with the old price kept for the strike-through. */
+export function saleFromOffer(price: number, compareAt: number | null, offer: string | null): {
+  price: number;
+  compareAtPrice: number | null;
+  discountTitle: string | null;
+} {
+  if (compareAt != null && compareAt > price) {
+    return { price, compareAtPrice: compareAt, discountTitle: discountBadge(price, compareAt, offer) };
+  }
+  const pct = offer ? offerPercent(offer) : null;
+  if (pct == null) {
+    return { price, compareAtPrice: compareAt, discountTitle: offer?.trim() || null };
+  }
+  const sale = Math.round((price / 100) * ((100 - pct) / 100)) * 100;
+  if (sale <= 0 || sale >= price) {
+    return { price, compareAtPrice: compareAt, discountTitle: `${pct}% off` };
+  }
+  return { price: sale, compareAtPrice: price, discountTitle: `${pct}% off` };
+}
+
+/** Apply a homepage promotion to the linked product's price, not only its label. */
+export function applyPromotionOffers(
+  products: StoreProduct[],
+  promotions: { href: string; offer: string }[],
+): StoreProduct[] {
+  return products.map((product) => {
+    const offer = promotionOfferForHandle(promotions, product.handle);
+    if (!offer) return product;
+    const variants = product.variants.map((variant) => {
+      const priced = saleFromOffer(variant.price, variant.compareAtPrice, offer);
+      return {
+        ...variant,
+        price: priced.price,
+        compareAtPrice: priced.compareAtPrice,
+        discountTitle: priced.discountTitle,
+      };
+    });
+    return refreshDisplayedPrice({ ...product, variants });
+  });
+}
+
 /** Apply a Shopify automatic discount from a one-item cart preview. */
 export function applyCartDiscounts(products: StoreProduct[], lines: DiscountPreviewLine[]): StoreProduct[] {
   const byVariant = new Map(lines.map((line) => [line.variantId, line]));

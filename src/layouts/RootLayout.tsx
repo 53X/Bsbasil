@@ -3,6 +3,8 @@ import { type ReactElement } from 'react';
 import { ScrollRestoration } from 'react-router';
 
 import HomepageSameAsJsonLd from '@/components/HomepageSameAsJsonLd';
+import SilkIntro from '@/components/motion/SilkIntro';
+import SmoothScroll from '@/components/motion/SmoothScroll';
 import Footer from '@/layouts/parts/Footer';
 import Header from '@/layouts/parts/Header';
 import Website from '@/layouts/Website';
@@ -20,7 +22,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
       <Website>
         <Helmet>
           <title>Bsbasil — Soft, Safe Baby Clothes for Ages 0–3</title>
-          <meta name="description" content="Bsbasil makes soft, safe, and adorable clothing for babies and toddlers aged 0–3 years. Shop rompers, onesies, sleepsuits, gift sets and more." />
+          <meta name="description" content="Bsbasil makes soft, safe clothing for babies and toddlers aged 0–3. Shop rompers, sets, sleepwear, winter wear and accessories." />
           <meta property="og:site_name" content="Bsbasil" />
           <meta property="og:image" content="https://bsbasil.com/og-image.png" />
           <meta property="og:image:secure_url" content="https://bsbasil.com/og-image.png" />
@@ -35,9 +37,16 @@ export default function RootLayout({ children }: RootLayoutProps) {
         </Helmet>
         <HomepageSameAsJsonLd />
         <ScrollRestoration />
-        <Header />
-        {children}
-        <Footer />
+        <SilkIntro />
+        <SmoothScroll>
+          <>
+            <Header />
+            <div id="content" className="flex-1">
+              {children}
+            </div>
+            <Footer />
+          </>
+        </SmoothScroll>
       </Website>
     </CartProvider>
     </AuthProvider>

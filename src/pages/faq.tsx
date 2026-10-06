@@ -62,7 +62,7 @@ export default function FAQPage() {
 
       <main>
         {/* Hero */}
-        <section className="py-16 md:py-20 text-center px-4">
+        <section className="px-4 py-16 text-center md:py-20" style={{ background: 'hsl(var(--sky))' }}>
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}

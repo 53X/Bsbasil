@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { ageCode, ageLabel, ageRangeLabel, applyCartDiscounts, expandProductsByAge, hasSelectableSizeOption, htmlToText, mapProduct, mapShopRules, matchingVariant, productMatchesFilters, productRequiresSizeSelection, productSizeLabels, toMinorUnits, variantForSelection } from './map';
+import { ageCode, ageLabel, ageRangeLabel, applyCartDiscounts, applyPromotionOffers, discountBadge, expandProductsByAge, hasSelectableSizeOption, htmlToText, mapProduct, mapShopRules, matchingVariant, productMatchesFilters, productRequiresSizeSelection, productSizeLabels, saleFromOffer, toMinorUnits, variantForSelection } from './map';
 
 describe('shopify product mapping', () => {
   it('keeps photos and video on the same product', () => {
@@ -52,6 +52,22 @@ describe('shopify product mapping', () => {
     expect(discounted[0]?.price).toBe(69900);
     expect(discounted[0]?.compareAtPrice).toBe(99900);
     expect(discounted[0]?.discountTitle).toBe('Festive offer');
+    expect(discountBadge(69900, 99900, 'Festive offer')).toBe('30% off');
+    expect(discountBadge(199900, null, '40% OFF')).toBe('40% off');
+    expect(saleFromOffer(199900, null, '40% off')).toEqual({
+      price: 119900,
+      compareAtPrice: 199900,
+      discountTitle: '40% off',
+    });
+    expect(saleFromOffer(199900, null, '30% off').price).toBe(139900);
+    const offered = applyPromotionOffers([product], [
+      { href: '/products/sunshine-romper', offer: '40% off' },
+      { href: '/catalog', offer: 'Up to 40% off' },
+    ]);
+    expect(offered[0]?.price).toBe(79900);
+    expect(offered[0]?.compareAtPrice).toBe(99900);
+    expect(offered[0]?.discountTitle).toBe('20% off');
+    expect(applyPromotionOffers([product], [{ href: '/catalog', offer: 'Up to 40% off' }])[0]?.discountTitle).toBeNull();
     expect(product.ageRange).toBe('0-3M');
     expect(product.ageRanges).toEqual(['0-3M', '6-12M']);
     expect(product.category).toBe('Romper');

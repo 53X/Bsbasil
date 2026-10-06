@@ -1,5 +1,5 @@
 import { shopifyConfig } from "./config";
-import { applyCartDiscounts, htmlToText, mapProduct, mapShopRules, type RawProductNode } from "./map";
+import { applyCartDiscounts, applyPromotionOffers, htmlToText, mapProduct, mapShopRules, promotionOfferForHandle, saleFromOffer, type RawProductNode } from "./map";
 import type { ShopRules, StoreCart, StoreCatalog, StorePolicy, StoreProduct, StorePromotion } from "./types";
 
 const PRODUCT_FIELDS = `
@@ -93,7 +93,7 @@ const CART_FIELDS = `
           title
           image { url }
           price { amount currencyCode }
-          product { title }
+          product { title handle }
         }
       }
       cost {
@@ -158,7 +158,7 @@ interface CartPayload {
           title: string;
           image?: { url: string } | null;
           price: { amount: string; currencyCode: string };
-          product: { title: string };
+          product: { title: string; handle: string };
         };
         cost?: {
           totalAmount: { amount: string; currencyCode: string };
@@ -325,6 +325,7 @@ function mapCart(cart: NonNullable<CartPayload["cart"]>): StoreCart {
         id: line.id,
         variantId: line.merchandise.id,
         name: line.merchandise.product.title,
+        handle: line.merchandise.product.handle,
         variantTitle,
         price: unit,
         compareAtPrice: listUnit > unit ? listUnit : null,
@@ -398,10 +399,29 @@ async function previewProductDiscounts(products: StoreProduct[]): Promise<StoreP
   }
 }
 
+async function withPromotionPrices(cart: StoreCart): Promise<StoreCart> {
+  const promotions = await loadPromotions();
+  return {
+    ...cart,
+    lines: cart.lines.map((line) => {
+      if (!line.handle) return line;
+      const offer = promotionOfferForHandle(promotions, line.handle);
+      if (!offer) return line;
+      const priced = saleFromOffer(line.price, line.compareAtPrice, offer);
+      return {
+        ...line,
+        price: priced.price,
+        compareAtPrice: priced.compareAtPrice,
+        discountTitle: priced.discountTitle ?? line.discountTitle,
+      };
+    }),
+  };
+}
+
 async function cartResult(payload: CartPayload): Promise<StoreCart> {
   const message = payload.userErrors.map((error) => error.message).join(", ");
   if (!payload.cart) throw new Error(message || "Cart update failed");
-  return mapCart(payload.cart);
+  return withPromotionPrices(mapCart(payload.cart));
 }
 
 export async function fetchCart(cartId: string): Promise<StoreCart | null> {
@@ -409,7 +429,7 @@ export async function fetchCart(cartId: string): Promise<StoreCart | null> {
     `query Cart($id: ID!) { cart(id: $id) { ${CART_FIELDS} } }`,
     { id: cartId },
   );
-  return data.cart ? mapCart(data.cart) : null;
+  return data.cart ? withPromotionPrices(mapCart(data.cart)) : null;
 }
 
 export async function createCart(
@@ -480,7 +500,13 @@ export async function updateCartLine(cartId: string, lineId: string, quantity: n
 }
 
 export async function catalogLoader() {
-  return loadCatalog();
+  const catalog = await loadCatalog();
+  const promotions = await loadPromotions();
+  return {
+    ...catalog,
+    products: applyPromotionOffers(catalog.products, promotions),
+    promotions,
+  };
 }
 
 interface PromotionField {
@@ -549,14 +575,23 @@ export async function loadPromotions(): Promise<StorePromotion[]> {
 export async function homeLoader() {
   const catalog = await loadCatalog();
   const promotions = await loadPromotions();
-  return { ...catalog, promotions };
+  return {
+    ...catalog,
+    products: applyPromotionOffers(catalog.products, promotions),
+    promotions,
+  };
 }
 
 export async function productLoader({ params }: { params: { handle?: string } }) {
   if (!params.handle) {
-    return { product: null as StoreProduct | null, catalog: await loadCatalog() };
+    const catalog = await catalogLoader();
+    return { product: null as StoreProduct | null, catalog };
   }
-  return loadProduct(params.handle);
+  const result = await loadProduct(params.handle);
+  const promotions = await loadPromotions();
+  const products = applyPromotionOffers(result.catalog.products, promotions);
+  const product = result.product ? applyPromotionOffers([result.product], promotions)[0] ?? null : null;
+  return { product, catalog: { ...result.catalog, products, promotions } };
 }
 
 export async function updateCartBuyer(

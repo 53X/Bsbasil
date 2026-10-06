@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router';
-import { Menu, X, ShoppingBag, ShoppingCart } from 'lucide-react';
+import { Menu, X, ShoppingBag } from 'lucide-react';
 import { useState } from 'react';
 import { useAuth } from '@/contexts/auth-context';
 import { useCart } from '@/contexts/use-cart';
@@ -13,52 +13,58 @@ export default function Header() {
   const navItems = [
     { href: '/', label: 'Home' },
     { href: '/catalog', label: 'Shop' },
+    { href: '/#moods', label: 'Lookbook' },
     { href: '/about', label: 'About' },
-    { href: '/faq', label: 'FAQ' },
     { href: '/contact', label: 'Contact' },
   ];
 
   return (
-    <header className="sticky top-0 z-50 border-b" style={{ background: 'hsl(var(--background))', borderColor: 'hsl(var(--border))' }}>
-      <div className="max-w-content mx-auto px-4">
-        <div className="flex h-16 items-center justify-between">
-          {/* Logo */}
-          <Link to="/" className="flex items-center group">
+    <header className="sticky top-0 z-50 bg-background/90 backdrop-blur-md">
+      <a
+        href="#content"
+        className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-3 focus:z-[60] focus:rounded-full focus:bg-primary focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-primary-foreground"
+      >
+        Skip to content
+      </a>
+      <div className="border-b border-foreground/10 bg-[#16301A] text-[#F6F3EA]">
+        <p className="mx-auto flex min-h-8 max-w-content items-center justify-center px-3 py-1 text-center text-[10px] font-semibold uppercase tracking-[0.12em] sm:text-[11px] sm:tracking-[0.2em]">
+          Soft cotton · Ages 0–3 · Pan-India delivery
+        </p>
+      </div>
+      <div className="mx-auto max-w-content px-4">
+        <div className="flex h-[4.25rem] items-center justify-between gap-4">
+          <Link to="/" className="flex shrink-0 items-center">
             <img
               src="/logo-horizontal.png"
               alt="Bsbasil"
-              className="block h-auto max-h-10 md:max-h-12 w-auto max-w-[180px] object-contain self-center"
+              className="block h-auto max-h-11 w-auto max-w-[180px] object-contain"
               width={180}
               height={48}
             />
           </Link>
 
-          {/* Desktop Nav */}
-          <nav className="hidden md:flex items-center gap-6" aria-label="Main navigation">
-            {navItems.map((item) => (
-              <Link
-                key={item.href}
-                to={item.href}
-                className="text-sm font-medium transition-colors"
-                style={{
-                  color:
-                    location.pathname === item.href
-                      ? 'hsl(var(--brand-ink))'
-                      : 'hsl(var(--muted-foreground))',
-                }}
-              >
-                {item.label}
-              </Link>
-            ))}
+          <nav className="hidden items-center gap-4 lg:flex xl:gap-7" aria-label="Main navigation">
+            {navItems.map((item) => {
+              const active = location.pathname === item.href;
+              return (
+                <Link
+                  key={item.href}
+                  to={item.href}
+                  className="text-sm font-medium uppercase tracking-[0.16em]"
+                  style={{ color: active ? 'hsl(var(--logo))' : 'hsl(var(--foreground))' }}
+                >
+                  {item.label}
+                </Link>
+              );
+            })}
           </nav>
 
-          {/* Right actions */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
             {ready && user ? (
               <button
                 type="button"
                 onClick={() => signOut()}
-                className="text-sm font-medium"
+                className="hidden min-h-11 px-2 text-sm font-medium uppercase tracking-[0.12em] sm:inline"
                 style={{ color: 'hsl(var(--muted-foreground))' }}
               >
                 Sign out
@@ -66,98 +72,53 @@ export default function Header() {
             ) : (
               <Link
                 to="/sign-in"
-                className="text-sm font-medium"
-                style={{ color: 'hsl(var(--brand-ink))' }}
+                className="hidden min-h-11 items-center px-2 text-sm font-medium uppercase tracking-[0.12em] sm:inline-flex"
               >
                 Sign in
               </Link>
             )}
-            {/* Cart icon */}
             <Link
               to="/cart"
-              className="relative p-2 rounded-full transition-colors hover:bg-muted"
-              aria-label="Shopping cart"
+              className="relative flex h-11 items-center gap-2 px-2 text-sm font-medium uppercase tracking-[0.14em]"
+              aria-label={cartCount > 0 ? `Bag, ${cartCount} items` : 'Bag'}
             >
-              <ShoppingCart size={20} style={{ color: 'hsl(var(--foreground))' }} />
-              {cartCount > 0 && (
-                <span
-                  className="absolute -top-1 -right-1 w-5 h-5 rounded-full text-xs font-bold flex items-center justify-center"
-                  style={{
-                    background: 'hsl(var(--primary))',
-                    color: 'hsl(var(--primary-foreground))',
-                  }}
-                >
-                  {cartCount}
-                </span>
-              )}
+              <ShoppingBag size={18} />
+              <span className="hidden sm:inline">Bag</span>
+              <span className="tabular-nums" style={{ color: 'hsl(var(--logo))' }}>
+                {cartCount}
+              </span>
             </Link>
-
-            <Link
-              to="/catalog"
-              className="hidden md:flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold transition-transform hover:scale-105"
-              style={{
-                background: 'hsl(var(--primary))',
-                color: 'hsl(var(--primary-foreground))',
-              }}
-            >
-              <ShoppingBag size={16} />
-              Shop Now
-            </Link>
-
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="md:hidden p-2 rounded-md transition-colors"
-              style={{ color: 'hsl(var(--foreground))' }}
+              className="flex h-11 w-11 items-center justify-center lg:hidden"
               aria-label="Toggle menu"
+              aria-expanded={isMobileMenuOpen}
             >
               {isMobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
             </button>
           </div>
         </div>
 
-        {/* Mobile Menu */}
         {isMobileMenuOpen && (
-          <div className="md:hidden border-t py-4" style={{ borderColor: 'hsl(var(--border))' }}>
-            <nav className="flex flex-col gap-2" aria-label="Mobile navigation">
-              {navItems.map((item) => (
-                <Link
-                  key={item.href}
-                  to={item.href}
-                  className="text-sm font-medium py-2 px-2 rounded-md transition-colors"
-                  style={{
-                    color:
-                      location.pathname === item.href
-                        ? 'hsl(var(--brand-ink))'
-                        : 'hsl(var(--muted-foreground))',
-                    background:
-                      location.pathname === item.href ? 'hsl(var(--muted))' : 'transparent',
-                  }}
-                  onClick={() => setIsMobileMenuOpen(false)}
-                >
-                  {item.label}
-                </Link>
-              ))}
-              {ready && user ? (
-                <button
-                  type="button"
-                  onClick={() => { setIsMobileMenuOpen(false); void signOut(); }}
-                  className="text-sm font-medium py-2 px-2 text-left"
-                  style={{ color: 'hsl(var(--muted-foreground))' }}
-                >
-                  Sign out
-                </button>
-              ) : (
-                <Link
-                  to="/sign-in"
-                  className="text-sm font-medium py-2 px-2"
-                  style={{ color: 'hsl(var(--brand-ink))' }}
-                  onClick={() => setIsMobileMenuOpen(false)}
-                >
-                  Sign in
-                </Link>
-              )}
-            </nav>
-          </div>
+          <nav className="flex flex-col gap-1 border-t border-foreground/10 py-3 lg:hidden" aria-label="Mobile navigation">
+            {navItems.map((item) => (
+              <Link
+                key={item.href}
+                to={item.href}
+                className="rounded-xl px-2 py-3 text-lg font-medium uppercase tracking-[0.14em]"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                {item.label}
+              </Link>
+            ))}
+            <Link
+              to="/catalog"
+              className="mt-2 flex min-h-12 items-center justify-center rounded-full bg-primary text-sm font-semibold uppercase tracking-[0.16em] text-primary-foreground"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              Explore the collection
+            </Link>
+          </nav>
         )}
       </div>
     </header>

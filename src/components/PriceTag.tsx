@@ -1,4 +1,4 @@
-import { formatMoney } from '@/lib/shopify/map';
+import { discountBadge, formatMoney } from '@/lib/shopify/map';
 
 export default function PriceTag({
   price,
@@ -14,18 +14,19 @@ export default function PriceTag({
   priceClassName?: string;
 }) {
   const onSale = compareAt != null && compareAt > price;
+  const label = discountBadge(price, compareAt, discount);
   return (
-    <span className="inline-flex flex-wrap items-baseline gap-2">
+    <span className={`inline-flex flex-wrap items-baseline gap-x-2 gap-y-1 ${onSale ? 'price-deal' : ''}`}>
       {onSale ? (
-        <span className="text-sm font-medium line-through" style={{ color: 'hsl(var(--muted-foreground))' }}>
+        <span className="price-was text-sm font-medium line-through" style={{ color: 'hsl(var(--muted-foreground))' }}>
           {formatMoney(compareAt / 100, currency)}
         </span>
       ) : null}
-      <span className={priceClassName} style={{ color: 'hsl(var(--foreground))' }}>
+      <span className={`${priceClassName} ${onSale ? 'price-now' : ''}`} style={{ color: 'hsl(var(--foreground))' }}>
         {formatMoney(price / 100, currency)}
       </span>
-      {discount ? (
-        <span className="text-xs font-semibold" style={{ color: 'hsl(var(--brand-ink))' }}>{discount}</span>
+      {label ? (
+        <span className="price-off text-xs font-semibold uppercase tracking-[0.08em]" style={{ color: 'hsl(var(--brand-ink))' }}>{label}</span>
       ) : null}
     </span>
   );

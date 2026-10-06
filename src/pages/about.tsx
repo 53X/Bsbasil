@@ -288,7 +288,7 @@ export default function AboutPage() {
         </section>
 
         {/* ── CTA Banner ── */}
-        <section className="py-xxl" style={{ background: '#ffffff' }}>
+        <section className="py-xxl" style={{ background: 'hsl(var(--blush))' }}>
           <motion.div
             initial="hidden"
             whileInView="visible"

@@ -99,7 +99,7 @@ export default function ContactPage() {
 
       <main>
         {/* Hero */}
-        <section className="py-xxl text-center" style={{ background: 'hsl(var(--muted))' }}>
+        <section className="py-xxl text-center" style={{ background: 'hsl(var(--butter))' }}>
           <div className="max-w-content mx-auto px-4">
             <p
               className="text-sm font-semibold mb-sm tracking-wide uppercase"

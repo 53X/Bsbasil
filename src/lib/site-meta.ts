@@ -5,5 +5,5 @@ export interface SiteMeta {
 
 export const siteMeta: SiteMeta = {
 	name: "Bsbasil",
-	summary: "Bsbasil is an Indian baby clothing brand offering soft, safe, and adorable clothes for newborns and toddlers aged 0–3 years, including rompers, onesies, ethnic wear, sleepwear, and gift sets with pan-India delivery.",
+	summary: "Bsbasil is an Indian baby clothing brand offering soft, safe clothes for newborns and toddlers aged 0–3 years: rompers, sets, sleepwear, winter wear, and accessories, with pan-India delivery.",
 };

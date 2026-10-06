@@ -68,7 +68,7 @@ export default function CartPage() {
         <meta name="twitter:image" content="https://bsbasil.com/og-image.png" />
         <meta name="robots" content="noindex, nofollow" />
       </Helmet>
-      <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="min-h-screen bg-background py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-3xl mx-auto">
         {/* Header */}
         <div className="mb-8">
@@ -116,7 +116,7 @@ export default function CartPage() {
               {cart.map((item, index) => (
                 <div
                   key={item.id}
-                  className={`flex items-center gap-4 p-6 ${index > 0 ? 'border-t' : ''}`}
+                  className={`flex flex-col gap-4 p-4 sm:flex-row sm:items-center sm:p-6 ${index > 0 ? 'border-t' : ''}`}
                   style={index > 0 ? { borderColor: 'hsl(var(--border))' } : {}}
                 >
                   {/* Product Image */}
@@ -124,7 +124,7 @@ export default function CartPage() {
                     <img
                       src={item.image}
                       alt={item.name}
-                      className="w-24 h-24 object-cover rounded-xl"
+                      className="h-24 w-24 shrink-0 rounded-xl bg-muted object-contain"
                     />
                   ) : (
                     <div className="w-24 h-24 rounded-xl flex items-center justify-center" style={{ background: 'hsl(var(--muted))' }}>
@@ -155,7 +155,7 @@ export default function CartPage() {
                   </div>
 
                   {/* Quantity Controls */}
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center justify-between gap-3 sm:justify-end">
                     <button
                       onClick={() => { void updateQuantity(item.id, item.quantity - 1); }}
                       className="w-10 h-10 flex items-center justify-center rounded-xl border text-lg font-medium transition-colors"

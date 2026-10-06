@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Fredoka+One:wght@400&family=Nunito:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@1,9..144,560&family=Oswald:wght@500;600&family=Outfit:wght@400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -6,25 +6,32 @@
 
 @layer base {
   :root {
-    /* Core Colors */
-    --background: 147 45% 97%;
+    /* Ivory paper, ink, and the logo green #62A848. */
+    --background: 42 38% 96%;
     --error-bg: 0 84% 97%;
     --error-border: 0 72% 85%;
     --error-text: 0 72% 40%;
-    --foreground: 151 30% 14%;
-    --card: 147 40% 96%;
-    --card-foreground: 151 30% 14%;
-    --popover: 147 45% 97%;
-    --popover-foreground: 151 30% 14%;
-    --primary: 147.13 56.65% 60.2%; /* #60D394 */
-    --primary-foreground: 151 45% 14%;
-    --brand-ink: 151 72% 24%;
-    --secondary: 147 42% 40%;
-    --secondary-foreground: 147 40% 97%;
-    --muted: 147 30% 93%;
-    --muted-foreground: 151 16% 32%;
-    --accent: 147.13 56.65% 60.2%;
-    --accent-foreground: 151 45% 14%;
+    --foreground: 140 18% 8%;
+    --card: 40 40% 98%;
+    --card-foreground: 140 18% 8%;
+    --popover: 42 38% 96%;
+    --popover-foreground: 140 18% 8%;
+    --primary: 108 42% 30%;
+    --primary-foreground: 48 40% 96%;
+    --brand-ink: 104 48% 32%;
+    --logo: 104 40% 47%;
+    --secondary: 108 28% 18%;
+    --secondary-foreground: 48 40% 96%;
+    --muted: 42 24% 92%;
+    --muted-foreground: 140 8% 28%;
+    --accent: 104 40% 47%;
+    --accent-foreground: 140 18% 8%;
+    --blush: 104 36% 92%;
+    --butter: 48 46% 90%;
+    --sky: 104 18% 93%;
+    --mint: 104 32% 88%;
+    --lilac: 90 28% 90%;
+    --peach: 36 40% 90%;
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
     --success: 160 84% 39%;
@@ -33,9 +40,9 @@
     --warning-foreground: 0 0% 100%;
     --info: 217 91% 60%;
     --info-foreground: 0 0% 100%;
-    --border: 147 28% 84%;
-    --input: 147 28% 84%;
-    --ring: 147.13 56.65% 60.2%;
+    --border: 28 28% 84%;
+    --input: 28 28% 84%;
+    --ring: 104 40% 47%;
 
     /* Social brand colours */
     --social-whatsapp: 142 70% 49%;
@@ -61,13 +68,14 @@
     --sidebar-ring: 147.13 56.65% 60.2%;
 
     /* Typography */
-    --font-sans: "Nunito", -apple-system, BlinkMacSystemFont, sans-serif;
-    --font-heading: "Fredoka One", -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-sans: "Outfit", -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-heading: "Oswald", "Arial Narrow", sans-serif;
+    --font-italic: "Fraunces", Georgia, serif;
     --font-serif: ui-serif, Georgia, "Times New Roman", serif;
     --font-mono: ui-monospace, "SF Mono", Monaco, "Cascadia Code", "Roboto Mono", Consolas, "Courier New", monospace;
 
     /* Border Radius */
-    --radius: 0.5rem;
+    --radius: 1.15rem;
     /* Button radius: the kit's radiusButton is written here at install time;
        the default matches shadcn `rounded-md` (calc(var(--radius) - 2px)) so a
        kit without a button radius renders unchanged. Consumed by the Button
@@ -85,15 +93,15 @@
     --space-xxxl: 6rem;
 
     /* Content container width (max-w-content) */
-    --width-content: 72rem;
+    --width-content: 76rem;
 
     /* Shadows */
     --shadow-2xs: 0 1px 3px 0px hsl(0 0% 0% / 0.05);
     --shadow-xs: 0 1px 3px 0px hsl(0 0% 0% / 0.05);
-    --shadow-sm: 0 1px 3px 0px hsl(0 0% 0% / 0.10), 0 1px 2px -1px hsl(0 0% 0% / 0.10);
-    --shadow: 0 1px 3px 0px hsl(0 0% 0% / 0.10), 0 1px 2px -1px hsl(0 0% 0% / 0.10);
-    --shadow-md: 0 1px 3px 0px hsl(0 0% 0% / 0.10), 0 2px 4px -1px hsl(0 0% 0% / 0.10);
-    --shadow-lg: 0 1px 3px 0px hsl(0 0% 0% / 0.10), 0 4px 6px -1px hsl(0 0% 0% / 0.10);
+    --shadow-sm: 0 8px 20px hsl(332 46% 14% / 0.06);
+    --shadow: 0 14px 36px hsl(332 46% 14% / 0.08);
+    --shadow-md: 0 18px 40px hsl(346 78% 40% / 0.10);
+    --shadow-lg: 0 24px 50px hsl(332 46% 14% / 0.12);
     --shadow-xl: 0 1px 3px 0px hsl(0 0% 0% / 0.10), 0 8px 10px -1px hsl(0 0% 0% / 0.10);
     --shadow-2xl: 0 1px 3px 0px hsl(0 0% 0% / 0.25);
   }
@@ -110,6 +118,16 @@
 
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-heading) !important;
+    letter-spacing: -0.02em;
+    font-weight: 500;
+  }
+
+  h1 em, h2 em, h3 em, .italic-accent {
+    font-family: var(--font-italic) !important;
+    font-style: italic;
+    font-weight: 560;
+    letter-spacing: -0.03em;
+    color: hsl(var(--logo));
   }
 }
 
@@ -242,9 +260,32 @@
   }
 }
 
-/* Unless told otherwise, keep it for smooth scrolling */
 html {
   scroll-behavior: smooth;
+}
+
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+html.lenis {
+  scroll-behavior: auto;
+}
+
+.marquee-track {
+  animation: marquee 32s linear infinite;
+}
+
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marquee-track {
+    animation: none;
+  }
 }
 
 .hero-orbs {
@@ -412,11 +453,158 @@ html {
   }
 
   .motion-tile:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 16px hsl(151 30% 14% / 0.06);
+    transform: translateY(-4px);
+    box-shadow: 0 16px 32px hsl(332 46% 14% / 0.1);
   }
 
   .motion-tile:active {
     transform: translateY(0) scale(0.985);
+  }
+}
+
+.lookbook-row {
+  display: flex;
+  gap: 1rem;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-padding-inline: 1rem;
+  padding-bottom: 0.5rem;
+  -webkit-overflow-scrolling: touch;
+}
+
+.lookbook-row::-webkit-scrollbar {
+  height: 8px;
+}
+
+.lookbook-row::-webkit-scrollbar-thumb {
+  background: hsl(var(--primary) / 0.35);
+  border-radius: 999px;
+}
+
+.age-card {
+  min-height: 7.5rem;
+}
+
+.arch-frame {
+  border-radius: 999px 999px 18px 18px;
+}
+
+.watermark {
+  position: absolute;
+  left: -0.06em;
+  top: 0.05em;
+  z-index: 0;
+  font-family: var(--font-heading);
+  font-size: clamp(5rem, 18vw, 16rem);
+  line-height: 0.8;
+  letter-spacing: -0.04em;
+  color: transparent;
+  -webkit-text-stroke: 1px hsl(var(--foreground) / 0.08);
+  pointer-events: none;
+  user-select: none;
+  white-space: nowrap;
+}
+
+.mood-track {
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+}
+
+@media (min-width: 1024px) {
+  .mood-track {
+    overflow: visible;
+    scroll-snap-type: none;
+  }
+}
+
+.concave-card {
+  transform: perspective(900px) rotateY(var(--tilt, 0deg));
+  transform-origin: center center;
+}
+
+[data-type] {
+  border-color: hsl(var(--border));
+  color: hsl(var(--foreground) / 0.55);
+  background: transparent;
+}
+
+[data-type].is-on {
+  border-color: #62a848;
+  color: #122117;
+  background: #62a848;
+}
+
+.price-was {
+  animation: price-strike 0.55s ease both;
+}
+
+.price-now,
+.price-off {
+  animation: price-rise 0.6s ease both;
+}
+
+.price-off {
+  animation-delay: 0.12s;
+}
+
+@keyframes price-strike {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes price-rise {
+  from { opacity: 0; transform: translateY(0.35em); }
+  to { opacity: 1; transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .price-was,
+  .price-now,
+  .price-off {
+    animation: none;
+  }
+}
+
+.view-disc {
+  position: absolute;
+  left: 50%;
+  top: 46%;
+  display: grid;
+  place-items: center;
+  width: 4.5rem;
+  height: 4.5rem;
+  margin-left: -2.25rem;
+  margin-top: -2.25rem;
+  border-radius: 999px;
+  background: hsl(var(--logo));
+  color: hsl(140 18% 8%);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  opacity: 0;
+  transform: scale(0.8);
+  transition: opacity 180ms ease, transform 180ms ease;
+}
+
+.group:hover .view-disc,
+.group:focus-visible .view-disc {
+  opacity: 1;
+  transform: scale(1);
+}
+
+@media (hover: none) {
+  .view-disc {
+    opacity: 1;
+    transform: scale(1);
+    top: auto;
+    bottom: 0.8rem;
+    margin-top: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .float-photo {
+    animation: none !important;
   }
 }

@@ -164,7 +164,7 @@ function MediaFrame({ item }: { item: StoreMedia }) {
         poster={item.poster}
         controls
         playsInline
-        className="w-full h-full object-cover bg-black"
+        className="h-full w-full bg-black object-contain"
       />
     );
   }
@@ -184,7 +184,7 @@ function MediaFrame({ item }: { item: StoreMedia }) {
     <img
       src={item.url || item.poster}
       alt={item.alt}
-      className="w-full h-full object-cover"
+      className="h-full w-full object-contain"
       width={800}
       height={800}
     />
@@ -348,14 +348,14 @@ export default function ProductPage() {
         <meta name="description" content={product.description.slice(0, 160) || `${product.name} from Bsbasil.`} />
         <link rel="canonical" href={`https://bsbasil.com/products/${product.handle}`} />
       </Helmet>
-      <main className="max-w-content mx-auto px-4 py-xl pb-28 md:pb-xl">
+      <main className="max-w-content mx-auto px-4 py-10 pb-28 md:py-14 md:pb-xl">
         <p className="text-sm mb-base" style={{ color: 'hsl(var(--muted-foreground))' }}>
           <Link to="/catalog" style={{ color: 'hsl(var(--brand-ink))' }}>Shop</Link>
           {product.category ? ` / ${product.category}` : ''}
         </p>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-xl">
-          <div>
-            <div className="aspect-square rounded-2xl overflow-hidden border" style={{ borderColor: 'hsl(var(--border))' }}>
+        <div className="grid grid-cols-1 items-start gap-10 lg:grid-cols-2">
+            <div className="lg:sticky lg:top-28">
+            <div className="aspect-square overflow-hidden rounded-[1.8rem] bg-muted shadow-md">
               {media ? <MediaFrame item={media} /> : <div className="w-full h-full" style={{ background: 'hsl(var(--muted))' }} />}
             </div>
             {gallery.length > 1 ? (
@@ -365,11 +365,11 @@ export default function ProductPage() {
                     key={`${item.kind}-${item.url ?? item.embedUrl}-${index}`}
                     type="button"
                     onClick={() => setMediaIndex(index)}
-                    className="w-16 h-16 rounded-xl overflow-hidden border shrink-0"
+                    className="h-16 w-16 shrink-0 overflow-hidden rounded-2xl border"
                     style={{ borderColor: index === mediaIndex ? 'hsl(var(--primary))' : 'hsl(var(--border))' }}
                     aria-label={item.kind === 'image' ? 'Show photo' : 'Play video'}
                   >
-                    <img src={item.kind === 'image' ? item.url : item.poster || item.url} alt="" className="w-full h-full object-cover" />
+                    <img src={item.kind === 'image' ? item.url : item.poster || item.url} alt="" className="h-full w-full object-contain" />
                   </button>
                 ))}
               </div>
@@ -483,7 +483,7 @@ export default function ProductPage() {
                                 }
                               }}
                               aria-pressed={active}
-                              className="px-base py-xs rounded-full text-sm font-medium border inline-flex items-center gap-2 disabled:opacity-40"
+                              className="inline-flex min-h-11 items-center gap-2 rounded-full border px-4 text-sm font-semibold disabled:opacity-40"
                               style={{
                                 background: active ? 'hsl(var(--primary))' : 'hsl(var(--background))',
                                 color: active ? 'hsl(var(--primary-foreground))' : 'hsl(var(--foreground))',
@@ -519,7 +519,7 @@ export default function ProductPage() {
                               type="button"
                               disabled={!offered}
                               onClick={() => setSelected((current) => selectionForOption(product, current, option.name, value))}
-                              className="px-base py-xs rounded-full text-sm font-medium border inline-flex items-center gap-2 disabled:opacity-40"
+                              className="inline-flex min-h-11 items-center gap-2 rounded-full border px-4 text-sm font-semibold disabled:opacity-40"
                               style={{
                                 background: active ? 'hsl(var(--primary))' : 'hsl(var(--background))',
                                 color: active ? 'hsl(var(--primary-foreground))' : 'hsl(var(--foreground))',
@@ -537,28 +537,30 @@ export default function ProductPage() {
               );
             })()}
 
-            <div className="flex items-center gap-3 mb-base">
-              <div className="flex items-center rounded-full overflow-hidden border" style={{ borderColor: 'hsl(var(--border))' }}>
-                <button type="button" className="w-10 h-10" onClick={() => setQuantity((value) => Math.max(1, value - 1))} aria-label="Decrease quantity">−</button>
-                <span className="w-8 text-center font-bold">{quantity}</span>
-                <button type="button" className="w-10 h-10" onClick={() => setQuantity((value) => value + 1)} aria-label="Increase quantity">+</button>
+            <div className="mb-base flex flex-col gap-3">
+              <div className="flex items-center gap-3">
+                <div className="flex items-center overflow-hidden rounded-full border" style={{ borderColor: 'hsl(var(--border))' }}>
+                  <button type="button" className="h-12 w-12 text-lg" onClick={() => setQuantity((value) => Math.max(1, value - 1))} aria-label="Decrease quantity">−</button>
+                  <span className="w-8 text-center font-bold">{quantity}</span>
+                  <button type="button" className="h-12 w-12 text-lg" onClick={() => setQuantity((value) => value + 1)} aria-label="Increase quantity">+</button>
+                </div>
+                <button
+                  type="button"
+                  onClick={onAdd}
+                  disabled={adding || buying || soldOut || (requiresSize && !chosenSize)}
+                  className="flex min-h-12 flex-1 items-center justify-center gap-2 rounded-full px-6 font-semibold disabled:opacity-60"
+                  style={{ background: 'hsl(var(--primary))', color: 'hsl(var(--primary-foreground))' }}
+                >
+                  <ShoppingBag size={16} />
+                  {soldOut ? 'Sold out' : adding ? 'Adding' : 'Add to bag'}
+                </button>
               </div>
-              <button
-                type="button"
-                onClick={onAdd}
-                disabled={adding || buying || soldOut || (requiresSize && !chosenSize)}
-                className="flex-1 flex items-center justify-center gap-2 px-xl py-sm rounded-full font-semibold disabled:opacity-60"
-                style={{ background: 'hsl(var(--primary))', color: 'hsl(var(--primary-foreground))' }}
-              >
-                <ShoppingBag size={16} />
-                {soldOut ? 'Sold out' : adding ? 'Adding' : 'Add to bag'}
-              </button>
               <button
                 type="button"
                 onClick={onBuyNow}
                 disabled={adding || buying || soldOut || (requiresSize && !chosenSize)}
-                className="px-xl py-sm rounded-full font-semibold border disabled:opacity-60"
-                style={{ borderColor: 'hsl(var(--primary))', color: 'hsl(var(--brand-ink))' }}
+                className="min-h-12 rounded-full border px-6 font-semibold disabled:opacity-60"
+                style={{ borderColor: 'hsl(var(--foreground))', color: 'hsl(var(--foreground))' }}
               >
                 {buying ? 'Opening checkout' : 'Buy now'}
               </button>
@@ -572,8 +574,8 @@ export default function ProductPage() {
           </div>
         </div>
 
-        <section className="mt-xxl grid grid-cols-1 md:grid-cols-2 gap-base">
-          <article className="rounded-2xl border p-lg" style={{ borderColor: 'hsl(var(--border))' }}>
+        <section className="mt-xxl grid grid-cols-1 gap-4 md:grid-cols-2">
+          <article className="rounded-[1.5rem] border bg-card p-6" style={{ borderColor: 'hsl(var(--border))' }}>
             <h2 className="text-lg font-bold mb-sm" style={{ color: 'hsl(var(--foreground))' }}>Size guide</h2>
             <ul className="text-sm space-y-2" style={{ color: 'hsl(var(--muted-foreground))' }}>
               {SIZE_GUIDE.map(([label, weight]) => (
@@ -581,7 +583,7 @@ export default function ProductPage() {
               ))}
             </ul>
           </article>
-          <article className="rounded-2xl border p-lg" style={{ borderColor: 'hsl(var(--border))' }}>
+          <article className="rounded-[1.5rem] border bg-card p-6" style={{ borderColor: 'hsl(var(--border))' }}>
             <h2 className="text-lg font-bold mb-sm" style={{ color: 'hsl(var(--foreground))' }}>
               {catalog.policies.shipping?.title || 'Shipping'}
             </h2>
@@ -589,7 +591,7 @@ export default function ProductPage() {
               {catalog.policies.shipping?.body || 'Shipping details will appear here once they are saved in Shopify.'}
             </p>
           </article>
-          <article className="rounded-2xl border p-lg md:col-span-2" style={{ borderColor: 'hsl(var(--border))' }}>
+          <article className="rounded-[1.5rem] border bg-card p-6 md:col-span-2" style={{ borderColor: 'hsl(var(--border))' }}>
             <h2 className="text-lg font-bold mb-sm" style={{ color: 'hsl(var(--foreground))' }}>
               {catalog.policies.refund?.title || 'Returns and refunds'}
             </h2>

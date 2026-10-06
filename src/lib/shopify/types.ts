@@ -107,6 +107,7 @@ export interface CartLine {
   id: string;
   variantId: string;
   name: string;
+  handle?: string;
   variantTitle: string;
   price: number;
   compareAtPrice: number | null;
