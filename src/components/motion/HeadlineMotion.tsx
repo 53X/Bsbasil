@@ -23,7 +23,8 @@ export default function HeadlineMotion() {
 
     const splitWords = (el: HTMLElement) => {
       if (el.dataset.words === '1') return;
-      if (el.closest('[data-still-name]')) return;
+      if (el.closest('[data-still-name], [data-about-reveal]')) return;
+      if (el.hasAttribute('data-about-reveal')) return;
       const raw = (el.textContent ?? '').replace(/\s+/g, ' ').trim();
       if (!raw) return;
       el.dataset.raw = raw;
@@ -90,6 +91,15 @@ export default function HeadlineMotion() {
       });
     };
 
+    const showNow = (el: HTMLElement) => {
+      el.dataset.played = '1';
+      piecesOf(el).forEach((piece) => {
+        piece.style.animation = 'none';
+        piece.style.opacity = '1';
+        piece.style.transform = 'none';
+      });
+    };
+
     const consider = (el: HTMLElement) => {
       if (el.dataset.played === '1') return;
       if (!piecesOf(el).length) return;
@@ -97,7 +107,12 @@ export default function HeadlineMotion() {
       if (box.height < 2) return;
       if (document.querySelector('[data-silk-intro]') && box.top < window.innerHeight && box.bottom > 0) return;
       const vh = window.innerHeight;
-      if (box.top < vh * 0.8 && box.bottom > vh * 0.12) play(el);
+      if (box.bottom < vh * 0.12 && box.top < 0) {
+        showNow(el);
+        return;
+      }
+      // Start as the line reaches the bottom edge, before it sits fully in view.
+      if (box.top < vh * 0.96 && box.bottom > vh * 0.08) play(el);
     };
 
     const watch = (el: HTMLElement) => {
@@ -156,7 +171,15 @@ export default function HeadlineMotion() {
       ];
       const running = words.flatMap((word) => [...word.getAnimations()]);
       const linesFinished = running.length > 0 && running.every((anim) => anim.playState === 'finished');
+      const snapped = running.length === 0 && heading.dataset.played === '1';
       const waited = performance.now() - Number(btn.dataset.heldAt);
+      if (snapped) {
+        btn.dataset.played = '1';
+        btn.style.animation = 'none';
+        btn.style.opacity = '1';
+        btn.style.transform = 'none';
+        return;
+      }
       if (linesFinished || waited > 2400) releaseButton(btn);
     };
 

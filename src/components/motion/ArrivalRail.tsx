@@ -3,7 +3,7 @@ import { Link } from 'react-router';
 import ProductCard from '@/components/ProductCard';
 import type { StoreProduct } from '@/lib/shopify/types';
 
-/** Product rail. Vertical scroll carries the cards sideways and reveals them one by one. */
+/** Product rail. Vertical scroll carries the cards in from the side, the same way the lookbook does. */
 export default function ArrivalRail({ products }: { products: StoreProduct[] }) {
   const rootRef = useRef<HTMLElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
@@ -15,20 +15,7 @@ export default function ArrivalRail({ products }: { products: StoreProduct[] }) 
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (reduced) return;
 
-    const cardNodes = () => Array.from(track.querySelectorAll<HTMLElement>('[data-card]'));
-    const clearCardMotion = () => {
-      cardNodes().forEach((card) => {
-        card.style.opacity = '';
-        card.style.visibility = '';
-        card.style.transform = '';
-      });
-    };
-    cardNodes().forEach((card) => {
-      card.style.opacity = '0';
-      card.style.transform = 'translateY(32px)';
-    });
-
-    let revert = clearCardMotion;
+    let revert = () => {};
     let cancelled = false;
 
     void Promise.all([import('gsap'), import('gsap/ScrollTrigger')]).then(([gsapMod, scrollMod]) => {
@@ -36,54 +23,30 @@ export default function ArrivalRail({ products }: { products: StoreProduct[] }) 
       const gsap = gsapMod.default;
       const ScrollTrigger = scrollMod.ScrollTrigger;
       gsap.registerPlugin(ScrollTrigger);
-      const cards = cardNodes();
-      const count = Math.max(cards.length, 1);
-
-      const pose = (progress: number) => {
-        cards.forEach((card, index) => {
-          const start = index / count;
-          const span = 1 / count;
-          const revealed = gsap.utils.clamp(0, 1, (progress - start) / span);
-          const box = card.getBoundingClientRect();
-          const delta = box.left + box.width / 2 - window.innerWidth / 2;
-          const rotate = gsap.utils.clamp(-18, 18, delta / 28);
-          gsap.set(card, {
-            autoAlpha: revealed,
-            y: (1 - revealed) * 32,
-            rotateY: rotate,
-            z: -Math.abs(rotate) * 2,
-          });
-        });
-      };
-
       const ctx = gsap.context(() => {
-        const slide = () => Math.max(0, track.scrollWidth - window.innerWidth + 48);
+        const distance = () => Math.max(0, track.scrollWidth - window.innerWidth + 32);
         const applyHeight = () => {
           const stage = root.querySelector('[data-arrival-stage]') as HTMLElement | null;
           const stageHeight = stage?.offsetHeight ?? 0;
-          const perCard = Math.round(window.innerHeight * 0.42);
-          const span = Math.max(slide(), count * perCard);
-          root.style.height = `${Math.max(window.innerHeight * 0.85, stageHeight) + span}px`;
+          root.style.height = `${stageHeight + distance()}px`;
         };
         applyHeight();
-        gsap.to(track, {
-          x: () => -slide(),
-          ease: 'none',
-          scrollTrigger: {
-            trigger: root,
-            start: 'top 6.25rem',
-            end: 'bottom bottom',
-            scrub: 0.7,
-            invalidateOnRefresh: true,
-            onRefresh: (self) => {
-              applyHeight();
-              pose(self.progress);
+        gsap.fromTo(
+          track,
+          { x: 0 },
+          {
+            x: () => -distance(),
+            ease: 'none',
+            scrollTrigger: {
+              trigger: root,
+              start: 'top 6.25rem',
+              end: 'bottom bottom',
+              scrub: 0.6,
+              invalidateOnRefresh: true,
+              onRefresh: applyHeight,
             },
-            onUpdate: (self) => pose(self.progress),
-            onLeave: () => pose(1),
-            onLeaveBack: () => pose(0),
           },
-        });
+        );
       }, root);
 
       const refresh = () => ScrollTrigger.refresh();
@@ -95,7 +58,8 @@ export default function ArrivalRail({ products }: { products: StoreProduct[] }) 
       revert = () => {
         window.removeEventListener('resize', refresh);
         ctx.revert();
-        clearCardMotion();
+        root.style.height = '';
+        track.style.transform = '';
       };
     });
 
@@ -108,7 +72,7 @@ export default function ArrivalRail({ products }: { products: StoreProduct[] }) 
   if (products.length === 0) return null;
 
   return (
-    <section ref={rootRef} id="arrivals" className="bg-background">
+    <section ref={rootRef} id="arrivals" className="relative bg-background">
       <div data-arrival-stage className="sticky top-[6.25rem] overflow-hidden py-6 sm:py-8">
         <div className="mx-auto mb-5 flex w-full max-w-content items-end justify-between gap-4 px-4">
           <h2 className="max-w-full text-[clamp(2.2rem,4vw,3.75rem)] leading-none">
@@ -124,14 +88,9 @@ export default function ArrivalRail({ products }: { products: StoreProduct[] }) 
           </Link>
         </div>
         <div className="overflow-hidden">
-          <div ref={trackRef} className="flex w-max items-stretch gap-4 px-4 pb-8 sm:gap-6" style={{ perspective: '1400px' }}>
+          <div ref={trackRef} className="flex w-max items-stretch gap-4 px-4 pb-8 sm:gap-6 lg:gap-8">
             {products.map((product, index) => (
-              <div
-                key={product.id}
-                data-card
-                className="w-[min(68vw,280px)] shrink-0 sm:w-[260px]"
-                style={{ transformStyle: 'preserve-3d' }}
-              >
+              <div key={product.id} className="w-[min(72vw,280px)] shrink-0 sm:w-[min(42vw,280px)] lg:w-[min(22vw,280px)]">
                 <ProductCard product={product} index={index} />
               </div>
             ))}

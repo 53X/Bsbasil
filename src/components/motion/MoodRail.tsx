@@ -130,8 +130,8 @@ export default function MoodRail() {
                   <span className="relative z-10 p-8 text-4xl uppercase leading-none text-[#122117]">Accessories</span>
                 )}
               </div>
-              <p className="mt-3 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em]">
-                <span style={{ color: 'hsl(var(--logo))' }}>{String(index + 1).padStart(2, '0')}</span>
+              <p className="look-caption italic-accent mt-3 flex items-baseline gap-2 text-sm uppercase">
+                <span>{String(index + 1).padStart(2, '0')}</span>
                 {kind.label}
               </p>
             </Link>

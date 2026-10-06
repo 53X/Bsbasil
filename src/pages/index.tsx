@@ -27,17 +27,22 @@ export default function HomePage() {
       const gsap = gsapMod.default;
       gsap.registerPlugin(scrollMod.ScrollTrigger);
       const ctx = gsap.context(() => {
-        gsap.from('[data-age-row]', {
-          x: 72,
-          opacity: 0,
-          stagger: 0.04,
-          ease: 'none',
-          scrollTrigger: {
-            trigger: root,
-            start: 'top 80%',
-            end: 'bottom 55%',
-            scrub: 0.6,
-          },
+        root.querySelectorAll('[data-age-row]').forEach((row) => {
+          gsap.fromTo(row, {
+            x: 72,
+            autoAlpha: 0,
+          }, {
+            x: 0,
+            autoAlpha: 1,
+            duration: 0.75,
+            ease: 'power3.out',
+            immediateRender: true,
+            scrollTrigger: {
+              trigger: row,
+              start: 'top 94%',
+              toggleActions: 'play none none none',
+            },
+          });
         });
       }, root);
       revert = () => ctx.revert();
@@ -138,7 +143,7 @@ export default function HomePage() {
         <section ref={ageRef} className="border-t border-foreground/10 py-16">
           <div className="mx-auto grid max-w-content gap-10 px-4 lg:grid-cols-[0.8fr_1.2fr] lg:items-start">
             <div>
-              <p className="mb-3 text-xs font-semibold uppercase tracking-[0.22em]" style={{ color: 'hsl(var(--brand-ink))' }}>
+              <p data-subhead className="mb-3 text-xs font-semibold uppercase tracking-[0.22em]" style={{ color: 'hsl(var(--brand-ink))' }}>
                 Start here
               </p>
               <h2 className="text-[clamp(2.88rem,7.2vw,5.52rem)] leading-[0.9]">
@@ -158,7 +163,7 @@ export default function HomePage() {
                       <span className="text-xs tracking-[0.18em]" style={{ color: 'hsl(var(--logo))' }}>
                         {String(index + 1).padStart(2, '0')}
                       </span>
-                      <span className="text-xl uppercase tracking-wide sm:text-2xl md:text-3xl">{group.label}</span>
+                      <span className="italic-accent age-months text-xl uppercase leading-[1.35] sm:text-2xl md:text-3xl">{group.label}</span>
                     </span>
                     <ArrowRight size={18} className="transition-transform group-hover:translate-x-1" />
                   </Link>
@@ -233,7 +238,7 @@ function PromotionCard({ promotion, index }: { promotion: StorePromotion; index:
       <div className={`mx-auto grid max-w-content items-center gap-8 px-4 py-12 lg:grid-cols-2 ${flip ? 'lg:[&>*:first-child]:order-2' : ''}`}>
         <div>
           {promotion.offer ? (
-            <p className="mb-4 text-base font-semibold uppercase tracking-[0.16em] sm:text-lg" style={{ color: 'hsl(var(--brand-ink))' }}>
+            <p data-subhead className="mb-4 text-base font-semibold uppercase tracking-[0.16em] sm:text-lg" style={{ color: 'hsl(var(--brand-ink))' }}>
               {promotion.offer}
             </p>
           ) : null}

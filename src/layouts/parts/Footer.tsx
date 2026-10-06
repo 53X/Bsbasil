@@ -44,7 +44,7 @@ export default function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="mt-auto bg-[#62A848] text-[#122117]">
+    <footer className="mt-auto bg-[#122117] text-[#F6F3EA]">
       <div className="mx-auto grid max-w-content gap-10 px-4 py-14 md:grid-cols-[1.3fr_1fr_1fr]">
         <div>
           <img
@@ -54,7 +54,7 @@ export default function Footer() {
             width={140}
             height={36}
           />
-          <p className="max-w-xs text-sm leading-relaxed text-[#122117]/80">
+          <p className="max-w-xs text-sm leading-relaxed text-[#F6F3EA]/80">
             Soft, safe clothes for ages 0–3. Pick an age, choose a size, and we’ll take care of the rest.
           </p>
           <div className="mt-5 flex items-center gap-2">
@@ -65,7 +65,7 @@ export default function Footer() {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label={s.label}
-                className="flex h-11 w-11 items-center justify-center rounded-full bg-[#F6F3EA]/35 transition-colors hover:bg-[#F6F3EA]"
+                className="flex h-11 w-11 items-center justify-center rounded-full bg-[#F6F3EA]/15 text-[#F6F3EA] transition-colors hover:bg-[#F6F3EA] hover:text-[#122117]"
               >
                 {s.icon}
               </a>
@@ -74,11 +74,11 @@ export default function Footer() {
         </div>
 
         <nav aria-label="Shop">
-          <p className="mb-3 text-xs font-semibold uppercase tracking-[0.16em] text-[#122117]">Shop</p>
+          <p className="mb-3 text-xs font-semibold uppercase tracking-[0.16em] text-[#F6F3EA]">Shop</p>
           <ul className="space-y-2">
             {SHOP_LINKS.map((item) => (
               <li key={item.href}>
-                <Link to={item.href} className="text-sm text-[#122117]/85 hover:text-[#122117]">
+                <Link to={item.href} className="text-sm text-[#F6F3EA]/85 hover:text-[#F6F3EA]">
                   {item.label}
                 </Link>
               </li>
@@ -87,38 +87,38 @@ export default function Footer() {
         </nav>
 
         <div>
-          <p className="mb-3 text-xs font-semibold uppercase tracking-[0.16em] text-[#122117]">Help</p>
+          <p className="mb-3 text-xs font-semibold uppercase tracking-[0.16em] text-[#F6F3EA]">Help</p>
           <ul className="space-y-2">
             <li>
-              <Link to="/about" className="text-sm text-[#122117]/85 hover:text-[#122117]">
+              <Link to="/about" className="text-sm text-[#F6F3EA]/85 hover:text-[#F6F3EA]">
                 Our story
               </Link>
             </li>
             <li>
-              <Link to="/faq" className="text-sm text-[#122117]/85 hover:text-[#122117]">
+              <Link to="/faq" className="text-sm text-[#F6F3EA]/85 hover:text-[#F6F3EA]">
                 FAQ
               </Link>
             </li>
             <li>
-              <Link to="/contact" className="text-sm text-[#122117]/85 hover:text-[#122117]">
+              <Link to="/contact" className="text-sm text-[#F6F3EA]/85 hover:text-[#F6F3EA]">
                 Contact
               </Link>
             </li>
             <li>
-              <Link to="/privacy-policy" className="text-sm text-[#122117]/85 hover:text-[#122117]">
+              <Link to="/privacy-policy" className="text-sm text-[#F6F3EA]/85 hover:text-[#F6F3EA]">
                 Privacy Policy
               </Link>
             </li>
             <li>
-              <Link to="/terms-of-use" className="text-sm text-[#122117]/85 hover:text-[#122117]">
+              <Link to="/terms-of-use" className="text-sm text-[#F6F3EA]/85 hover:text-[#F6F3EA]">
                 Terms of Use
               </Link>
             </li>
           </ul>
         </div>
       </div>
-      <div className="border-t border-[#122117]/15">
-        <p className="mx-auto max-w-content px-4 py-5 text-xs text-[#122117]/70">
+      <div className="border-t border-[#F6F3EA]/15">
+        <p className="mx-auto max-w-content px-4 py-5 text-xs text-[#F6F3EA]/70">
           © {currentYear} Bsbasil. All rights reserved.
         </p>
       </div>

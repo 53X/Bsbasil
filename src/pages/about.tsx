@@ -69,11 +69,11 @@ export default function AboutPage() {
           inLanguage: 'en-IN',
         }).replace(/</g, '\\u003c')}</script>
       </Helmet>
-      <main>
+      <main data-script-ink>
         <AboutReveal />
         {/* ── Hero ── */}
-        <section className="relative overflow-hidden" style={{ background: 'hsl(var(--muted))' }}>
-          <div className="absolute inset-0 pointer-events-none">
+        <section className="relative" style={{ background: 'hsl(var(--muted))' }}>
+          <div className="absolute inset-0 pointer-events-none overflow-hidden">
             <img
               src="/airo-assets/images/pages/about/hero"
               alt="Mother and baby in soft Bsbasil clothing"
@@ -106,8 +106,8 @@ export default function AboutPage() {
                 className="text-lg md:text-xl max-w-2xl mx-auto mb-lg"
                 style={{ color: 'hsl(var(--mutedForeground, var(--muted-foreground)))' }}
               >
-                Bsbasil was born from a simple belief — every little one deserves clothes that are
-                as gentle as they are adorable.
+                Bsbasil was born from a simple belief — every little one deserves clothes that are{' '}
+                <span className="italic-accent text-[1.35em] leading-none">as gentle as they are adorable</span>.
               </p>
               <p
                 data-about-reveal
@@ -130,7 +130,8 @@ export default function AboutPage() {
                 <em className="mt-[0.55em] block text-[0.92em] leading-[1.15]">Stand For</em>
               </h2>
               <p className="text-base" style={{ color: 'hsl(var(--muted-foreground))' }}>
-                Every Bsbasil piece is guided by three core promises.
+                Every Bsbasil piece is guided by{' '}
+                <span className="italic-accent text-[1.45em] leading-none">three core promises</span>.
               </p>
             </div>
 
@@ -151,7 +152,7 @@ export default function AboutPage() {
                     >
                       <Icon size={28} style={{ color: v.color }} />
                     </div>
-                    <h3 className="text-xl font-bold mb-sm" style={{ color: 'hsl(var(--foreground))' }}>
+                    <h3 className="italic-accent mb-sm text-[clamp(1.7rem,2.5vw,2.15rem)] leading-[1.2]">
                       {v.title}
                     </h3>
                     <p className="text-sm leading-relaxed" style={{ color: 'hsl(var(--muted-foreground))' }}>
@@ -186,7 +187,8 @@ export default function AboutPage() {
               >
                 Every Bsbasil garment is tested to meet international baby safety standards. We use
                 only OEKO-TEX® certified fabrics — free from harmful chemicals, dyes, and
-                irritants. Because your baby's skin deserves nothing less.
+                irritants. Because your baby's skin deserves{' '}
+                <span className="italic-accent text-[1.35em] leading-none">nothing less</span>.
               </p>
 
               <div className="flex flex-wrap justify-center gap-base">
@@ -233,16 +235,15 @@ export default function AboutPage() {
                 <p className="text-sm font-semibold mb-sm" style={{ color: 'hsl(var(--brand-ink))' }}>
                   A note from our founder
                 </p>
-                <p className="italic-accent mb-base text-[clamp(1.7rem,3.2vw,2.45rem)] leading-[1.3]">
-                  my love letter
-                </p>
                 <blockquote
                   className="text-xl md:text-2xl font-medium leading-relaxed mb-base"
                   style={{ color: 'hsl(var(--foreground))' }}
                 >
                   "When my daughter was born, I couldn't find clothes that were truly soft, safe,
-                  and beautiful all at once. So I made them. Bsbasil is my love letter to every
-                  parent who wants the very best for their little one."
+                  and beautiful all at once. So I made them.{' '}
+                  <span className="italic-accent text-[1.2em] leading-[1.35]">
+                    Bsbasil is my love letter to every parent who wants the very best for their little one."
+                  </span>
                 </blockquote>
                 <p className="font-semibold" style={{ color: 'hsl(var(--muted-foreground))' }}>
                   — Founder, Bsbasil
@@ -268,7 +269,9 @@ export default function AboutPage() {
               className="text-lg mb-lg"
               style={{ color: 'hsl(var(--muted-foreground))' }}
             >
-              Explore our collection of soft, safe, and adorable clothes for ages 0–3.
+              Explore our collection of{' '}
+              <span className="italic-accent text-[1.35em] leading-none">soft, safe, and adorable</span>{' '}
+              clothes for ages 0–3.
             </p>
             <div data-about-reveal>
               <Link

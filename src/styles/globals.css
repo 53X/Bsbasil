@@ -501,6 +501,21 @@ html.lenis {
   display: inline-block;
 }
 
+/* Sunlight is a single weight. A hairline stroke makes the age labels a little heavier. */
+.age-months {
+  -webkit-text-stroke: 0.4px currentColor;
+  paint-order: stroke fill;
+}
+
+/* Lookbook image captions only. Thinner than .age-months (~2% vs ~5%). */
+.look-caption {
+  -webkit-text-stroke: 0.16px currentColor;
+  paint-order: stroke fill;
+  font-style: normal;
+  line-height: 1.45;
+  padding-block: 0.06em;
+}
+
 @keyframes slide-left {
   from { opacity: 0; transform: translate3d(-3.75rem, 0, 0); }
   to { opacity: 1; transform: translate3d(0, 0, 0); }
@@ -521,7 +536,24 @@ html.lenis {
 .slide-left { animation-name: slide-left; }
 .slide-right { animation-name: slide-right; }
 
+[data-script-ink] :is(h1 em, h2 em, h3 em, .italic-accent) {
+  color: hsl(104 48% 32%);
+}
+
 @media (prefers-reduced-motion: no-preference) {
+  .word-in:not(.slide-left):not(.slide-right) {
+    opacity: 0;
+  }
+
+  [data-shop-photo]:not(.slide-left):not(.slide-right),
+  [data-offer-cta]:not(.slide-right) {
+    opacity: 0;
+  }
+
+  [data-age-row] {
+    opacity: 0;
+  }
+
   [data-about-reveal]:not([data-shown]) {
     opacity: 0;
     transform: translate3d(-4.5rem, 0, 0);
@@ -531,6 +563,14 @@ html.lenis {
     opacity: 1;
     transform: translate3d(0, 0, 0);
     transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  [data-about-reveal] .word-in,
+  [data-about-reveal] .slide-left,
+  [data-about-reveal] .slide-right {
+    animation: none !important;
+    transform: none !important;
+    opacity: 1 !important;
   }
 }
 

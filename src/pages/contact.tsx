@@ -97,7 +97,7 @@ export default function ContactPage() {
         }).replace(/</g, '\\u003c')}</script>
       </Helmet>
 
-      <main>
+      <main data-script-ink>
         <ContactReveal />
         {/* Hero */}
         <section className="py-xxl text-center" style={{ background: 'hsl(var(--butter))' }}>
@@ -122,7 +122,9 @@ export default function ContactPage() {
               className="text-lg max-w-xl mx-auto"
               style={{ color: 'hsl(var(--muted-foreground))' }}
             >
-              {contact.hero.subheading}
+              Questions about sizing, orders, or our fabrics?{' '}
+              <span className="italic-accent text-[1.35em] leading-none">Drop us a message</span>{' '}
+              and we'll get back to you within 24 hours.
             </p>
           </div>
         </section>
@@ -147,7 +149,8 @@ export default function ContactPage() {
                     className="text-base"
                     style={{ color: 'hsl(var(--muted-foreground))' }}
                   >
-                    {contact.details.body}
+                    Reach out through any of the channels below, or fill in the form and{' '}
+                    <span className="italic-accent text-[1.35em] leading-none">we'll respond promptly</span>.
                   </p>
                 </div>
 
@@ -219,7 +222,7 @@ export default function ContactPage() {
                       <p className="text-sm" style={{ color: 'hsl(var(--muted-foreground))' }}>
                         {contact.details.hours}
                         <br />
-                        {contact.details.responseTime}
+                        <span className="italic-accent text-[1.35em] leading-none">{contact.details.responseTime}</span>
                       </p>
                     </div>
                   </div>
@@ -235,7 +238,7 @@ export default function ContactPage() {
                   }}
                 >
                   <p className="text-sm font-semibold mb-1" style={{ color: 'hsl(var(--brand-ink))' }}>
-                    {contact.trust.label}
+                    💛 <span className="italic-accent text-[1.45em] leading-none">Parents first</span>
                   </p>
                   <p className="text-sm" style={{ color: 'hsl(var(--muted-foreground))' }}>
                     {contact.trust.body}
@@ -261,7 +264,8 @@ export default function ContactPage() {
                         {contact.form.successHeading}
                       </h3>
                       <p style={{ color: 'hsl(var(--muted-foreground))' }}>
-                        {contact.form.successBody}
+                        Your message is ready in WhatsApp. Tap send there and we'll get back to you{' '}
+                        <span className="italic-accent text-[1.25em] leading-none">within 24 hours</span>.
                       </p>
                       <button
                         onClick={() => setStatus('idle')}
