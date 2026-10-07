@@ -1,10 +1,10 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router';
 import { ArrowRight } from 'lucide-react';
 
 const KINDS = [
   {
-    src: '/hero-cube/romper.jpg',
+    src: '/hero-cube/romper.webp',
     label: 'Rompers',
     href: '/catalog?category=Romper',
     lead: 'Premium comfort',
@@ -12,7 +12,7 @@ const KINDS = [
     sub: 'Soft all day, from the first feed to the last cuddle.',
   },
   {
-    src: '/hero-cube/sets.jpg',
+    src: '/hero-cube/sets.webp',
     label: 'Sets',
     href: '/catalog?category=Sets',
     lead: 'Tiny elegance',
@@ -20,7 +20,7 @@ const KINDS = [
     sub: 'A dressed-up set for parties, photos, and everyone waiting to see them.',
   },
   {
-    src: '/hero-cube/sleepwear.jpg',
+    src: '/hero-cube/sleepwear.webp',
     label: 'Sleepwear',
     href: '/catalog?category=Sleepwear',
     lead: 'Cute comfort',
@@ -28,7 +28,7 @@ const KINDS = [
     sub: 'For naps, nights, and every small trip in between.',
   },
   {
-    src: '/hero-cube/winter-wear.jpg',
+    src: '/hero-cube/winter-wear.webp',
     label: 'Winter wear',
     href: '/catalog?category=Winter%20wear',
     lead: 'Cozy warmth',
@@ -69,6 +69,7 @@ function paintLine(el: Element | null, text: string) {
  */
 export default function CinematicHero({ eyebrow }: { eyebrow: string }) {
   const rootRef = useRef<HTMLElement>(null);
+  const [restReady, setRestReady] = useState(false);
 
   useEffect(() => {
     const root = rootRef.current;
@@ -145,6 +146,14 @@ export default function CinematicHero({ eyebrow }: { eyebrow: string }) {
     };
   }, []);
 
+  useEffect(() => {
+    const arm = () => {
+      if (window.scrollY > 24) setRestReady(true);
+    };
+    window.addEventListener('scroll', arm, { passive: true });
+    return () => window.removeEventListener('scroll', arm);
+  }, []);
+
   return (
     <section ref={rootRef} className="relative h-[280svh] bg-background sm:h-[340svh] lg:h-[380vh]">
       <div className="sticky top-[6.25rem] mx-auto grid h-[calc(100svh-6.25rem)] max-w-content grid-rows-[auto_minmax(0,1fr)] items-stretch gap-3 overflow-hidden px-4 py-3 sm:gap-4 sm:py-5 lg:h-[calc(100dvh-6.25rem)] lg:grid-cols-[minmax(0,0.82fr)_minmax(0,1.18fr)] lg:grid-rows-none lg:items-stretch lg:gap-8">
@@ -196,12 +205,18 @@ export default function CinematicHero({ eyebrow }: { eyebrow: string }) {
               <img
                 key={still.src}
                 data-still
-                src={still.src}
+                src={index === 0 || restReady ? still.src : undefined}
+                srcSet={index === 0 ? `${still.src.replace('.webp', '-640.webp')} 640w, ${still.src} 960w` : undefined}
+                sizes={index === 0 ? '(min-width: 1024px) 42vw, 92vw' : undefined}
                 alt={still.label}
                 className="absolute inset-0 h-full w-full object-contain lg:object-cover"
                 style={index === 0 ? undefined : { opacity: 0 }}
                 width={720}
                 height={900}
+                decoding="async"
+                {...(index === 0
+                  ? { fetchPriority: 'high' as const, loading: 'eager' as const }
+                  : { fetchPriority: 'low' as const, loading: 'lazy' as const })}
               />
             ))}
           </div>

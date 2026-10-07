@@ -68,7 +68,7 @@ export default function SignInPage() {
   }, [addVariant, attachBuyer, navigate, needsSignup, next, ready, signingUp, user]);
 
   const continueWithGoogle = async () => {
-    const supabase = getSupabase();
+    const supabase = await getSupabase();
     if (!supabase) return;
     setBusy(true);
     setError(null);

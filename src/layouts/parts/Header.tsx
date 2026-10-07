@@ -35,7 +35,7 @@ export default function Header() {
         <div className="flex h-[4.25rem] items-center justify-between gap-4">
           <Link to="/" className="flex shrink-0 items-center">
             <img
-              src="/logo-horizontal.png"
+              src="/logo-horizontal.webp"
               alt="Bsbasil"
               className="block h-auto max-h-9 w-auto max-w-[9.5rem] object-contain sm:max-h-11 sm:max-w-[180px]"
               width={180}
@@ -80,7 +80,7 @@ export default function Header() {
             <Link
               to="/cart"
               className="relative flex h-11 items-center gap-2 px-2 text-sm font-medium uppercase tracking-[0.14em]"
-              aria-label={cartCount > 0 ? `Bag, ${cartCount} items` : 'Bag'}
+              aria-label={`BAG ${cartCount}`}
             >
               <ShoppingBag size={18} />
               <span className="hidden sm:inline">Bag</span>

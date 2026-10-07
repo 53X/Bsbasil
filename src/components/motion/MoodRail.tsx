@@ -2,10 +2,10 @@ import { useEffect, useRef } from 'react';
 import { Link } from 'react-router';
 
 const KINDS = [
-  { src: '/hero-cube/romper.jpg', label: 'Rompers', href: '/catalog?category=Romper' },
-  { src: '/hero-cube/sets.jpg', label: 'Sets', href: '/catalog?category=Sets' },
-  { src: '/hero-cube/sleepwear.jpg', label: 'Sleepwear', href: '/catalog?category=Sleepwear' },
-  { src: '/hero-cube/winter-wear.jpg', label: 'Winter wear', href: '/catalog?category=Winter%20wear' },
+  { src: '/hero-cube/romper.webp', label: 'Rompers', href: '/catalog?category=Romper' },
+  { src: '/hero-cube/sets.webp', label: 'Sets', href: '/catalog?category=Sets' },
+  { src: '/hero-cube/sleepwear.webp', label: 'Sleepwear', href: '/catalog?category=Sleepwear' },
+  { src: '/hero-cube/winter-wear.webp', label: 'Winter wear', href: '/catalog?category=Winter%20wear' },
   { src: '', label: 'Accessories', href: '/catalog?category=Accessories' },
 ];
 
@@ -125,6 +125,9 @@ export default function MoodRail() {
                     className="absolute inset-0 h-full w-full object-cover"
                     width={480}
                     height={640}
+                    loading="lazy"
+                    decoding="async"
+                    fetchPriority="low"
                   />
                 ) : (
                   <span className="relative z-10 p-8 text-4xl uppercase leading-none text-[#122117]">Accessories</span>

@@ -48,7 +48,9 @@ export default function Footer() {
       <div className="mx-auto grid max-w-content gap-10 px-4 py-14 md:grid-cols-[1.3fr_1fr_1fr]">
         <div>
           <img
-            src="/logo-horizontal.png"
+            src="/logo-horizontal.webp"
+            loading="lazy"
+            decoding="async"
             alt="Bsbasil"
             className="mb-4 block h-auto max-h-10 w-auto object-contain"
             width={140}

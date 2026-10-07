@@ -264,6 +264,10 @@ function PromotionCard({ promotion, index }: { promotion: StorePromotion; index:
               src={promotion.imageUrl}
               alt={promotion.imageAlt}
               className="mx-auto block h-auto max-h-[min(70vh,36rem)] w-auto max-w-full"
+              width={800}
+              height={1000}
+              loading="lazy"
+              decoding="async"
             />
           ) : null}
         </div>

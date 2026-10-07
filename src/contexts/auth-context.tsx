@@ -17,29 +17,34 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const configured = isSupabaseConfigured();
 
   useEffect(() => {
-    const supabase = getSupabase();
-    if (!supabase) {
-      setReady(true);
-      return;
-    }
     let active = true;
-    supabase.auth.getSession().then(({ data }) => {
+    let unsubscribe = () => {};
+    void getSupabase().then((supabase) => {
       if (!active) return;
-      setSession(data.session);
-      setReady(true);
-    });
-    const { data } = supabase.auth.onAuthStateChange((_event, next) => {
-      setSession(next);
-      setReady(true);
+      if (!supabase) {
+        setReady(true);
+        return;
+      }
+      void supabase.auth.getSession().then(({ data }) => {
+        if (!active) return;
+        setSession(data.session);
+        setReady(true);
+      });
+      const { data } = supabase.auth.onAuthStateChange((_event, next) => {
+        setSession(next);
+        setReady(true);
+      });
+      unsubscribe = () => data.subscription.unsubscribe();
     });
     return () => {
       active = false;
-      data.subscription.unsubscribe();
+      unsubscribe();
     };
   }, []);
 
   const signOut = useCallback(async () => {
-    await getSupabase()?.auth.signOut();
+    const supabase = await getSupabase();
+    await supabase?.auth.signOut();
     setSession(null);
   }, []);
 

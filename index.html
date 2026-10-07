@@ -17,13 +17,33 @@
     <link rel="icon" href="/logo-favicon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="google-site-verification" content="EPnSQcE_GnvhBqH5IdMfdEEyJAeywleg2h69eZgeOQk">
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="preload"
+      as="image"
+      href="/hero-cube/romper-640.webp"
+      imagesrcset="/hero-cube/romper-640.webp 640w, /hero-cube/romper.webp 960w"
+      imagesizes="(min-width: 1024px) 42vw, 92vw"
+      type="image/webp"
+      fetchpriority="high"
+    />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600&display=swap"
+      media="print"
+      onload="this.media='all'"
+    />
+    <noscript>
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600&display=swap" />
+    </noscript>
     <!--app-head-->
-    <script src="/airo-video-slots.js"></script>
-    <script src="/airo-logo-orientation.js"></script>
+    <script src="/airo-video-slots.js" defer></script>
+    <script src="/airo-logo-orientation.js" defer></script>
   </head>
   <body class="fs-unmask-airo-app-builder">
     <div id="app" class="fs-unmask-airo-app-builder"><!--app-html--></div>
     <script type="module" src="/src/main.tsx"></script>
-    <script src="/analytics.js"></script>
+    <script src="/analytics.js" defer></script>
   </body>
 </html>

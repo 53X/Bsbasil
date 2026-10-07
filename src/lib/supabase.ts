@@ -1,16 +1,21 @@
-import { createClient, type SupabaseClient } from '@supabase/supabase-js';
+import type { SupabaseClient } from '@supabase/supabase-js';
 
 const url = import.meta.env.VITE_SUPABASE_URL as string | undefined;
 const key = import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined;
 
-let client: SupabaseClient | null = null;
+let clientPromise: Promise<SupabaseClient | null> | null = null;
 
 export function isSupabaseConfigured(): boolean {
   return Boolean(url && key);
 }
 
-export function getSupabase(): SupabaseClient | null {
-  if (!isSupabaseConfigured() || typeof window === 'undefined') return null;
-  if (!client) client = createClient(url!, key!, { auth: { persistSession: true, autoRefreshToken: true } });
-  return client;
+/** Loads the Supabase client on demand so it stays out of the first paint bundle. */
+export function getSupabase(): Promise<SupabaseClient | null> {
+  if (!isSupabaseConfigured() || typeof window === 'undefined') return Promise.resolve(null);
+  if (!clientPromise) {
+    clientPromise = import('@supabase/supabase-js').then(({ createClient }) =>
+      createClient(url!, key!, { auth: { persistSession: true, autoRefreshToken: true } }),
+    );
+  }
+  return clientPromise;
 }

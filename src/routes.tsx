@@ -1,17 +1,6 @@
 import { Navigate, redirect, type RouteObject } from 'react-router';
 import HomePage from './pages/index';
-import AboutPage from './pages/about';
-import CatalogPage from './pages/catalog';
-import ProductPage from './pages/product';
-import CartPage from './pages/cart';
 import { catalogLoader, homeLoader, productLoader } from './lib/shopify/storefront';
-import ContactPage from './pages/contact';
-import CheckoutSuccess from './pages/checkout/success';
-import CheckoutCancel from './pages/checkout/cancel';
-import PrivacyPolicyPage from './pages/privacy-policy';
-import TermsOfUsePage from './pages/terms-of-use';
-import FAQPage from './pages/faq';
-import SignInPage from './pages/sign-in';
 // Eager import so renderToString doesn't hit a Suspense boundary on 404 routes
 // and abort to client rendering. The prod 404 page is tiny; the dev-tools
 // variant stays lazy because it pulls in dev-only code we don't want in
@@ -28,17 +17,17 @@ export const routes: RouteObject[] = [
   },
   {
     path: '/about',
-    element: <AboutPage />,
+    lazy: () => import('./pages/about').then((m) => ({ Component: m.default })),
   },
   {
     path: '/catalog',
     loader: catalogLoader,
-    element: <CatalogPage />,
+    lazy: () => import('./pages/catalog').then((m) => ({ Component: m.default })),
   },
   {
     path: '/products/:handle',
     loader: productLoader,
-    element: <ProductPage />,
+    lazy: () => import('./pages/product').then((m) => ({ Component: m.default })),
   },
   {
     path: '/shop',
@@ -47,39 +36,39 @@ export const routes: RouteObject[] = [
   },
   {
     path: '/cart',
-    element: <CartPage />,
+    lazy: () => import('./pages/cart').then((m) => ({ Component: m.default })),
   },
   {
     path: '/contact',
-    element: <ContactPage />,
+    lazy: () => import('./pages/contact').then((m) => ({ Component: m.default })),
   },
   {
     path: '/sign-in',
-    element: <SignInPage />,
+    lazy: () => import('./pages/sign-in').then((m) => ({ Component: m.default })),
   },
   {
     path: '/sign-up',
-    element: <SignInPage />,
+    lazy: () => import('./pages/sign-in').then((m) => ({ Component: m.default })),
   },
   {
     path: '/checkout/success',
-    element: <CheckoutSuccess />,
+    lazy: () => import('./pages/checkout/success').then((m) => ({ Component: m.default })),
   },
   {
     path: '/checkout/cancel',
-    element: <CheckoutCancel />,
+    lazy: () => import('./pages/checkout/cancel').then((m) => ({ Component: m.default })),
   },
   {
     path: '/privacy-policy',
-    element: <PrivacyPolicyPage />,
+    lazy: () => import('./pages/privacy-policy').then((m) => ({ Component: m.default })),
   },
   {
     path: '/terms-of-use',
-    element: <TermsOfUsePage />,
+    lazy: () => import('./pages/terms-of-use').then((m) => ({ Component: m.default })),
   },
   {
     path: '/faq',
-    element: <FAQPage />,
+    lazy: () => import('./pages/faq').then((m) => ({ Component: m.default })),
   },
   {
     path: '*',
