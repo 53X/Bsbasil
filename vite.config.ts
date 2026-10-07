@@ -24,6 +24,19 @@ function extractHostname(value: string): string {
     return value;
   }
 }
+function deferStylesheetPlugin(): Plugin {
+  return {
+    name: "defer-render-blocking-css",
+    apply: "build",
+    transformIndexHtml(html) {
+      return html.replace(
+        /<link rel="stylesheet" crossorigin href="([^"]+\.css)">/g,
+        '<link rel="stylesheet" crossorigin href="$1" media="print" onload="this.media=\'all\'"><noscript><link rel="stylesheet" href="$1"></noscript>',
+      );
+    },
+  };
+}
+
 function apiDevPlugin(): Plugin {
   return {
     name: "api-dev",
@@ -338,7 +351,7 @@ if (corsOrigins.length === 0) {
 export default defineConfig(async ({ mode, isSsrBuild }: ConfigEnv): Promise<UserConfig> => {
   const base: UserConfig = {
     envPrefix: ["VITE_", "SITE_"],
-    plugins: [react({
+    plugins: [deferStylesheetPlugin(), react({
       babel: {
         plugins: []
       }

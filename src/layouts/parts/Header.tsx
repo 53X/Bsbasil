@@ -79,12 +79,12 @@ export default function Header() {
             )}
             <Link
               to="/cart"
-              className="relative flex h-11 items-center gap-2 px-2 text-sm font-medium uppercase tracking-[0.14em]"
+              className="relative flex h-11 items-center gap-2 px-2 text-sm font-medium tracking-[0.14em]"
               aria-label={`BAG ${cartCount}`}
             >
-              <ShoppingBag size={18} />
-              <span className="hidden sm:inline">Bag</span>
-              <span className="tabular-nums" style={{ color: 'hsl(var(--logo))' }}>
+              <ShoppingBag size={18} aria-hidden="true" />
+              <span className="hidden sm:inline" aria-hidden="true">BAG</span>
+              <span className="tabular-nums" aria-hidden="true" style={{ color: 'hsl(var(--logo))' }}>
                 {cartCount}
               </span>
             </Link>

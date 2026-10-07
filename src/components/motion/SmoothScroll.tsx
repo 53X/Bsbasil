@@ -11,7 +11,10 @@ export default function SmoothScroll({ children }: { children: ReactNode }) {
 
     let destroyed = false;
     let stop = () => {};
+    let cancelIdle = () => {};
 
+    const start = () => {
+      if (destroyed) return;
     void Promise.all([import('lenis'), import('gsap'), import('gsap/ScrollTrigger')]).then(
       ([lenisMod, gsapMod, scrollMod]) => {
         if (destroyed) return;
@@ -47,9 +50,19 @@ export default function SmoothScroll({ children }: { children: ReactNode }) {
         };
       },
     );
+    };
+
+    if (typeof window.requestIdleCallback === 'function') {
+      const id = window.requestIdleCallback(start, { timeout: 2500 });
+      cancelIdle = () => window.cancelIdleCallback(id);
+    } else {
+      const id = window.setTimeout(start, 1500);
+      cancelIdle = () => window.clearTimeout(id);
+    }
 
     return () => {
       destroyed = true;
+      cancelIdle();
       stop();
     };
   }, []);

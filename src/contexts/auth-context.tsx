@@ -19,6 +19,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     let active = true;
     let unsubscribe = () => {};
+    const load = () => {
     void getSupabase().then((supabase) => {
       if (!active) return;
       if (!supabase) {
@@ -36,8 +37,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       });
       unsubscribe = () => data.subscription.unsubscribe();
     });
+    };
+    let cancelIdle = () => {};
+    if (typeof window.requestIdleCallback === 'function') {
+      const id = window.requestIdleCallback(load, { timeout: 2500 });
+      cancelIdle = () => window.cancelIdleCallback(id);
+    } else {
+      const id = window.setTimeout(load, 1500);
+      cancelIdle = () => window.clearTimeout(id);
+    }
     return () => {
       active = false;
+      cancelIdle();
       unsubscribe();
     };
   }, []);

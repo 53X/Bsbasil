@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Link } from 'react-router';
 import { ArrowRight } from 'lucide-react';
 
@@ -70,6 +70,9 @@ function paintLine(el: Element | null, text: string) {
 export default function CinematicHero({ eyebrow }: { eyebrow: string }) {
   const rootRef = useRef<HTMLElement>(null);
   const [restReady, setRestReady] = useState(false);
+  const [hasPoster] = useState(
+    () => typeof document !== 'undefined' && Boolean(document.getElementById('hero-lcp')),
+  );
 
   useEffect(() => {
     const root = rootRef.current;
@@ -80,6 +83,7 @@ export default function CinematicHero({ eyebrow }: { eyebrow: string }) {
     let revert = () => {};
     let cancelled = false;
 
+    const run = () => {
     void Promise.all([import('gsap'), import('gsap/ScrollTrigger')]).then(([gsapMod, scrollMod]) => {
       if (cancelled || !rootRef.current) return;
       const gsap = gsapMod.default;
@@ -139,11 +143,32 @@ export default function CinematicHero({ eyebrow }: { eyebrow: string }) {
         previousRevert();
       };
     });
+    };
+
+    let cancelIdle = () => {};
+    if (typeof window.requestIdleCallback === 'function') {
+      const id = window.requestIdleCallback(run, { timeout: 1800 });
+      cancelIdle = () => window.cancelIdleCallback(id);
+    } else {
+      const id = window.setTimeout(run, 1200);
+      cancelIdle = () => window.clearTimeout(id);
+    }
 
     return () => {
       cancelled = true;
+      cancelIdle();
       revert();
     };
+  }, []);
+
+  useLayoutEffect(() => {
+    const poster = document.getElementById('hero-lcp');
+    const frame = rootRef.current?.querySelector('[data-hero-photo]');
+    if (!(poster instanceof HTMLImageElement) || !(frame instanceof HTMLElement)) return;
+    poster.dataset.still = 'true';
+    poster.className = 'absolute inset-0 h-full w-full object-contain lg:object-cover';
+    poster.removeAttribute('style');
+    if (poster.parentElement !== frame) frame.prepend(poster);
   }, []);
 
   useEffect(() => {
@@ -201,7 +226,7 @@ export default function CinematicHero({ eyebrow }: { eyebrow: string }) {
         <div className="relative z-10 flex min-h-0 flex-col lg:h-full">
           <div className="absolute -left-4 top-8 hidden h-[78%] w-16 bg-[#62A848] xl:block" aria-hidden="true" />
           <div data-hero-photo className="relative min-h-[9rem] w-full flex-1 overflow-hidden rounded-[1.25rem] bg-muted will-change-transform lg:rounded-[999px_999px_18px_18px]">
-            {STILLS.map((still, index) => (
+            {STILLS.map((still, index) => index === 0 && hasPoster ? null : (
               <img
                 key={still.src}
                 data-still

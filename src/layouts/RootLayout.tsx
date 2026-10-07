@@ -4,7 +4,6 @@ import { ScrollRestoration } from 'react-router';
 
 import HomepageSameAsJsonLd from '@/components/HomepageSameAsJsonLd';
 import HeadlineMotion from '@/components/motion/HeadlineMotion';
-import SilkIntro from '@/components/motion/SilkIntro';
 import SmoothScroll from '@/components/motion/SmoothScroll';
 import Footer from '@/layouts/parts/Footer';
 import Header from '@/layouts/parts/Header';
@@ -38,7 +37,6 @@ export default function RootLayout({ children }: RootLayoutProps) {
         </Helmet>
         <HomepageSameAsJsonLd />
         <ScrollRestoration />
-        <SilkIntro />
         <HeadlineMotion />
         <SmoothScroll>
           <>

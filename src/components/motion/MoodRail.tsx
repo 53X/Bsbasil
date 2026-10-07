@@ -24,6 +24,7 @@ export default function MoodRail() {
     let revert = () => {};
     let cancelled = false;
 
+    const run = () => {
     void Promise.all([import('gsap'), import('gsap/ScrollTrigger')]).then(([gsapMod, scrollMod]) => {
       if (cancelled) return;
       const gsap = gsapMod.default;
@@ -85,9 +86,20 @@ export default function MoodRail() {
         previousRevert();
       };
     });
+    };
+
+    let cancelIdle = () => {};
+    if (typeof window.requestIdleCallback === 'function') {
+      const id = window.requestIdleCallback(run, { timeout: 1800 });
+      cancelIdle = () => window.cancelIdleCallback(id);
+    } else {
+      const id = window.setTimeout(run, 1200);
+      cancelIdle = () => window.clearTimeout(id);
+    }
 
     return () => {
       cancelled = true;
+      cancelIdle();
       revert();
     };
   }, []);

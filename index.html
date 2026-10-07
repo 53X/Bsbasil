@@ -19,15 +19,33 @@
     <meta name="google-site-verification" content="EPnSQcE_GnvhBqH5IdMfdEEyJAeywleg2h69eZgeOQk">
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      rel="preload"
-      as="image"
-      href="/hero-cube/romper-640.webp"
-      imagesrcset="/hero-cube/romper-640.webp 640w, /hero-cube/romper.webp 960w"
-      imagesizes="(min-width: 1024px) 42vw, 92vw"
-      type="image/webp"
-      fetchpriority="high"
-    />
+    <style>
+      html, body { margin: 0; background: hsl(42 38% 96%); }
+      #hero-lcp {
+        position: absolute;
+        z-index: 2;
+        left: 1rem;
+        right: 1rem;
+        top: 24rem;
+        width: calc(100% - 2rem);
+        height: min(70vw, 24rem);
+        object-fit: contain;
+        object-position: center top;
+        border-radius: 1.25rem;
+        background: #f4f1ea;
+      }
+      @media (min-width: 1024px) {
+        #hero-lcp {
+          left: auto;
+          right: max(1rem, calc((100vw - 76rem) / 2));
+          top: 7.5rem;
+          width: min(46vw, 34rem);
+          height: calc(100dvh - 9rem);
+          object-fit: cover;
+          border-radius: 999px 999px 18px 18px;
+        }
+      }
+    </style>
     <link
       rel="stylesheet"
       href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600&display=swap"
@@ -43,6 +61,15 @@
   </head>
   <body class="fs-unmask-airo-app-builder">
     <div id="app" class="fs-unmask-airo-app-builder"><!--app-html--></div>
+    <img
+      id="hero-lcp"
+      src="/hero-cube/romper-640.webp"
+      alt="Rompers"
+      width="640"
+      height="800"
+      fetchpriority="high"
+      decoding="async"
+    />
     <script type="module" src="/src/main.tsx"></script>
     <script src="/analytics.js" defer></script>
   </body>
