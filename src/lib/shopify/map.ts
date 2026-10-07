@@ -233,6 +233,7 @@ const COLOR_METAOBJECTS: Record<string, { name: string; hex?: string }> = {
   "gid://shopify/Metaobject/430357053525": { name: "Dusty Pink", hex: "#C9A3A8" },
   "gid://shopify/Metaobject/430357086293": { name: "Sage", hex: "#B7CDB4" },
   "gid://shopify/Metaobject/430357119061": { name: "Mauve", hex: "#B5A09A" },
+  "gid://shopify/Metaobject/430445166677": { name: "Blue", hex: "#3E6FB5" },
 };
 
 /**
