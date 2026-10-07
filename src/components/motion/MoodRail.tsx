@@ -100,11 +100,11 @@ export default function MoodRail() {
       >
         <div ref={trackRef} className="flex w-max items-end gap-4 px-4 py-6 sm:gap-6 lg:gap-8 lg:px-10">
           <div className="w-[min(78vw,26rem)] shrink-0 pr-2">
-            <p className="mb-3 text-xs font-semibold uppercase tracking-[0.22em] sm:mb-4" style={{ color: 'hsl(var(--brand-ink))' }}>
+            <p className="mb-3 text-[0.9rem] font-semibold uppercase leading-[1.2rem] tracking-[0.22em] sm:mb-4" style={{ color: 'hsl(var(--brand-ink))' }}>
               The Bsbasil archive
             </p>
             <h2 className="text-[clamp(1.85rem,8vw,4.15rem)] leading-none">
-              <span className="block leading-[1.05]">Creating little styles</span>
+              <span className="block text-[0.92em] leading-[1.05]">Creating little styles</span>
               <em className="mt-[0.55em] block text-[0.92em] leading-[1.15]">for big personality</em>
             </h2>
             <p data-subhead className="mt-5 max-w-sm text-sm leading-relaxed sm:text-base" style={{ color: 'hsl(var(--muted-foreground))' }}>
