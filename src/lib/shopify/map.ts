@@ -205,6 +205,7 @@ export function ageCode(raw: string): string | null {
  * resolving references needs `unauthenticated_read_metaobjects`.
  */
 const SIZE_METAOBJECT_LABELS: Record<string, string> = {
+  "gid://shopify/Metaobject/430357151829": "Newborn",
   "gid://shopify/Metaobject/428238504021": "0-3 months",
   "gid://shopify/Metaobject/428238536789": "3-6 months",
   "gid://shopify/Metaobject/428239847509": "6-9 months",
@@ -225,15 +226,28 @@ const SIZE_METAOBJECT_LABELS: Record<string, string> = {
 const COLOR_METAOBJECTS: Record<string, { name: string; hex?: string }> = {
   "gid://shopify/Metaobject/428477481045": { name: "Beige", hex: "#EAD8AB" },
   "gid://shopify/Metaobject/428477448277": { name: "Navy", hex: "#282099" },
+  "gid://shopify/Metaobject/430355087445": { name: "Pink", hex: "#F4A7C5" },
+  "gid://shopify/Metaobject/430355120213": { name: "Yellow", hex: "#F2C94C" },
+  "gid://shopify/Metaobject/430355152981": { name: "Aqua", hex: "#7FDBE8" },
+  "gid://shopify/Metaobject/430355185749": { name: "Sky Blue", hex: "#9FD4F5" },
+  "gid://shopify/Metaobject/430357053525": { name: "Dusty Pink", hex: "#C9A3A8" },
+  "gid://shopify/Metaobject/430357086293": { name: "Sage", hex: "#B7CDB4" },
+  "gid://shopify/Metaobject/430357119061": { name: "Mauve", hex: "#B5A09A" },
 };
 
 /**
  * Ages for catalog filters come from Category metafields → Size (shopify.size).
  * Fall back to variant Size options / age tags only when Size metafield is empty.
  */
+function optionValueNames(option: { values?: string[]; optionValues?: { name?: string | null }[] | null }): string[] {
+  const fromOptionValues = option.optionValues?.map((value) => value.name).filter((name): name is string => Boolean(name));
+  if (fromOptionValues && fromOptionValues.length > 0) return fromOptionValues;
+  return option.values ?? [];
+}
+
 function collectAges(
   tags: string[],
-  options: { name: string; values: string[] }[],
+  options: { name: string; values?: string[]; optionValues?: { name?: string | null }[] | null }[],
   sizeLabels: string[] = [],
 ): string[] {
   const found = new Set<string>();
@@ -256,7 +270,7 @@ function collectAges(
   tags.forEach(add);
   options
     .filter((option) => /size|age/i.test(option.name))
-    .forEach((option) => option.values.forEach(add));
+    .forEach((option) => optionValueNames(option).forEach(add));
   return AGE_TAGS.filter((age) => found.has(age));
 }
 

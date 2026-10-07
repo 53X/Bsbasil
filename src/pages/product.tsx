@@ -234,7 +234,7 @@ export default function ProductPage() {
       product?.variants.find((item) => item.available) ||
       product?.variants[0];
     const selected: Record<string, string> = {};
-    preferred?.selectedOptions.forEach((option) => {
+    (preferred?.selectedOptions ?? []).forEach((option) => {
       // Never auto-pick Size/Age — customer must choose (unless URL age already did).
       if (/size|age/i.test(option.name) && !/^title$/i.test(option.name)) {
         if (preferredSizeFromUrl && option.value === preferredSizeFromUrl) {
