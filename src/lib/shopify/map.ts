@@ -1,4 +1,4 @@
-import type { Money, ShopRules, StoreMedia, StoreProduct, StoreVariant } from "./types";
+import type { Money, ShopRules, StoreColor, StoreMedia, StoreProduct, StoreVariant } from "./types";
 
 const AGE_TAGS = ["0-3M", "3-6M", "6-12M", "12-18M", "18-24M", "24-30M", "30-36M"];
 const CATEGORY_MATCHERS: { label: string; pattern: RegExp }[] = [
@@ -235,6 +235,50 @@ const COLOR_METAOBJECTS: Record<string, { name: string; hex?: string }> = {
   "gid://shopify/Metaobject/430357119061": { name: "Mauve", hex: "#B5A09A" },
   "gid://shopify/Metaobject/430445166677": { name: "Blue", hex: "#3E6FB5" },
 };
+
+/**
+ * Top-to-bottom stops for a colourway, keyed by product handle and the
+ * Shopify colour label. `null` drops a metafield colour that is a dye in
+ * another colourway, not its own garment. `name` is set when the garment's
+ * colourway name is not the metafield label. Checked against the product photos.
+ */
+const COLORWAY_STOPS: Record<string, Record<string, { stops: string[]; name?: string } | null>> = {
+  // Mint top, pink bottom. Yellow top, aqua bottom. Aqua is not a third garment.
+  "follow-your-intuition-sweatshirt-set": {
+    Pink: { name: "Mint Pink", stops: ["#7FDBE8", "#F4A7C5"] },
+    Yellow: { name: "Yellow Aqua", stops: ["#F2C94C", "#7FDBE8"] },
+    Aqua: null,
+  },
+  // Light blue shirt, navy patterned legs. Mauve shirt, beige patterned legs.
+  "bow-tie-suspender-romper": {
+    "Sky Blue": { stops: ["#9FD4F5", "#1E3358"] },
+    Mauve: { stops: ["#B5A09A", "#E6D3C0"] },
+  },
+  // White printed tee over a checkered dungaree. The sage metafield is the mint colourway.
+  "bunny-bow-checkered-romper": {
+    Pink: { stops: ["#F7F7F5", "#F4A7C5"] },
+    Sage: { name: "Mint", stops: ["#F7F7F5", "#C6E6C8"] },
+  },
+  // White/navy striped tee (white dominates) over dungaree shorts.
+  "animal-print-dungaree-romper": {
+    Pink: { stops: ["#F7F7F5", "#F4A7C5"] },
+    Blue: { stops: ["#F7F7F5", "#3E6FB5"] },
+  },
+  // Photo is the mauve shirt with beige patterned legs. One colourway, labeled Beige.
+  "baby-boys-smart-bow-tie-romper-set": {
+    Beige: { stops: ["#B5A09A", "#E6D3C0"] },
+  },
+};
+
+function layoutColors(handle: string, colors: { name: string; hex?: string }[]): StoreColor[] {
+  const splits = COLORWAY_STOPS[handle];
+  return colors.flatMap((color) => {
+    const override = splits?.[color.name];
+    if (override === null) return [];
+    const stops = override && override.stops.length > 0 ? override.stops : color.hex ? [color.hex] : [];
+    return [{ name: override?.name || color.name, hex: color.hex ?? stops[0], stops }];
+  });
+}
 
 /**
  * Ages for catalog filters come from Category metafields → Size (shopify.size).
@@ -623,7 +667,7 @@ export function mapProduct(node: RawProductNode): StoreProduct {
     media: media.length > 0 ? media : image ? [{ kind: "image", url: image, alt: node.title }] : [],
     options: mapOptions(node.options),
     variants,
-    colors: colorMetafieldColors(node.colorMetafield),
+    colors: layoutColors(node.handle, colorMetafieldColors(node.colorMetafield)),
   };
 }
 

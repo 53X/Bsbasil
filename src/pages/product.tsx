@@ -5,10 +5,11 @@ import { ShoppingBag } from 'lucide-react';
 import { useAuth } from '@/contexts/auth-context';
 import { useCart } from '@/contexts/use-cart';
 import { savePendingPurchase } from '@/lib/pending-purchase';
+import { photosForColour } from '@/lib/colour-photos';
 import { ageLabel, hasSelectableSizeOption, productRequiresSizeSelection, productSizeLabels, selectionForOption, variantForSelection } from '@/lib/shopify/map';
 import PriceTag from '@/components/PriceTag';
 import NotifyMe from '@/components/NotifyMe';
-import type { StoreMedia, StoreProduct, StoreCatalog } from '@/lib/shopify/types';
+import type { StoreColor, StoreMedia, StoreProduct, StoreCatalog } from '@/lib/shopify/types';
 
 const COLOR_DOTS: Record<string, string> = {
   pink: '#e7a0b4',
@@ -27,6 +28,26 @@ function isColorOption(name: string): boolean {
   return /colou?r/i.test(name);
 }
 
+function colourOptionOf(product: StoreProduct) {
+  return product.options.find((option) => isColorOption(option.name) && option.values.length > 1);
+}
+
+function colourNamesOf(product: StoreProduct): string[] {
+  return colourOptionOf(product)?.values ?? product.colors.map((color) => color.name);
+}
+
+/** Solid colour, or a hard horizontal split from the top of the garment to the bottom. */
+function swatchBackground(color: Pick<StoreColor, 'hex' | 'stops'>): string {
+  const stops = color.stops.length > 0 ? color.stops : color.hex ? [color.hex] : [];
+  if (stops.length === 0) return 'hsl(var(--muted))';
+  if (stops.length === 1) return stops[0];
+  const slice = 100 / stops.length;
+  const bands = stops
+    .map((stop, index) => `${stop} ${index * slice}% ${(index + 1) * slice}%`)
+    .join(', ');
+  return `linear-gradient(to bottom, ${bands})`;
+}
+
 function ColorChoices({
   product,
   option,
@@ -40,7 +61,7 @@ function ColorChoices({
 }) {
   const currentColor = selected[option.name] ?? option.values[0];
   return (
-    <div className="mb-base">
+    <div data-about-reveal className="mb-base">
       <p className="text-sm mb-xs" style={{ color: 'hsl(var(--foreground))' }}>
         Colour: <span className="font-semibold">{currentColor}</span>
       </p>
@@ -66,7 +87,8 @@ function ColorChoices({
               item.selectedOptions.some((entry) => entry.name === option.name && entry.value === value),
           )?.image;
           const swatch = option.swatches?.find((item) => item.name === value);
-          const fill = swatch?.swatchColor || COLOR_DOTS[value.trim().toLowerCase()];
+          const mapped = product.colors.find((color) => color.name.toLowerCase() === value.trim().toLowerCase());
+          const fill = mapped ? swatchBackground(mapped) : swatch?.swatchColor || COLOR_DOTS[value.trim().toLowerCase()];
           return (
             <button
               key={value}
@@ -110,13 +132,13 @@ function CategoryColors({
   value,
   onSelect,
 }: {
-  colors: { name: string; hex?: string }[];
+  colors: StoreColor[];
   value: string | null;
   onSelect: (name: string) => void;
 }) {
   const current = value ?? colors[0]?.name ?? '';
   return (
-    <div className="mb-base">
+    <div data-about-reveal className="mb-base">
       <p className="text-sm mb-xs" style={{ color: 'hsl(var(--foreground))' }}>
         Colour: <span className="font-semibold">{current}</span>
       </p>
@@ -136,7 +158,7 @@ function CategoryColors({
             >
               <span
                 className="block w-full h-full rounded-md border"
-                style={{ background: color.hex || 'hsl(var(--muted))', borderColor: 'hsl(var(--border))' }}
+                style={{ background: swatchBackground(color), borderColor: 'hsl(var(--border))' }}
               />
             </button>
           );
@@ -260,16 +282,27 @@ export default function ProductPage() {
   }, [product?.id, product?.colors, initialSelection, preferredSizeFromUrl]);
 
   const variant = product ? variantForSelection(product, selected) : undefined;
+  const activeColour = useMemo(() => {
+    if (!product) return null;
+    const option = colourOptionOf(product);
+    if (option) return selected[option.name] ?? option.values[0] ?? null;
+    if (product.colors.length > 1) return chosenColor ?? product.colors[0]?.name ?? null;
+    return null;
+  }, [product, selected, chosenColor]);
   const gallery = useMemo(() => {
     if (!product) return [];
-    if (!variant?.image) return product.media;
-    const rest = product.media.filter((item) => item.url !== variant.image);
-    return [{ kind: 'image' as const, url: variant.image, alt: product.name }, ...rest];
-  }, [product, variant]);
+    const names = colourNamesOf(product);
+    if (!activeColour || names.length < 2) {
+      if (!variant?.image) return product.media;
+      const rest = product.media.filter((item) => item.url !== variant.image);
+      return [{ kind: 'image' as const, url: variant.image, alt: product.name }, ...rest];
+    }
+    return photosForColour(product.media, names, activeColour);
+  }, [product, variant, activeColour]);
 
   useEffect(() => {
     setMediaIndex(0);
-  }, [variant?.id]);
+  }, [activeColour, variant?.id]);
 
   if (!product) {
     return (
@@ -349,12 +382,14 @@ export default function ProductPage() {
         <link rel="canonical" href={`https://bsbasil.com/products/${product.handle}`} />
       </Helmet>
       <main className="max-w-content mx-auto px-4 py-10 pb-28 md:py-14 md:pb-xl">
+        <ProductReveal key={product.id} />
         <p className="text-sm mb-base" style={{ color: 'hsl(var(--muted-foreground))' }}>
           <Link to="/catalog" style={{ color: 'hsl(var(--brand-ink))' }}>Shop</Link>
           {product.category ? ` / ${product.category}` : ''}
         </p>
         <div className="grid grid-cols-1 items-start gap-10 lg:grid-cols-2">
             <div className="lg:sticky lg:top-28">
+            <div data-about-reveal>
             <div className="aspect-square overflow-hidden rounded-[1.8rem] bg-muted shadow-md">
               {media ? <MediaFrame item={media} /> : <div className="w-full h-full" style={{ background: 'hsl(var(--muted))' }} />}
             </div>
@@ -374,19 +409,20 @@ export default function ProductPage() {
                 ))}
               </div>
             ) : null}
+            </div>
           </div>
 
           <div>
             {product.badge ? (
-              <p className="text-xs font-bold uppercase tracking-wide mb-xs" style={{ color: 'hsl(var(--brand-ink))' }}>{product.badge}</p>
+              <p data-about-reveal className="text-xs font-bold uppercase tracking-wide mb-xs" style={{ color: 'hsl(var(--brand-ink))' }}>{product.badge}</p>
             ) : null}
-            <h1 className="mb-sm break-words text-[clamp(1.75rem,6vw,2.5rem)] font-bold" style={{ color: 'hsl(var(--foreground))' }}>{product.name}</h1>
-            <p className="mb-xs">
+            <h1 data-about-reveal className="mb-sm break-words text-[clamp(1.75rem,6vw,2.5rem)] font-bold" style={{ color: 'hsl(var(--foreground))' }}>{product.name}</h1>
+            <p data-about-reveal className="mb-xs">
               <PriceTag price={price} compareAt={compareAt} currency={currency} discount={discountTitle} priceClassName="text-2xl font-bold" />
             </p>
-            <p className="text-sm mb-base" style={{ color: soldOut ? 'hsl(var(--destructive, 0 70% 45%))' : 'hsl(var(--muted-foreground))' }}>{stockLabel}</p>
+            <p data-about-reveal className="text-sm mb-base" style={{ color: soldOut ? 'hsl(var(--destructive, 0 70% 45%))' : 'hsl(var(--muted-foreground))' }}>{stockLabel}</p>
             {product.description ? (
-              <p className="text-base mb-lg whitespace-pre-line" style={{ color: 'hsl(var(--muted-foreground))' }}>{product.description}</p>
+              <p data-about-reveal className="text-base mb-lg whitespace-pre-line" style={{ color: 'hsl(var(--muted-foreground))' }}>{product.description}</p>
             ) : null}
 
             {(() => {
@@ -398,7 +434,7 @@ export default function ProductPage() {
               ].filter((row): row is [string, string] => Boolean(row[1]));
               if (!facts.length) return null;
               return (
-                <dl className="mb-lg rounded-2xl border divide-y" style={{ borderColor: 'hsl(var(--border))', color: 'hsl(var(--foreground))' }}>
+                <dl data-about-reveal className="mb-lg rounded-2xl border divide-y" style={{ borderColor: 'hsl(var(--border))', color: 'hsl(var(--foreground))' }}>
                   {facts.map(([label, value]) => (
                     <div key={label} className="flex items-start justify-between gap-4 px-base py-sm">
                       <dt className="text-sm font-semibold">{label}</dt>
@@ -431,6 +467,7 @@ export default function ProductPage() {
                       selected={selected}
                       onSelect={(value) => {
                         setMessage(null);
+                        setMediaIndex(0);
                         setSelected((current) => selectionForOption(product, current, option.name, value));
                       }}
                     />
@@ -441,12 +478,13 @@ export default function ProductPage() {
                       value={chosenColor}
                       onSelect={(name) => {
                         setChosenColor(name);
+                        setMediaIndex(0);
                         setMessage(null);
                       }}
                     />
                   ) : null}
                   {sizeLabels.length > 0 ? (
-                    <div className="mb-base">
+                    <div data-about-reveal className="mb-base">
                       <p className="text-xs font-semibold uppercase tracking-wide mb-xs" style={{ color: 'hsl(var(--muted-foreground))' }}>
                         Size
                       </p>
@@ -505,7 +543,7 @@ export default function ProductPage() {
                   ) : null}
 
                   {otherOptions.filter((option) => !isColorOption(option.name)).map((option) => (
-                    <div key={option.name} className="mb-base">
+                    <div key={option.name} data-about-reveal className="mb-base">
                       <p className="text-xs font-semibold uppercase tracking-wide mb-xs" style={{ color: 'hsl(var(--muted-foreground))' }}>{option.name}</p>
                       <div className="flex flex-wrap gap-2">
                         {option.values.map((value) => {
@@ -537,7 +575,7 @@ export default function ProductPage() {
               );
             })()}
 
-            <div className="mb-base flex flex-col gap-3">
+            <div data-about-reveal className="mb-base flex flex-col gap-3">
               <div className="flex items-center gap-3">
                 <div className="flex items-center overflow-hidden rounded-full border" style={{ borderColor: 'hsl(var(--border))' }}>
                   <button type="button" className="h-12 w-12 text-lg" onClick={() => setQuantity((value) => Math.max(1, value - 1))} aria-label="Decrease quantity">−</button>
@@ -566,16 +604,18 @@ export default function ProductPage() {
               </button>
             </div>
             {message ? <p className="text-sm mb-base" style={{ color: 'hsl(var(--muted-foreground))' }}>{message}</p> : null}
-            <NotifyMe
-              handle={product.handle}
-              variantId={variant?.id ?? ''}
-              selection={[chosenColor, chosenSize].filter(Boolean).join(', ')}
-            />
+            <div data-about-reveal>
+              <NotifyMe
+                handle={product.handle}
+                variantId={variant?.id ?? ''}
+                selection={[chosenColor, chosenSize].filter(Boolean).join(', ')}
+              />
+            </div>
           </div>
         </div>
 
         <section className="mt-xxl grid grid-cols-1 gap-4 md:grid-cols-2">
-          <article className="rounded-[1.5rem] border bg-card p-6" style={{ borderColor: 'hsl(var(--border))' }}>
+          <article data-about-reveal className="rounded-[1.5rem] border bg-card p-6" style={{ borderColor: 'hsl(var(--border))' }}>
             <h2 className="text-lg font-bold mb-sm" style={{ color: 'hsl(var(--foreground))' }}>Size guide</h2>
             <ul className="text-sm space-y-2" style={{ color: 'hsl(var(--muted-foreground))' }}>
               {SIZE_GUIDE.map(([label, weight]) => (
@@ -583,7 +623,7 @@ export default function ProductPage() {
               ))}
             </ul>
           </article>
-          <article className="rounded-[1.5rem] border bg-card p-6" style={{ borderColor: 'hsl(var(--border))' }}>
+          <article data-about-reveal className="rounded-[1.5rem] border bg-card p-6" style={{ borderColor: 'hsl(var(--border))' }}>
             <h2 className="text-lg font-bold mb-sm" style={{ color: 'hsl(var(--foreground))' }}>
               {catalog.policies.shipping?.title || 'Shipping'}
             </h2>
@@ -591,7 +631,7 @@ export default function ProductPage() {
               {catalog.policies.shipping?.body || 'Shipping details will appear here once they are saved in Shopify.'}
             </p>
           </article>
-          <article className="rounded-[1.5rem] border bg-card p-6 md:col-span-2" style={{ borderColor: 'hsl(var(--border))' }}>
+          <article data-about-reveal className="rounded-[1.5rem] border bg-card p-6 md:col-span-2" style={{ borderColor: 'hsl(var(--border))' }}>
             <h2 className="text-lg font-bold mb-sm" style={{ color: 'hsl(var(--foreground))' }}>
               {catalog.policies.refund?.title || 'Returns and refunds'}
             </h2>
@@ -620,4 +660,71 @@ export default function ProductPage() {
       </div>
     </>
   );
+}
+
+/** Product page: each block stays hidden until it enters the screen, then slides in from the left. */
+function ProductReveal() {
+  useEffect(() => {
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const nodes = [...document.querySelectorAll<HTMLElement>('[data-about-reveal]')];
+    if (reduced) {
+      nodes.forEach((el) => { el.dataset.shown = '1'; });
+      return;
+    }
+
+    let frame = 0;
+    const reveal = (batch: HTMLElement[]) => {
+      const ordered = [...batch].sort((a, b) => {
+        const aa = a.getBoundingClientRect();
+        const bb = b.getBoundingClientRect();
+        return aa.top - bb.top || aa.left - bb.left;
+      });
+      ordered.forEach((el, index) => {
+        el.style.transitionDelay = `${index * 0.08}s`;
+        el.dataset.shown = '1';
+      });
+    };
+
+    const tick = () => {
+      frame = 0;
+      if (document.querySelector('[data-silk-intro]')) {
+        frame = window.requestAnimationFrame(tick);
+        return;
+      }
+      const vh = window.innerHeight;
+      const entered: HTMLElement[] = [];
+      nodes.forEach((el) => {
+        if (el.dataset.shown === '1') return;
+        const box = el.getBoundingClientRect();
+        if (box.height < 2) return;
+        if (box.bottom < 48 && box.top < 0) {
+          el.style.transition = 'none';
+          el.dataset.shown = '1';
+          return;
+        }
+        if (box.top < vh - 32 && box.bottom > 64) entered.push(el);
+      });
+      if (entered.length) reveal(entered);
+      if (nodes.some((el) => el.dataset.shown !== '1')) {
+        frame = window.requestAnimationFrame(tick);
+      }
+    };
+
+    const kick = () => {
+      if (frame) return;
+      frame = window.requestAnimationFrame(tick);
+    };
+
+    kick();
+    window.addEventListener('scroll', kick, { passive: true });
+    window.addEventListener('bs-motion-refresh', kick);
+
+    return () => {
+      window.removeEventListener('scroll', kick);
+      window.removeEventListener('bs-motion-refresh', kick);
+      if (frame) window.cancelAnimationFrame(frame);
+    };
+  }, []);
+
+  return null;
 }

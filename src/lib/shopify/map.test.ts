@@ -381,8 +381,45 @@ describe('shopify product mapping', () => {
     });
 
     expect(product.colors).toEqual([
-      { name: 'Beige', hex: '#EAD8AB' },
-      { name: 'Navy', hex: '#282099' },
+      { name: 'Beige', hex: '#EAD8AB', stops: ['#EAD8AB'] },
+      { name: 'Navy', hex: '#282099', stops: ['#282099'] },
     ]);
+  });
+
+  it('splits a colourway from the top of the garment to the bottom', () => {
+    const product = mapProduct({
+      id: 'gid://shopify/Product/bow',
+      handle: 'bow-tie-suspender-romper',
+      title: 'Bow Tie Suspender Romper',
+      tags: [],
+      availableForSale: true,
+      colorMetafield: {
+        value: '["gid://shopify/Metaobject/430355185749","gid://shopify/Metaobject/430357119061"]',
+      },
+      variants: { nodes: [] },
+    });
+
+    expect(product.colors).toEqual([
+      { name: 'Sky Blue', hex: '#9FD4F5', stops: ['#9FD4F5', '#1E3358'] },
+      { name: 'Mauve', hex: '#B5A09A', stops: ['#B5A09A', '#E6D3C0'] },
+    ]);
+  });
+
+  it('keeps one chip per colour-block colourway', () => {
+    const product = mapProduct({
+      id: 'gid://shopify/Product/intuition',
+      handle: 'follow-your-intuition-sweatshirt-set',
+      title: 'Follow Your Intuition Sweatshirt Set',
+      tags: [],
+      availableForSale: true,
+      colorMetafield: {
+        value: '["gid://shopify/Metaobject/430355087445","gid://shopify/Metaobject/430355120213","gid://shopify/Metaobject/430355152981"]',
+      },
+      variants: { nodes: [] },
+    });
+
+    expect(product.colors.map((color) => color.name)).toEqual(['Mint Pink', 'Yellow Aqua']);
+    expect(product.colors[0]?.stops).toEqual(['#7FDBE8', '#F4A7C5']);
+    expect(product.colors[1]?.stops).toEqual(['#F2C94C', '#7FDBE8']);
   });
 });

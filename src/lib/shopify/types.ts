@@ -71,7 +71,14 @@ export interface StoreProduct {
   options: StoreOption[];
   variants: StoreVariant[];
   /** Colours from the Shopify category metafield (shopify.color-pattern). */
-  colors: { name: string; hex?: string }[];
+  colors: StoreColor[];
+}
+
+/** One selectable colourway. `stops` run from the top of the garment to the bottom. */
+export interface StoreColor {
+  name: string;
+  hex?: string;
+  stops: string[];
 }
 
 export interface StorePromotion {
