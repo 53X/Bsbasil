@@ -1,0 +1,20 @@
+{
+  "specVersion": "1.0",
+  "host": {
+    "displayName": "Bsbasil",
+    "documentationUrl": "https://bsbasil.vercel.app/llms.txt"
+  },
+  "entries": [
+    {
+      "identifier": "urn:air:bsbasil.vercel.app:site:shop",
+      "displayName": "Bsbasil baby clothes",
+      "type": "text/markdown; profile=\"urn:air:agent-skills\"",
+      "url": "https://bsbasil.vercel.app/llms.txt",
+      "description": "Soft cotton baby clothes for ages 0–3, with the shop, lookbook, and contact pages.",
+      "representativeQueries": [
+        "baby rompers for newborns",
+        "soft cotton clothes for toddlers aged 0 to 3"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+# Bsbasil
+
+> Bsbasil is an Indian baby clothing brand offering soft, safe clothes for newborns and toddlers aged 0–3 years: rompers, sets, sleepwear, winter wear, and accessories, with pan-India delivery.
+
+## Pages
+
+- [Home](https://bsbasil.vercel.app/)
+- [Shop](https://bsbasil.vercel.app/catalog)
+- [About](https://bsbasil.vercel.app/about)
+- [Contact](https://bsbasil.vercel.app/contact)
+- [FAQ](https://bsbasil.vercel.app/faq)
+- [Privacy policy](https://bsbasil.vercel.app/privacy-policy)
+- [Terms of use](https://bsbasil.vercel.app/terms-of-use)
