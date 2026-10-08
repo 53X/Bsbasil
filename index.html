@@ -11,6 +11,7 @@
             history.replaceState(null, '', u.toString());
           }
         } catch (e) {}
+        if (location.pathname !== '/') document.documentElement.classList.add('skip-boot');
       })();
     </script>
     <meta name="referrer" content="same-origin" />
@@ -21,6 +22,36 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <style>
       html, body { margin: 0; background: hsl(42 38% 96%); }
+      #boot {
+        position: fixed;
+        inset: 0;
+        z-index: 80;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #fff;
+        pointer-events: auto;
+      }
+      html.skip-boot #boot { display: none !important; }
+      .boot-logo {
+        width: min(62vw, 15.5rem);
+        height: auto;
+        transform: translate3d(0, 46vh, 0);
+        animation: boot-rise 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      }
+      #boot.is-leave {
+        pointer-events: none;
+        animation: boot-lift 0.85s cubic-bezier(0.76, 0, 0.24, 1) forwards;
+      }
+      @keyframes boot-rise {
+        to { transform: translate3d(0, 0, 0); }
+      }
+      @keyframes boot-lift {
+        to { transform: translate3d(0, -110%, 0); }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        #boot { display: none !important; }
+      }
       #hero-lcp {
         position: absolute;
         z-index: 2;
@@ -36,11 +67,12 @@
       }
       @media (min-width: 1024px) {
         #hero-lcp {
-          left: auto;
+          position: fixed;
+          top: 4.2rem;
           right: max(1rem, calc((100vw - 76rem) / 2));
-          top: 7.5rem;
-          width: min(46vw, 34rem);
-          height: calc(100dvh - 9rem);
+          left: auto;
+          width: min(58vw, 48rem);
+          height: calc(100dvh - 4.2rem);
           object-fit: cover;
           border-radius: 999px 999px 18px 18px;
         }
@@ -60,7 +92,9 @@
     <script src="/airo-logo-orientation.js" defer></script>
   </head>
   <body class="fs-unmask-airo-app-builder">
-    <div id="app" class="fs-unmask-airo-app-builder"><!--app-html--></div>
+    <div id="boot" aria-hidden="true">
+      <img class="boot-logo" src="/logo-horizontal.webp" alt="" width="248" height="72" decoding="async" />
+    </div>
     <img
       id="hero-lcp"
       src="/hero-cube/romper-640.webp"
@@ -70,6 +104,29 @@
       fetchpriority="high"
       decoding="async"
     />
+    <script>
+      (function () {
+        var boot = document.getElementById('boot');
+        if (!boot) return;
+        var started = performance.now();
+        var armed = false;
+        function leave() {
+          if (armed || !boot) return;
+          armed = true;
+          var wait = Math.max(0, 820 - (performance.now() - started));
+          setTimeout(function () {
+            boot.classList.add('is-leave');
+            setTimeout(function () { boot.remove(); }, 900);
+          }, wait);
+        }
+        window.addEventListener('bs-boot-ready', leave, { once: true });
+        setTimeout(leave, 2000);
+        boot.addEventListener('animationend', function (event) {
+          if (event.animationName === 'boot-lift') boot.remove();
+        });
+      })();
+    </script>
+    <div id="app" class="fs-unmask-airo-app-builder"><!--app-html--></div>
     <script type="module" src="/src/main.tsx"></script>
     <script src="/analytics.js" defer></script>
   </body>

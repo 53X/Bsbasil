@@ -535,6 +535,13 @@ html.lenis {
 .slide-left { animation-name: slide-left; }
 .slide-right { animation-name: slide-right; }
 
+/* Same duration and ease as the hero headline words. */
+@media (prefers-reduced-motion: no-preference) {
+  [data-hero-photo] [data-still] {
+    transition: opacity 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+}
+
 [data-script-ink] :is(h1 em, h2 em, h3 em, .italic-accent) {
   color: hsl(104 48% 32%);
 }

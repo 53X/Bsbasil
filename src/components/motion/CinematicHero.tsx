@@ -164,11 +164,13 @@ export default function CinematicHero({ eyebrow }: { eyebrow: string }) {
   useLayoutEffect(() => {
     const poster = document.getElementById('hero-lcp');
     const frame = rootRef.current?.querySelector('[data-hero-photo]');
-    if (!(poster instanceof HTMLImageElement) || !(frame instanceof HTMLElement)) return;
-    poster.dataset.still = 'true';
-    poster.className = 'absolute inset-0 h-full w-full object-contain lg:object-cover';
-    poster.removeAttribute('style');
-    if (poster.parentElement !== frame) frame.prepend(poster);
+    if (poster instanceof HTMLImageElement && frame instanceof HTMLElement) {
+      poster.dataset.still = 'true';
+      poster.className = 'absolute inset-0 h-full w-full object-contain lg:object-cover';
+      poster.removeAttribute('style');
+      if (poster.parentElement !== frame) frame.prepend(poster);
+    }
+    window.dispatchEvent(new Event('bs-boot-ready'));
   }, []);
 
   useEffect(() => {
@@ -176,6 +178,16 @@ export default function CinematicHero({ eyebrow }: { eyebrow: string }) {
       if (window.scrollY > 24) setRestReady(true);
     };
     window.addEventListener('scroll', arm, { passive: true });
+    const next = STILLS[1]?.src;
+    const warm = () => {
+      if (!next) return;
+      const img = new Image();
+      img.decoding = 'async';
+      img.src = next;
+    };
+    const poster = document.getElementById('hero-lcp');
+    if (poster instanceof HTMLImageElement && poster.complete) warm();
+    else poster?.addEventListener('load', warm, { once: true });
     return () => window.removeEventListener('scroll', arm);
   }, []);
 
