@@ -1,17 +1,39 @@
+.hero-cube-column,
 .hero-cube-scene {
-  --cube: clamp(8.75rem, 58vw, 16.5rem);
-  width: min(var(--cube), 100%);
+  --cube: min(64vw, calc(100vw - 3.5rem), calc(100svh - 24rem), 17.5rem);
+}
+
+.hero-cube-link {
+  position: absolute;
+  z-index: 30;
+  left: 50%;
+  top: 50%;
+  width: var(--cube);
+  height: var(--cube);
+  transform: translate(-50%, -50%);
+  border-radius: 1.15rem;
+  cursor: pointer;
+}
+
+.hero-cube-link:focus-visible {
+  outline: 2px solid hsl(var(--primary));
+  outline-offset: 4px;
+}
+
+.hero-cube-scene {
+  width: var(--cube);
   height: var(--cube);
   max-width: 100%;
-  perspective: calc(var(--cube) * 4);
+  flex-shrink: 0;
+  aspect-ratio: 1;
+  perspective: calc(var(--cube) * 4.5);
   margin-inline: auto;
   transform-style: preserve-3d;
 }
 
 .hero-cube-tilt,
 .hero-cube-rig,
-.hero-cube,
-.hero-cube-face {
+.hero-cube {
   transform-style: preserve-3d;
 }
 
@@ -24,7 +46,8 @@
 .hero-cube-rig {
   width: 100%;
   height: 100%;
-  transition: transform 1.15s cubic-bezier(0.45, 0.05, 0.2, 1);
+  transform: rotateX(0deg) rotateY(0deg);
+  transition: transform 1.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .hero-cube {
@@ -39,9 +62,9 @@
   overflow: hidden;
   border-radius: clamp(0.75rem, 2vw, 1.25rem);
   backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
   box-shadow: 0 18px 40px hsl(var(--foreground) / 0.12);
   background: hsl(var(--muted));
-  container-type: inline-size;
   pointer-events: none;
   color: inherit;
   text-decoration: none;
@@ -66,33 +89,17 @@
   display: block;
 }
 
-.hero-cube-face span {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  padding: 18cqi 4cqi 4cqi;
-  background: linear-gradient(transparent, hsl(var(--foreground) / 0.62));
-  color: white;
-  font-weight: 700;
-  font-size: clamp(0.7rem, 11cqi, 1rem);
-  line-height: 1.15;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  text-wrap: balance;
-}
-
 @media (min-width: 640px) {
+  .hero-cube-column,
   .hero-cube-scene {
-    --cube: clamp(12rem, 34vw, 18rem);
+    --cube: min(40vw, calc(100svh - 20rem), 20rem);
   }
 }
 
 @media (min-width: 1024px) {
+  .hero-cube-column,
   .hero-cube-scene {
-    --cube: clamp(14rem, min(26vw, 34vh), 22rem);
-    /* 25% of the cube, desktop only. Phones keep the cube centered. Stop short of the screen edge. */
-    translate: max(0px, min(25%, calc(50vw - 78% - 2rem))) 0;
+    --cube: min(28vw, 46svh, 24rem);
   }
 
   .hero-cube-tilt {
@@ -100,10 +107,23 @@
   }
 }
 
-@media (min-width: 1024px) and (max-width: 1180px) {
+/* Landscape phones and short windows: text and cube sit side by side, and the cube stays on screen. */
+@media (max-height: 520px) and (min-width: 640px) and (max-width: 1023px) {
+  .hero-stage.hero-stage {
+    grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+    grid-template-rows: minmax(0, 1fr);
+    align-items: center;
+  }
+}
+
+@media (max-height: 520px) {
+  .hero-cube-column,
   .hero-cube-scene {
-    --cube: min(20vw, 15rem);
-    translate: 12% 0;
+    --cube: min(30vw, 40svh, 14rem);
+  }
+
+  .hero-stage h1 {
+    font-size: clamp(1.35rem, 4.2vw, 2.5rem);
   }
 }
 

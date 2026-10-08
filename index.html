@@ -57,11 +57,11 @@
         z-index: 2;
         left: 1rem;
         right: 1rem;
-        top: 24rem;
+        top: 23.8rem;
         width: calc(100% - 2rem);
-        height: min(70vw, 24rem);
+        height: 26rem;
         object-fit: contain;
-        object-position: center top;
+        object-position: center;
         border-radius: 1.25rem;
         background: #f4f1ea;
       }
@@ -76,6 +76,52 @@
           object-fit: cover;
           border-radius: 999px 999px 18px 18px;
         }
+      }
+      #hero-lcp[data-still] {
+        position: absolute;
+        inset: 0;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        max-width: none;
+        z-index: 1;
+        object-fit: cover;
+        object-position: center;
+        border-radius: inherit;
+      }
+      .hero-cube-scene {
+        --cube: min(64vw, calc(100vw - 3.5rem), calc(100svh - 24rem), 17.5rem);
+        width: var(--cube);
+        height: var(--cube);
+        margin-inline: auto;
+        position: relative;
+        flex-shrink: 0;
+      }
+      .hero-cube,
+      .hero-cube-tilt,
+      .hero-cube-rig {
+        width: 100%;
+        height: 100%;
+        position: relative;
+      }
+      .hero-cube-face {
+        position: absolute;
+        inset: 0;
+        overflow: hidden;
+        border-radius: 1rem;
+        background: #f4f1ea;
+      }
+      @media (min-width: 640px) {
+        .hero-cube-scene { --cube: min(40vw, calc(100svh - 20rem), 20rem); }
+      }
+      @media (min-width: 1024px) {
+        .hero-cube-scene { --cube: min(28vw, 46svh, 24rem); }
+      }
+      @media (max-height: 520px) {
+        .hero-cube-scene { --cube: min(30vw, 40svh, 14rem); }
       }
     </style>
     <link

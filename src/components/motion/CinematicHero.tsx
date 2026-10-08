@@ -1,6 +1,25 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Link } from 'react-router';
 import { ArrowRight } from 'lucide-react';
+import '../HeroCube.css';
+
+const FACE_TRANSFORM = [
+  'rotateY(0deg) translateZ(calc(var(--cube) / 2))',
+  'rotateY(90deg) translateZ(calc(var(--cube) / 2))',
+  'rotateY(180deg) translateZ(calc(var(--cube) / 2))',
+  'rotateY(-90deg) translateZ(calc(var(--cube) / 2))',
+  'rotateX(90deg) translateZ(calc(var(--cube) / 2))',
+  'rotateX(-90deg) translateZ(calc(var(--cube) / 2))',
+];
+
+const POSES = [
+  'rotateX(0deg) rotateY(0deg)',
+  'rotateX(0deg) rotateY(-90deg)',
+  'rotateX(0deg) rotateY(-180deg)',
+  'rotateX(0deg) rotateY(-270deg)',
+  'rotateX(-90deg) rotateY(0deg)',
+  'rotateX(90deg) rotateY(0deg)',
+];
 
 const KINDS = [
   {
@@ -28,6 +47,14 @@ const KINDS = [
     sub: 'For naps, nights, and every small trip in between.',
   },
   {
+    src: '/hero-cube/dungarees.jpg',
+    label: 'Dungarees',
+    href: '/catalog?category=Romper',
+    lead: 'Play clothes',
+    script: 'that keep up',
+    sub: 'Room to crawl, climb, and still make it back for a cuddle.',
+  },
+  {
     src: '/hero-cube/winter-wear.webp',
     label: 'Winter wear',
     href: '/catalog?category=Winter%20wear',
@@ -36,15 +63,14 @@ const KINDS = [
     sub: 'A warm layer that still lets them play.',
   },
   {
-    src: '',
-    label: 'Accessories',
-    href: '/catalog?category=Accessories',
-    lead: 'Sweet details',
-    script: 'for tiny looks',
-    sub: 'The little extras that finish a romper, a set, or a sleepy night.',
+    src: '/hero-cube/party-wear.jpg',
+    label: 'Party wear',
+    href: '/catalog?category=Sets',
+    lead: 'Dressed up',
+    script: 'for a little occasion',
+    sub: 'Waistcoat, shorts, and a bow for the photos.',
   },
 ];
-const STILLS = KINDS.filter((kind) => kind.src);
 
 /** Replace a hero line without wiping a matching word animation already on screen. */
 function paintLine(el: Element | null, text: string) {
@@ -64,11 +90,13 @@ function paintLine(el: Element | null, text: string) {
 }
 
 /**
- * Sticky hero. Scrolling plays all six clothing types: the photograph
- * crossfades through each still while the matching name lights up.
+ * Sticky hero. Scrolling turns one cube through six clothing faces
+ * while the matching headline changes with it.
  */
 export default function CinematicHero({ eyebrow }: { eyebrow: string }) {
   const rootRef = useRef<HTMLElement>(null);
+  const faceRef = useRef(0);
+  const [face, setFace] = useState(0);
   const [restReady, setRestReady] = useState(false);
   const [hasPoster] = useState(
     () => typeof document !== 'undefined' && Boolean(document.getElementById('hero-lcp')),
@@ -89,12 +117,11 @@ export default function CinematicHero({ eyebrow }: { eyebrow: string }) {
       const gsap = gsapMod.default;
       const ScrollTrigger = scrollMod.ScrollTrigger;
       gsap.registerPlugin(ScrollTrigger);
-      const wide = window.matchMedia('(min-width: 1024px)').matches;
 
       const ctx = gsap.context(() => {
-        const stills = gsap.utils.toArray<HTMLElement>('[data-still]');
         const labels = gsap.utils.toArray<HTMLElement>('[data-type]');
-        const caption = root.querySelector('[data-still-name]');
+        const rig = root.querySelector('[data-cube-rig]');
+        const faces = gsap.utils.toArray<HTMLElement>('[data-cube-face]');
         const lead = root.querySelector('[data-hero-lead]');
         const script = root.querySelector('[data-hero-script]');
         const sub = root.querySelector('[data-hero-sub]');
@@ -102,12 +129,17 @@ export default function CinematicHero({ eyebrow }: { eyebrow: string }) {
         const mark = (progress: number) => {
           const index = Math.min(KINDS.length - 1, Math.floor(progress * KINDS.length));
           const kind = KINDS[index];
-          const stillIndex = Math.min(stills.length - 1, index);
+          if (index !== faceRef.current) {
+            faceRef.current = index;
+            setFace(index);
+          }
           labels.forEach((label, i) => label.classList.toggle('is-on', i === index));
-          stills.forEach((still, i) => {
-            still.style.opacity = i === stillIndex ? '1' : '0';
+          if (rig instanceof HTMLElement) rig.style.transform = POSES[index] ?? POSES[0];
+          faces.forEach((face, i) => {
+            const front = i === index;
+            face.toggleAttribute('data-front', front);
+            face.setAttribute('aria-hidden', front ? 'false' : 'true');
           });
-          if (caption) caption.textContent = kind?.label ?? '';
           paintLine(lead, kind?.lead ?? '');
           paintLine(script, kind?.script ?? '');
           paintLine(sub, kind?.sub ?? '');
@@ -124,9 +156,6 @@ export default function CinematicHero({ eyebrow }: { eyebrow: string }) {
           },
         });
 
-        if (wide) {
-          timeline.fromTo('[data-hero-photo]', { scale: 1.14 }, { scale: 1, ease: 'none', duration: 1 }, 0);
-        }
         timeline.fromTo('[data-watermark]', { xPercent: -4 }, { xPercent: 8, ease: 'none', duration: 1 }, 0);
 
         if (bar) timeline.fromTo(bar, { scaleX: 0 }, { scaleX: 1, ease: 'none', duration: 1 }, 0);
@@ -163,12 +192,12 @@ export default function CinematicHero({ eyebrow }: { eyebrow: string }) {
 
   useLayoutEffect(() => {
     const poster = document.getElementById('hero-lcp');
-    const frame = rootRef.current?.querySelector('[data-hero-photo]');
-    if (poster instanceof HTMLImageElement && frame instanceof HTMLElement) {
+    const face = rootRef.current?.querySelector('[data-cube-front]');
+    if (poster instanceof HTMLImageElement && face instanceof HTMLElement) {
       poster.dataset.still = 'true';
-      poster.className = 'absolute inset-0 h-full w-full object-contain lg:object-cover';
+      poster.className = 'h-full w-full object-cover object-center';
       poster.removeAttribute('style');
-      if (poster.parentElement !== frame) frame.prepend(poster);
+      if (poster.parentElement !== face) face.prepend(poster);
     }
     window.dispatchEvent(new Event('bs-boot-ready'));
   }, []);
@@ -178,7 +207,15 @@ export default function CinematicHero({ eyebrow }: { eyebrow: string }) {
       if (window.scrollY > 24) setRestReady(true);
     };
     window.addEventListener('scroll', arm, { passive: true });
-    const next = STILLS[1]?.src;
+    let cancelIdle = () => {};
+    if (typeof window.requestIdleCallback === 'function') {
+      const id = window.requestIdleCallback(() => setRestReady(true), { timeout: 4500 });
+      cancelIdle = () => window.cancelIdleCallback(id);
+    } else {
+      const id = window.setTimeout(() => setRestReady(true), 4500);
+      cancelIdle = () => window.clearTimeout(id);
+    }
+    const next = KINDS[1]?.src;
     const warm = () => {
       if (!next) return;
       const img = new Image();
@@ -188,12 +225,15 @@ export default function CinematicHero({ eyebrow }: { eyebrow: string }) {
     const poster = document.getElementById('hero-lcp');
     if (poster instanceof HTMLImageElement && poster.complete) warm();
     else poster?.addEventListener('load', warm, { once: true });
-    return () => window.removeEventListener('scroll', arm);
+    return () => {
+      cancelIdle();
+      window.removeEventListener('scroll', arm);
+    };
   }, []);
 
   return (
-    <section ref={rootRef} className="relative h-[280svh] bg-background sm:h-[340svh] lg:h-[380vh]">
-      <div className="sticky top-[6.25rem] mx-auto grid h-[calc(100svh-6.25rem)] max-w-content grid-rows-[auto_minmax(0,1fr)] items-stretch gap-3 overflow-hidden px-4 py-3 sm:gap-4 sm:py-5 lg:h-[calc(100dvh-6.25rem)] lg:grid-cols-[minmax(0,0.82fr)_minmax(0,1.18fr)] lg:grid-rows-none lg:items-stretch lg:gap-8">
+    <section ref={rootRef} className="relative h-[340svh] bg-background sm:h-[400svh] lg:h-[460vh]">
+      <div className="hero-stage sticky top-[6.25rem] mx-auto grid h-[calc(100svh-6.25rem)] max-w-content grid-rows-[auto_minmax(0,1fr)] items-stretch gap-3 overflow-visible px-4 py-3 sm:gap-4 sm:py-5 lg:h-[calc(100dvh-6.25rem)] lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:grid-rows-none lg:items-center lg:gap-8">
         <p data-watermark className="watermark" aria-hidden="true">
           COLOUR
         </p>
@@ -212,13 +252,13 @@ export default function CinematicHero({ eyebrow }: { eyebrow: string }) {
           <p data-hero-sub className="mt-2 line-clamp-2 max-w-md text-sm leading-relaxed sm:mt-5 sm:text-base md:text-lg lg:line-clamp-none" style={{ color: 'hsl(var(--foreground) / 0.78)' }}>
             {KINDS[0].sub}
           </p>
-          <ul className="mt-3 flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] sm:mt-5 lg:flex-wrap lg:overflow-visible [&::-webkit-scrollbar]:hidden" aria-label="Clothing types">
+          <ul className="mt-3 grid grid-cols-3 gap-1.5 sm:mt-5 sm:flex sm:flex-wrap sm:gap-2" aria-label="Clothing types">
             {KINDS.map((kind, index) => (
-              <li key={kind.label} className="shrink-0">
+              <li key={kind.label} className="min-w-0 sm:shrink-0">
                 <Link
                   data-type
                   to={kind.href}
-                  className={`inline-flex min-h-9 items-center rounded-full border px-3 text-[11px] font-semibold uppercase tracking-[0.12em] sm:text-xs ${index === 0 ? 'is-on' : ''}`}
+                  className={`flex min-h-8 w-full items-center justify-center rounded-full border px-1 text-center text-[10px] font-semibold uppercase leading-none tracking-tight sm:inline-flex sm:min-h-9 sm:w-auto sm:px-3 sm:text-xs sm:tracking-[0.12em] ${index === 0 ? 'is-on' : ''}`}
                 >
                   {kind.label}
                 </Link>
@@ -235,32 +275,43 @@ export default function CinematicHero({ eyebrow }: { eyebrow: string }) {
             </Link>
           </div>
         </div>
-        <div className="relative z-10 flex min-h-0 flex-col lg:h-full">
-          <div className="absolute -left-4 top-8 hidden h-[78%] w-16 bg-[#62A848] xl:block" aria-hidden="true" />
-          <div data-hero-photo className="relative min-h-[9rem] w-full flex-1 overflow-hidden rounded-[1.25rem] bg-muted will-change-transform lg:rounded-[999px_999px_18px_18px]">
-            {STILLS.map((still, index) => index === 0 && hasPoster ? null : (
-              <img
-                key={still.src}
-                data-still
-                src={index === 0 || restReady ? still.src : undefined}
-                srcSet={index === 0 ? `${still.src.replace('.webp', '-640.webp')} 640w, ${still.src} 960w` : undefined}
-                sizes={index === 0 ? '(min-width: 1024px) 42vw, 92vw' : undefined}
-                alt={still.label}
-                className="absolute inset-0 h-full w-full object-contain lg:object-cover"
-                style={index === 0 ? undefined : { opacity: 0 }}
-                width={720}
-                height={900}
-                decoding="async"
-                {...(index === 0
-                  ? { fetchPriority: 'high' as const, loading: 'eager' as const }
-                  : { fetchPriority: 'low' as const, loading: 'lazy' as const })}
-              />
-            ))}
+        <div className="hero-cube-column relative z-10 flex min-h-0 w-full flex-col items-center justify-center lg:h-full">
+          <div data-hero-photo className="hero-cube-scene" aria-hidden="true">
+            <div className="hero-cube-tilt">
+              <div data-cube-rig className="hero-cube-rig">
+                <div className="hero-cube">
+                  {KINDS.map((kind, index) => (
+                    <div
+                      key={kind.label}
+                      data-cube-face
+                      data-cube-front={index === 0 ? '' : undefined}
+                      className="hero-cube-face"
+                      style={{ transform: FACE_TRANSFORM[index] }}
+                      aria-hidden={index === 0 ? undefined : true}
+                    >
+                      {index === 0 && hasPoster ? null : (
+                        <img
+                          alt={kind.label}
+                          src={index === 0 || restReady ? kind.src : undefined}
+                          width={720}
+                          height={900}
+                          decoding="async"
+                          fetchPriority="low"
+                          loading="lazy"
+                          className="h-full w-full object-cover object-center"
+                        />
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
           </div>
-          <p className="mt-2 flex items-center justify-between gap-3 text-[11px] font-semibold uppercase tracking-[0.16em] sm:text-xs sm:tracking-[0.2em]">
-            <span data-still-name>{KINDS[0].label}</span>
-            <span className="italic-accent normal-case tracking-normal text-base">the edit</span>
-          </p>
+          <Link
+            to={KINDS[face].href}
+            aria-label={`Shop ${KINDS[face].label}`}
+            className="hero-cube-link"
+          />
         </div>
         <div className="absolute bottom-2 left-4 right-4 z-10 h-px bg-foreground/15 sm:bottom-4">
           <div data-film-bar className="h-px origin-left scale-x-0 bg-[#62A848]" />
