@@ -22,6 +22,13 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <style>
       html, body { margin: 0; background: hsl(42 38% 96%); }
+      @font-face {
+        font-family: "Brimula";
+        src: url("/fonts/Brimula.otf") format("opentype");
+        font-weight: 400;
+        font-style: normal;
+        font-display: swap;
+      }
       #boot {
         position: fixed;
         inset: 0;
@@ -33,11 +40,26 @@
         pointer-events: auto;
       }
       html.skip-boot #boot { display: none !important; }
+      .boot-mark {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.85rem;
+        transform: translate3d(0, 46vh, 0);
+        animation: boot-rise 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      }
+      .boot-welcome {
+        margin: 0;
+        font-family: Brimula, Georgia, "Times New Roman", serif;
+        font-size: clamp(1.65rem, 4.6vw, 2.35rem);
+        font-weight: 400;
+        letter-spacing: 0.01em;
+        line-height: 1;
+        color: hsl(140 18% 8%);
+      }
       .boot-logo {
         width: min(62vw, 15.5rem);
         height: auto;
-        transform: translate3d(0, 46vh, 0);
-        animation: boot-rise 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
       }
       #boot.is-leave {
         pointer-events: none;
@@ -139,7 +161,10 @@
   </head>
   <body class="fs-unmask-airo-app-builder">
     <div id="boot" aria-hidden="true">
-      <img class="boot-logo" src="/logo-horizontal.webp" alt="" width="248" height="72" decoding="async" />
+      <div class="boot-mark">
+        <p class="boot-welcome">Welcome to</p>
+        <img class="boot-logo" src="/logo-horizontal.webp" alt="" width="248" height="72" decoding="async" />
+      </div>
     </div>
     <img
       id="hero-lcp"
