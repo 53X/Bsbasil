@@ -3,8 +3,23 @@ import { Link } from 'react-router';
 import ProductCard from '@/components/ProductCard';
 import type { StoreProduct } from '@/lib/shopify/types';
 
+/** How long the product row takes to catch the page scroll, in seconds. */
+const SCRUB = 1.15;
+
 /** Product rail. Vertical scroll carries the cards in from the side, the same way the lookbook does. */
-export default function ArrivalRail({ products }: { products: StoreProduct[] }) {
+export default function ArrivalRail({
+  products,
+  id = 'arrivals',
+  lead = 'NEW',
+  accent = 'ARRIVALS',
+  href = '/catalog',
+}: {
+  products: StoreProduct[];
+  id?: string;
+  lead?: string;
+  accent?: string;
+  href?: string;
+}) {
   const rootRef = useRef<HTMLElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
 
@@ -38,11 +53,12 @@ export default function ArrivalRail({ products }: { products: StoreProduct[] }) 
           {
             x: () => -distance(),
             ease: 'none',
+            force3D: true,
             scrollTrigger: {
               trigger: root,
               start: 'top 6.25rem',
               end: 'bottom bottom',
-              scrub: 0.6,
+              scrub: SCRUB,
               invalidateOnRefresh: true,
               onRefresh: applyHeight,
             },
@@ -84,15 +100,15 @@ export default function ArrivalRail({ products }: { products: StoreProduct[] }) 
   if (products.length === 0) return null;
 
   return (
-    <section ref={rootRef} id="arrivals" className="relative bg-background">
+    <section ref={rootRef} id={id} className="relative bg-background">
       <div data-arrival-stage className="sticky top-[6.25rem] overflow-hidden py-6 sm:py-8">
         <div className="mx-auto mb-5 flex w-full max-w-content items-end justify-between gap-4 px-4">
           <h2 className="max-w-full text-[clamp(2.2rem,4vw,3.75rem)] leading-none">
-            <span className="align-baseline">NEW</span>{' '}
-            <em className="ml-[0.12em] inline-block align-baseline text-[1.05em] leading-none">ARRIVALS</em>
+            <span className="align-baseline">{lead}</span>{' '}
+            <em className="ml-[0.12em] inline-block align-baseline text-[1.05em] leading-none">{accent}</em>
           </h2>
           <Link
-            to="/catalog"
+            to={href}
             className="mb-1 shrink-0 text-xs font-semibold uppercase tracking-[0.16em]"
             style={{ color: 'hsl(var(--brand-ink))' }}
           >
@@ -100,7 +116,7 @@ export default function ArrivalRail({ products }: { products: StoreProduct[] }) 
           </Link>
         </div>
         <div className="overflow-hidden">
-          <div ref={trackRef} className="flex w-max items-stretch gap-4 px-4 pb-8 sm:gap-6 lg:gap-8">
+          <div ref={trackRef} className="flex w-max items-stretch gap-4 px-4 pb-8 will-change-transform sm:gap-6 lg:gap-8">
             {products.map((product, index) => (
               <div key={product.id} className="w-[min(72vw,280px)] shrink-0 sm:w-[min(42vw,280px)] lg:w-[min(22vw,280px)]">
                 <ProductCard product={product} index={index} />

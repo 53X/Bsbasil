@@ -7,13 +7,14 @@ import ArrivalRail from '@/components/motion/ArrivalRail';
 import CinematicHero from '@/components/motion/CinematicHero';
 import Marquee from '@/components/motion/Marquee';
 import MoodRail from '@/components/motion/MoodRail';
-import type { StoreCatalog, StorePromotion } from '@/lib/shopify/types';
+import type { StoreCatalog, StoreProduct, StorePromotion } from '@/lib/shopify/types';
 
 export default function HomePage() {
   const siteUrl = 'https://bsbasil.com';
-  const store = useLoaderData() as StoreCatalog & { promotions: StorePromotion[] };
+  const store = useLoaderData() as StoreCatalog & { promotions: StorePromotion[]; bestsellers?: StoreProduct[] };
   const promotions = store.promotions ?? [];
   const arrivals = store.products ?? [];
+  const bestsellers = store.bestsellers ?? [];
   const ageRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
@@ -186,6 +187,10 @@ export default function HomePage() {
 
         <ArrivalRail products={arrivals} />
 
+        {bestsellers.length > 0 ? (
+          <ArrivalRail id="bestsellers" products={bestsellers} lead="BEST" accent="SELLERS" />
+        ) : null}
+
         <section className="py-16">
           <div className="mx-auto mb-10 max-w-content px-4">
             <h2 className="text-[clamp(2.53rem,5.75vw,4.83rem)] uppercase leading-[0.9]">{home.featuredSection.title}</h2>
@@ -209,6 +214,11 @@ export default function HomePage() {
             </div>
           )}
         </section>
+
+        <Marquee
+          label="First purchase offer"
+          items={Array.from({ length: 8 }, () => 'Use code FIRSTPURCHASE for 40% off')}
+        />
       </main>
     </>
   );

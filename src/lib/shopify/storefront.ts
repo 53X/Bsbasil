@@ -598,12 +598,42 @@ export async function loadPromotions(): Promise<StorePromotion[]> {
   }
 }
 
+const BESTSELLER_HANDLES = ['bestsellers', 'best-sellers'];
+
+/** Products from the Shopify collection named Bestsellers. Reorder or swap them in Admin. */
+export async function loadBestsellers(): Promise<StoreProduct[]> {
+  if (!shopifyConfig()) return [];
+  try {
+    for (const handle of BESTSELLER_HANDLES) {
+      const data = await storefront<{
+        collection: { products: { nodes: RawProductNode[] } } | null;
+      }>(
+        `query Bestsellers($handle: String!) {
+          collection(handle: $handle) {
+            products(first: 24) { nodes { ${PRODUCT_FIELDS} } }
+          }
+        }`,
+        { handle },
+      );
+      const nodes = data.collection?.products.nodes ?? [];
+      if (data.collection) return nodes.map(mapProduct);
+    }
+    return [];
+  } catch {
+    return [];
+  }
+}
+
 export async function homeLoader() {
-  const catalog = await loadCatalog();
-  const promotions = await loadPromotions();
+  const [catalog, promotions, bestsellers] = await Promise.all([
+    loadCatalog(),
+    loadPromotions(),
+    loadBestsellers(),
+  ]);
   return {
     ...catalog,
     products: applyPromotionOffers(catalog.products, promotions),
+    bestsellers: applyPromotionOffers(bestsellers, promotions),
     promotions,
   };
 }

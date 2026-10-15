@@ -12,15 +12,6 @@ const FACE_TRANSFORM = [
   'rotateX(-90deg) translateZ(calc(var(--cube) / 2))',
 ];
 
-const POSES = [
-  'rotateX(0deg) rotateY(0deg)',
-  'rotateX(0deg) rotateY(-90deg)',
-  'rotateX(0deg) rotateY(-180deg)',
-  'rotateX(0deg) rotateY(-270deg)',
-  'rotateX(-90deg) rotateY(0deg)',
-  'rotateX(90deg) rotateY(0deg)',
-];
-
 const KINDS = [
   {
     src: '/hero-cube/romper.webp',
@@ -134,7 +125,6 @@ export default function CinematicHero({ eyebrow }: { eyebrow: string }) {
             setFace(index);
           }
           labels.forEach((label, i) => label.classList.toggle('is-on', i === index));
-          if (rig instanceof HTMLElement) rig.style.transform = POSES[index] ?? POSES[0];
           faces.forEach((face, i) => {
             const front = i === index;
             face.toggleAttribute('data-front', front);
@@ -150,15 +140,33 @@ export default function CinematicHero({ eyebrow }: { eyebrow: string }) {
             trigger: root,
             start: 'top 6.25rem',
             end: 'bottom bottom',
-            scrub: 0.65,
+            scrub: 1.15,
             invalidateOnRefresh: true,
             onUpdate: (self) => mark(self.progress),
           },
         });
 
-        timeline.fromTo('[data-watermark]', { xPercent: -4 }, { xPercent: 8, ease: 'none', duration: 1 }, 0);
+        if (rig instanceof HTMLElement) {
+          rig.style.transition = 'none';
+          gsap.set(rig, { rotationX: 0, rotationY: 0, force3D: true });
+          timeline.to(
+            rig,
+            {
+              keyframes: [
+                { rotationY: -90, duration: 1, ease: 'power2.inOut' },
+                { rotationY: -180, duration: 1, ease: 'power2.inOut' },
+                { rotationY: -270, duration: 1, ease: 'power2.inOut' },
+                { rotationY: -360, rotationX: -90, duration: 1, ease: 'power2.inOut' },
+                { rotationX: -270, rotationY: -360, duration: 1, ease: 'power2.inOut' },
+              ],
+            },
+            0,
+          );
+        }
 
-        if (bar) timeline.fromTo(bar, { scaleX: 0 }, { scaleX: 1, ease: 'none', duration: 1 }, 0);
+        timeline.fromTo('[data-watermark]', { xPercent: -4 }, { xPercent: 8, ease: 'none', duration: 5 }, 0);
+
+        if (bar) timeline.fromTo(bar, { scaleX: 0 }, { scaleX: 1, ease: 'none', duration: 5 }, 0);
         mark(0);
       }, root);
 
