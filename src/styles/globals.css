@@ -473,7 +473,7 @@ html.lenis {
   display: flex;
   gap: 1rem;
   overflow-x: auto;
-  scroll-snap-type: x mandatory;
+  scroll-snap-type: none;
   scroll-padding-inline: 1rem;
   padding-bottom: 0.5rem;
   -webkit-overflow-scrolling: touch;

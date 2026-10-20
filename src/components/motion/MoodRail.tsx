@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { Link } from 'react-router';
+import { bindPointerScrub, scrollPageBy } from '@/lib/page-scroll';
 
 const KINDS = [
   { src: '/hero-cube/romper.webp', label: 'Rompers', href: '/catalog?category=Romper' },
@@ -9,10 +10,12 @@ const KINDS = [
   { src: '', label: 'Accessories', href: '/catalog?category=Accessories' },
 ];
 
-/** How long the sideways track takes to catch the page scroll, in seconds. */
-const SCRUB = 1.15;
+/** Seconds the sideways track takes to catch vertical page scroll. */
+const SCRUB = 1.55;
+/** How far the gallery moves for each pixel of vertical scroll. */
+const SENSITIVITY = 1.1;
 
-/** Vertical scroll is spent moving this lookbook sideways, on every screen size. */
+/** Sticky lookbook: page scroll, trackpad, and a finger swipe all move it sideways. */
 export default function MoodRail() {
   const sectionRef = useRef<HTMLElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
@@ -20,9 +23,13 @@ export default function MoodRail() {
   useEffect(() => {
     const section = sectionRef.current;
     const track = trackRef.current;
-    if (!section || !track) return;
+    const stage = section?.querySelector('[data-mood-stage]') as HTMLElement | null;
+    if (!section || !track || !stage) return;
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (reduced) return;
+    if (reduced) {
+      stage.style.overflowX = 'auto';
+      return;
+    }
 
     let revert = () => {};
     let cancelled = false;
@@ -34,11 +41,10 @@ export default function MoodRail() {
       const ScrollTrigger = scrollMod.ScrollTrigger;
       gsap.registerPlugin(ScrollTrigger);
       const ctx = gsap.context(() => {
-        const distance = () => Math.max(0, track.scrollWidth - window.innerWidth + 32);
+        const distance = () => Math.max(0, track.scrollWidth - stage.clientWidth);
         const applyHeight = () => {
-          const stage = section.querySelector('[data-mood-stage]') as HTMLElement | null;
-          const stageHeight = stage?.offsetHeight ?? window.innerHeight;
-          section.style.height = `${stageHeight + distance()}px`;
+          const stageHeight = stage.offsetHeight || window.innerHeight;
+          section.style.height = `${stageHeight + distance() / SENSITIVITY}px`;
         };
         applyHeight();
         gsap.fromTo(
@@ -77,7 +83,21 @@ export default function MoodRail() {
           );
         }
       }, section);
-      revert = () => ctx.revert();
+
+      const onWheel = (event: WheelEvent) => {
+        event.preventDefault();
+        const delta = Math.abs(event.deltaX) > Math.abs(event.deltaY) ? event.deltaX : event.deltaY;
+        scrollPageBy(delta);
+      };
+      stage.addEventListener('wheel', onWheel, { passive: false });
+      const unbindScrub = bindPointerScrub(stage, () => 1 / SENSITIVITY, () => 1);
+
+      revert = () => {
+        stage.removeEventListener('wheel', onWheel);
+        unbindScrub();
+        ctx.revert();
+        section.style.height = '';
+      };
       const refresh = () => ScrollTrigger.refresh();
       track.querySelectorAll('img').forEach((img) => {
         if (!img.complete) img.addEventListener('load', refresh, { once: true });
@@ -92,18 +112,10 @@ export default function MoodRail() {
     });
     };
 
-    let cancelIdle = () => {};
-    if (typeof window.requestIdleCallback === 'function') {
-      const id = window.requestIdleCallback(run, { timeout: 1800 });
-      cancelIdle = () => window.cancelIdleCallback(id);
-    } else {
-      const id = window.setTimeout(run, 1200);
-      cancelIdle = () => window.clearTimeout(id);
-    }
-
+    const idle = window.setTimeout(run, 80);
     return () => {
       cancelled = true;
-      cancelIdle();
+      window.clearTimeout(idle);
       revert();
     };
   }, []);
@@ -112,7 +124,8 @@ export default function MoodRail() {
     <section ref={sectionRef} className="relative bg-background">
       <div
         data-mood-stage
-        className="sticky top-[6.25rem] flex h-[calc(100svh-6.25rem)] items-center overflow-hidden lg:h-[calc(100dvh-6.25rem)]"
+        data-hscroll
+        className="sticky top-[6.25rem] flex h-[calc(100svh-6.25rem)] touch-none items-center overflow-hidden overscroll-x-contain lg:h-[calc(100dvh-6.25rem)]"
       >
         <div ref={trackRef} className="flex w-max items-end gap-4 px-4 py-6 will-change-transform sm:gap-6 lg:gap-8 lg:px-10">
           <div className="w-[min(78vw,26rem)] shrink-0 pr-2">
