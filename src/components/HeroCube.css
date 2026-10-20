@@ -12,12 +12,21 @@
   height: var(--cube);
   transform: translate(-50%, -50%);
   border-radius: 1.15rem;
-  cursor: pointer;
+  cursor: grab;
+  touch-action: none;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+  box-shadow: none;
+  border: 0;
 }
 
+.hero-cube-link:active {
+  cursor: grabbing;
+}
+
+.hero-cube-link:focus,
 .hero-cube-link:focus-visible {
-  outline: 2px solid hsl(var(--primary));
-  outline-offset: 4px;
+  outline: none;
 }
 
 .hero-cube-scene {
@@ -47,7 +56,8 @@
   width: 100%;
   height: 100%;
   transform: rotateX(0deg) rotateY(0deg);
-  transition: transform 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform;
+  backface-visibility: hidden;
 }
 
 .hero-cube {
@@ -75,9 +85,12 @@
   cursor: pointer;
 }
 
+.hero-cube-face,
+.hero-cube-face[data-front],
+.hero-cube-face[data-front]:focus,
 .hero-cube-face[data-front]:focus-visible {
-  outline: 2px solid hsl(var(--primary));
-  outline-offset: 4px;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .hero-cube-face img {

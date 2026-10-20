@@ -1,6 +1,7 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Link } from 'react-router';
 import { ArrowRight } from 'lucide-react';
+import { bindPointerScrub, scrollPageBy } from '@/lib/page-scroll';
 import '../HeroCube.css';
 
 const FACE_TRANSFORM = [
@@ -109,6 +110,7 @@ export default function CinematicHero({ eyebrow }: { eyebrow: string }) {
       const ScrollTrigger = scrollMod.ScrollTrigger;
       gsap.registerPlugin(ScrollTrigger);
 
+      let unbindScrub = () => {};
       const ctx = gsap.context(() => {
         const labels = gsap.utils.toArray<HTMLElement>('[data-type]');
         const rig = root.querySelector('[data-cube-rig]');
@@ -140,7 +142,7 @@ export default function CinematicHero({ eyebrow }: { eyebrow: string }) {
             trigger: root,
             start: 'top 6.25rem',
             end: 'bottom bottom',
-            scrub: 1.15,
+            scrub: window.matchMedia('(pointer: coarse)').matches ? 1.05 : 1.55,
             invalidateOnRefresh: true,
             onUpdate: (self) => mark(self.progress),
           },
@@ -148,20 +150,41 @@ export default function CinematicHero({ eyebrow }: { eyebrow: string }) {
 
         if (rig instanceof HTMLElement) {
           rig.style.transition = 'none';
+          rig.style.willChange = 'transform';
           gsap.set(rig, { rotationX: 0, rotationY: 0, force3D: true });
           timeline.to(
             rig,
             {
               keyframes: [
-                { rotationY: -90, duration: 1, ease: 'power2.inOut' },
-                { rotationY: -180, duration: 1, ease: 'power2.inOut' },
-                { rotationY: -270, duration: 1, ease: 'power2.inOut' },
-                { rotationY: -360, rotationX: -90, duration: 1, ease: 'power2.inOut' },
-                { rotationX: -270, rotationY: -360, duration: 1, ease: 'power2.inOut' },
+                { rotationY: -90, duration: 1, ease: 'none' },
+                { rotationY: -180, duration: 1, ease: 'none' },
+                { rotationY: -270, duration: 1, ease: 'none' },
+                { rotationY: -360, rotationX: -90, duration: 1, ease: 'none' },
+                { rotationX: -270, rotationY: -360, duration: 1, ease: 'none' },
               ],
+              ease: 'none',
+              force3D: true,
             },
             0,
           );
+        }
+
+        const control = root.querySelector('[data-cube-control]');
+        const trigger = timeline.scrollTrigger;
+        if (control instanceof HTMLElement && trigger) {
+          const gain = () =>
+            Math.max(1.62, (trigger.end - trigger.start) / Math.max(240, control.clientWidth * 1.33));
+          const unbindPointer = bindPointerScrub(control, gain, gain);
+          const onWheel = (event: WheelEvent) => {
+            event.preventDefault();
+            const delta = Math.abs(event.deltaX) > Math.abs(event.deltaY) ? event.deltaX : event.deltaY;
+            scrollPageBy(delta * 1.04);
+          };
+          control.addEventListener('wheel', onWheel, { passive: false });
+          unbindScrub = () => {
+            unbindPointer();
+            control.removeEventListener('wheel', onWheel);
+          };
         }
 
         timeline.fromTo('[data-watermark]', { xPercent: -4 }, { xPercent: 8, ease: 'none', duration: 5 }, 0);
@@ -170,7 +193,10 @@ export default function CinematicHero({ eyebrow }: { eyebrow: string }) {
         mark(0);
       }, root);
 
-      revert = () => ctx.revert();
+      revert = () => {
+        unbindScrub();
+        ctx.revert();
+      };
       const refresh = () => ScrollTrigger.refresh();
       window.addEventListener('resize', refresh);
       ScrollTrigger.refresh();
@@ -183,13 +209,8 @@ export default function CinematicHero({ eyebrow }: { eyebrow: string }) {
     };
 
     let cancelIdle = () => {};
-    if (typeof window.requestIdleCallback === 'function') {
-      const id = window.requestIdleCallback(run, { timeout: 1800 });
-      cancelIdle = () => window.cancelIdleCallback(id);
-    } else {
-      const id = window.setTimeout(run, 1200);
-      cancelIdle = () => window.clearTimeout(id);
-    }
+    const idle = window.setTimeout(run, 80);
+    cancelIdle = () => window.clearTimeout(idle);
 
     return () => {
       cancelled = true;
@@ -240,7 +261,7 @@ export default function CinematicHero({ eyebrow }: { eyebrow: string }) {
   }, []);
 
   return (
-    <section ref={rootRef} className="relative h-[340svh] bg-background sm:h-[400svh] lg:h-[460vh]">
+    <section ref={rootRef} className="relative h-[360svh] bg-background sm:h-[420svh] lg:h-[480vh]">
       <div className="hero-stage sticky top-[6.25rem] mx-auto grid h-[calc(100svh-6.25rem)] max-w-content grid-rows-[auto_minmax(0,1fr)] items-stretch gap-3 overflow-visible px-4 py-3 sm:gap-4 sm:py-5 lg:h-[calc(100dvh-6.25rem)] lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:grid-rows-none lg:items-center lg:gap-8">
         <p data-watermark className="watermark" aria-hidden="true">
           COLOUR
@@ -318,10 +339,11 @@ export default function CinematicHero({ eyebrow }: { eyebrow: string }) {
           <Link
             to={KINDS[face].href}
             aria-label={`Shop ${KINDS[face].label}`}
+            data-cube-control
             className="hero-cube-link"
           />
         </div>
-        <div className="absolute bottom-2 left-4 right-4 z-10 h-px bg-foreground/15 sm:bottom-4">
+        <div className="absolute bottom-4 left-4 right-4 z-10 hidden h-px bg-foreground/15 lg:block">
           <div data-film-bar className="h-px origin-left scale-x-0 bg-[#62A848]" />
         </div>
       </div>
