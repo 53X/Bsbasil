@@ -39,18 +39,23 @@ export default function Reveal({
           });
           return;
         }
-        gsap.from(items, {
-          y: 36,
-          opacity: 0,
-          duration: 0.8,
-          stagger: 0.07,
-          ease: 'power3.out',
-          scrollTrigger: {
-            trigger: root,
-            start: 'top 86%',
-            once: true,
+        gsap.fromTo(
+          items,
+          { y: 28, opacity: 0 },
+          {
+            y: 0,
+            opacity: 1,
+            ease: 'none',
+            stagger: 0.04,
+            immediateRender: true,
+            scrollTrigger: {
+              trigger: root,
+              start: 'top 90%',
+              end: 'top 62%',
+              scrub: true,
+            },
           },
-        });
+        );
       }, root);
       revert = () => ctx.revert();
     });

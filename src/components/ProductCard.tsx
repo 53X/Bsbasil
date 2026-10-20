@@ -23,7 +23,7 @@ export default function ProductCard({
       className="group flex h-full flex-col"
       style={{ ['--tilt' as string]: index % 2 === 0 ? '0deg' : '0deg' }}
     >
-      <Link to={href} data-reveal className="relative block aspect-[3/4] overflow-hidden bg-background">
+      <Link to={href} className="relative block aspect-[3/4] overflow-hidden bg-background">
         <span className="absolute inset-x-0 top-0 h-2" style={{ background: PANELS[index % PANELS.length] }} />
         {product.image ? (
           <img

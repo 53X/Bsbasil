@@ -10,8 +10,6 @@ const KINDS = [
   { src: '', label: 'Accessories', href: '/catalog?category=Accessories' },
 ];
 
-/** Seconds the sideways track takes to catch vertical page scroll. */
-const SCRUB = 1.55;
 /** How far the gallery moves for each pixel of vertical scroll. */
 const SENSITIVITY = 1.1;
 
@@ -53,12 +51,12 @@ export default function MoodRail() {
           {
             x: () => -distance(),
             ease: 'none',
-            force3D: true,
+            immediateRender: true,
             scrollTrigger: {
               trigger: section,
               start: 'top 6.25rem',
               end: 'bottom bottom',
-              scrub: SCRUB,
+              scrub: true,
               invalidateOnRefresh: true,
               onRefresh: applyHeight,
             },
@@ -72,11 +70,12 @@ export default function MoodRail() {
             {
               scaleX: 1,
               ease: 'none',
+              immediateRender: true,
               scrollTrigger: {
                 trigger: section,
                 start: 'top 6.25rem',
                 end: 'bottom bottom',
-                scrub: SCRUB,
+                scrub: true,
                 invalidateOnRefresh: true,
               },
             },
@@ -125,7 +124,7 @@ export default function MoodRail() {
       <div
         data-mood-stage
         data-hscroll
-        className="sticky top-[6.25rem] flex h-[calc(100svh-6.25rem)] touch-none items-center overflow-hidden overscroll-x-contain lg:h-[calc(100dvh-6.25rem)]"
+        className="sticky top-[6.25rem] flex h-[calc(100svh-6.25rem)] items-center overflow-hidden lg:h-[calc(100dvh-6.25rem)]"
       >
         <div ref={trackRef} className="flex w-max items-end gap-4 px-4 py-6 will-change-transform sm:gap-6 lg:gap-8 lg:px-10">
           <div className="w-[min(78vw,26rem)] shrink-0 pr-2">
