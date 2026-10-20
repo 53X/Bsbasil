@@ -1,8 +1,19 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Link } from 'react-router';
 import { ArrowRight } from 'lucide-react';
-import { bindPointerScrub, scrollPageBy } from '@/lib/page-scroll';
+import { bindCubeSteer, scrollPageBy } from '@/lib/page-scroll';
 import '../HeroCube.css';
+
+const COUNT = 6;
+
+const POSES = [
+  { x: 0, y: 0 },
+  { x: 0, y: -90 },
+  { x: 0, y: -180 },
+  { x: 0, y: -270 },
+  { x: -90, y: -360 },
+  { x: -270, y: -360 },
+];
 
 const FACE_TRANSFORM = [
   'rotateY(0deg) translateZ(calc(var(--cube) / 2))',
@@ -81,9 +92,21 @@ function paintLine(el: Element | null, text: string) {
   el.dispatchEvent(new CustomEvent('bs-line-change', { bubbles: true }));
 }
 
+function wrapFace(progress: number) {
+  return ((progress % COUNT) + COUNT) % COUNT;
+}
+
+function poseUnwrapped(index: number) {
+  const cycle = Math.floor(index / COUNT);
+  const face = wrapFace(index);
+  return {
+    x: POSES[face].x + cycle * -360,
+    y: POSES[face].y + cycle * -360,
+  };
+}
+
 /**
- * Sticky hero. Scrolling turns one cube through six clothing faces
- * while the matching headline changes with it.
+ * Sticky hero. The cube loops: rompers follows party wear in both directions.
  */
 export default function CinematicHero({ eyebrow }: { eyebrow: string }) {
   const rootRef = useRef<HTMLElement>(null);
@@ -119,12 +142,31 @@ export default function CinematicHero({ eyebrow }: { eyebrow: string }) {
         const script = root.querySelector('[data-hero-script]');
         const sub = root.querySelector('[data-hero-sub]');
         const bar = root.querySelector('[data-film-bar]');
-        const mark = (progress: number) => {
-          const index = Math.min(KINDS.length - 1, Math.floor(progress * KINDS.length));
+        const control = root.querySelector('[data-cube-control]');
+        let settled = 0;
+        let pending = 0;
+        let lastScroll = window.scrollY;
+        let ignoreScrollUntil = 0;
+
+        const unit = () => {
+          const pin = root.offsetHeight - Math.max(240, window.innerHeight - 100);
+          return Math.max(160, pin) / COUNT;
+        };
+
+        const pageMax = () =>
+          Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
+
+        const pageBlocked = (delta: number) => {
+          const y = window.scrollY;
+          return (delta < 0 && y <= 0) || (delta > 0 && y >= pageMax());
+        };
+
+        const showFace = (index: number) => {
           const kind = KINDS[index];
           if (index !== faceRef.current) {
             faceRef.current = index;
             setFace(index);
+            setRestReady(true);
           }
           labels.forEach((label, i) => label.classList.toggle('is-on', i === index));
           faces.forEach((face, i) => {
@@ -135,62 +177,110 @@ export default function CinematicHero({ eyebrow }: { eyebrow: string }) {
           paintLine(lead, kind?.lead ?? '');
           paintLine(script, kind?.script ?? '');
           paintLine(sub, kind?.sub ?? '');
+          if (bar instanceof HTMLElement) {
+            gsap.set(bar, { scaleX: index / COUNT });
+          }
         };
 
-        const timeline = gsap.timeline({
+        const paintRig = (next: number, animate: boolean) => {
+          if (!(rig instanceof HTMLElement)) return;
+          const pose = poseUnwrapped(next);
+          rig.style.transition = animate
+            ? 'transform 0.5s cubic-bezier(0.22, 1, 0.36, 1)'
+            : 'none';
+          rig.style.transform = `translate3d(0,0,0) rotateX(${pose.x}deg) rotateY(${pose.y}deg)`;
+        };
+
+        const goTo = (next: number) => {
+          if (next > 60 || next < -60) next = wrapFace(next);
+          settled = next;
+          pending = 0;
+          showFace(wrapFace(next));
+          paintRig(next, true);
+        };
+
+        const commit = () => {
+          if (Math.abs(pending) < 0.08) {
+            pending = 0;
+            return;
+          }
+          const dir = Math.sign(pending);
+          const steps = Math.abs(pending) >= 0.85 ? Math.max(1, Math.round(Math.abs(pending))) : 1;
+          goTo(settled + dir * steps);
+        };
+
+        const feed = (deltaProgress: number) => {
+          if (!deltaProgress) return;
+          pending += deltaProgress;
+          if (Math.abs(pending) < 0.22) return;
+          commit();
+        };
+
+        const heroVisible = () => {
+          const box = root.getBoundingClientRect();
+          return box.bottom > 80 && box.top < window.innerHeight;
+        };
+
+        const onScroll = () => {
+          const y = window.scrollY;
+          const dy = y - lastScroll;
+          lastScroll = y;
+          if (performance.now() < ignoreScrollUntil) return;
+          if (!heroVisible()) return;
+          if (Math.abs(dy) < 6) return;
+          feed(dy / unit());
+        };
+
+        if (rig instanceof HTMLElement) {
+          gsap.killTweensOf(rig);
+          rig.style.willChange = 'transform';
+          paintRig(0, false);
+        }
+
+        const onWheel = (event: WheelEvent) => {
+          if (event.target instanceof Element && event.target.closest('[data-cube-control]')) return;
+          const delta = event.deltaY + event.deltaX;
+          if (!delta || !heroVisible() || !pageBlocked(delta)) return;
+          event.preventDefault();
+          feed(delta / unit());
+          commit();
+        };
+
+        if (control instanceof HTMLElement) {
+          unbindScrub = bindCubeSteer(
+            control,
+            (delta) => {
+              ignoreScrollUntil = performance.now() + 480;
+              feed(delta / Math.max(140, control.clientWidth * 0.55));
+              if (!pageBlocked(delta)) scrollPageBy(delta);
+            },
+            () => commit(),
+          );
+        }
+
+        gsap.fromTo('[data-watermark]', {
+          xPercent: -4,
+        }, {
+          xPercent: 8,
+          ease: 'none',
           scrollTrigger: {
             trigger: root,
             start: 'top 6.25rem',
             end: 'bottom bottom',
-            scrub: window.matchMedia('(pointer: coarse)').matches ? 1.05 : 1.55,
-            invalidateOnRefresh: true,
-            onUpdate: (self) => mark(self.progress),
+            scrub: true,
           },
         });
 
-        if (rig instanceof HTMLElement) {
-          rig.style.transition = 'none';
-          rig.style.willChange = 'transform';
-          gsap.set(rig, { rotationX: 0, rotationY: 0, force3D: true });
-          timeline.to(
-            rig,
-            {
-              keyframes: [
-                { rotationY: -90, duration: 1, ease: 'none' },
-                { rotationY: -180, duration: 1, ease: 'none' },
-                { rotationY: -270, duration: 1, ease: 'none' },
-                { rotationY: -360, rotationX: -90, duration: 1, ease: 'none' },
-                { rotationX: -270, rotationY: -360, duration: 1, ease: 'none' },
-              ],
-              ease: 'none',
-              force3D: true,
-            },
-            0,
-          );
-        }
-
-        const control = root.querySelector('[data-cube-control]');
-        const trigger = timeline.scrollTrigger;
-        if (control instanceof HTMLElement && trigger) {
-          const gain = () =>
-            Math.max(1.62, (trigger.end - trigger.start) / Math.max(240, control.clientWidth * 1.33));
-          const unbindPointer = bindPointerScrub(control, gain, gain);
-          const onWheel = (event: WheelEvent) => {
-            event.preventDefault();
-            const delta = Math.abs(event.deltaX) > Math.abs(event.deltaY) ? event.deltaX : event.deltaY;
-            scrollPageBy(delta * 1.04);
-          };
-          control.addEventListener('wheel', onWheel, { passive: false });
-          unbindScrub = () => {
-            unbindPointer();
-            control.removeEventListener('wheel', onWheel);
-          };
-        }
-
-        timeline.fromTo('[data-watermark]', { xPercent: -4 }, { xPercent: 8, ease: 'none', duration: 5 }, 0);
-
-        if (bar) timeline.fromTo(bar, { scaleX: 0 }, { scaleX: 1, ease: 'none', duration: 5 }, 0);
-        mark(0);
+        window.addEventListener('scroll', onScroll, { passive: true });
+        root.addEventListener('wheel', onWheel, { passive: false });
+        showFace(0);
+        const previousUnbind = unbindScrub;
+        unbindScrub = () => {
+          if (rig instanceof HTMLElement) gsap.killTweensOf(rig);
+          window.removeEventListener('scroll', onScroll);
+          root.removeEventListener('wheel', onWheel);
+          previousUnbind();
+        };
       }, root);
 
       revert = () => {

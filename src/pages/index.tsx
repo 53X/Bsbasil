@@ -31,18 +31,18 @@ export default function HomePage() {
       const ctx = gsap.context(() => {
         root.querySelectorAll('[data-age-row]').forEach((row) => {
           gsap.fromTo(row, {
-            x: 72,
+            x: 48,
             autoAlpha: 0,
           }, {
             x: 0,
             autoAlpha: 1,
-            duration: 0.75,
-            ease: 'power3.out',
+            ease: 'none',
             immediateRender: true,
             scrollTrigger: {
               trigger: row,
-              start: 'top 94%',
-              toggleActions: 'play none none none',
+              start: 'top 96%',
+              end: 'top 68%',
+              scrub: true,
             },
           });
         });

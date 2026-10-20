@@ -3,10 +3,7 @@ import { Link } from 'react-router';
 import ProductCard from '@/components/ProductCard';
 import type { StoreProduct } from '@/lib/shopify/types';
 
-/** How long the product row takes to catch the page scroll, in seconds. */
-const SCRUB = 1.15;
-
-/** Product rail. Vertical scroll carries the cards in from the side, the same way the lookbook does. */
+/** Product rail. Vertical page scroll moves the cards sideways, and back again. */
 export default function ArrivalRail({
   products,
   id = 'arrivals',
@@ -26,9 +23,14 @@ export default function ArrivalRail({
   useEffect(() => {
     const root = rootRef.current;
     const track = trackRef.current;
-    if (!root || !track || products.length === 0) return;
+    const stage = root?.querySelector('[data-arrival-stage]') as HTMLElement | null;
+    const clip = root?.querySelector('[data-arrival-clip]') as HTMLElement | null;
+    if (!root || !track || !stage || !clip || products.length === 0) return;
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (reduced) return;
+    if (reduced) {
+      clip.style.overflowX = 'auto';
+      return;
+    }
 
     let revert = () => {};
     let cancelled = false;
@@ -40,10 +42,9 @@ export default function ArrivalRail({
       const ScrollTrigger = scrollMod.ScrollTrigger;
       gsap.registerPlugin(ScrollTrigger);
       const ctx = gsap.context(() => {
-        const distance = () => Math.max(0, track.scrollWidth - window.innerWidth + 32);
+        const distance = () => Math.max(0, track.scrollWidth - clip.clientWidth);
         const applyHeight = () => {
-          const stage = root.querySelector('[data-arrival-stage]') as HTMLElement | null;
-          const stageHeight = stage?.offsetHeight ?? 0;
+          const stageHeight = stage.offsetHeight || window.innerHeight;
           root.style.height = `${stageHeight + distance()}px`;
         };
         applyHeight();
@@ -53,12 +54,12 @@ export default function ArrivalRail({
           {
             x: () => -distance(),
             ease: 'none',
-            force3D: true,
+            immediateRender: true,
             scrollTrigger: {
               trigger: root,
               start: 'top 6.25rem',
               end: 'bottom bottom',
-              scrub: SCRUB,
+              scrub: true,
               invalidateOnRefresh: true,
               onRefresh: applyHeight,
             },
@@ -101,7 +102,7 @@ export default function ArrivalRail({
 
   return (
     <section ref={rootRef} id={id} className="relative bg-background">
-      <div data-arrival-stage className="sticky top-[6.25rem] overflow-hidden py-6 sm:py-8">
+      <div data-arrival-stage className="sticky top-[6.25rem] py-6 sm:py-8">
         <div className="mx-auto mb-5 flex w-full max-w-content items-end justify-between gap-4 px-4">
           <h2 className="max-w-full text-[clamp(2.2rem,4vw,3.75rem)] leading-none">
             <span className="align-baseline">{lead}</span>{' '}
@@ -115,8 +116,11 @@ export default function ArrivalRail({
             View all
           </Link>
         </div>
-        <div className="overflow-hidden">
-          <div ref={trackRef} className="flex w-max items-stretch gap-4 px-4 pb-8 will-change-transform sm:gap-6 lg:gap-8">
+        <div
+          data-arrival-clip
+          className="arrival-clip overflow-hidden"
+        >
+          <div ref={trackRef} className="flex w-max items-stretch gap-4 px-4 pb-8 sm:gap-6 lg:gap-8">
             {products.map((product, index) => (
               <div key={product.id} className="w-[min(72vw,280px)] shrink-0 sm:w-[min(42vw,280px)] lg:w-[min(22vw,280px)]">
                 <ProductCard product={product} index={index} />

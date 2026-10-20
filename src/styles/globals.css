@@ -535,6 +535,38 @@ html.lenis {
 .slide-left { animation-name: slide-left; }
 .slide-right { animation-name: slide-right; }
 
+@keyframes slide-left-out {
+  from { opacity: 1; transform: translate3d(0, 0, 0); }
+  to { opacity: 0; transform: translate3d(-3.75rem, 0, 0); }
+}
+
+@keyframes slide-right-out {
+  from { opacity: 1; transform: translate3d(0, 0, 0); }
+  to { opacity: 0; transform: translate3d(3.75rem, 0, 0); }
+}
+
+.slide-left-out,
+.slide-right-out {
+  animation-duration: 0.7s;
+  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+  animation-fill-mode: both;
+}
+
+.slide-left-out { animation-name: slide-left-out; }
+.slide-right-out { animation-name: slide-right-out; }
+
+.arrival-clip {
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 1.25rem, #000 calc(100% - 1.25rem), transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 1.25rem, #000 calc(100% - 1.25rem), transparent);
+}
+
+@media (min-width: 1024px) {
+  .arrival-clip {
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 2rem, #000 calc(100% - 2rem), transparent);
+    mask-image: linear-gradient(90deg, transparent, #000 2rem, #000 calc(100% - 2rem), transparent);
+  }
+}
+
 /* Same duration and ease as the hero headline words. */
 @media (prefers-reduced-motion: no-preference) {
   [data-hero-photo] [data-still] {
@@ -547,11 +579,11 @@ html.lenis {
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  .word-in:not(.slide-left):not(.slide-right) {
+  .word-in:not(.slide-left):not(.slide-right):not(.slide-left-out):not(.slide-right-out) {
     opacity: 0;
   }
 
-  [data-shop-photo]:not(.slide-left):not(.slide-right),
+  [data-shop-photo]:not(.slide-left):not(.slide-right):not(.slide-left-out):not(.slide-right-out),
   [data-offer-cta]:not(.slide-right) {
     opacity: 0;
   }

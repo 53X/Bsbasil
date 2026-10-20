@@ -86,33 +86,49 @@ export default function HeadlineMotion() {
         const from = el.hasAttribute('data-shop-photo')
           ? (el.dataset.side === 'right' ? 'right' : 'left')
           : dir;
+        piece.style.animation = '';
+        piece.style.opacity = '';
+        piece.style.transform = '';
         piece.style.animationDelay = `${Math.min(index, 8) * 0.11}s`;
+        piece.classList.remove('slide-left-out', 'slide-right-out');
         piece.classList.add(from === 'right' ? 'slide-right' : 'slide-left');
       });
     };
 
-    const showNow = (el: HTMLElement) => {
-      el.dataset.played = '1';
+    const hide = (el: HTMLElement) => {
+      if (el.dataset.played !== '1') return;
+      delete el.dataset.played;
       piecesOf(el).forEach((piece) => {
-        piece.style.animation = 'none';
-        piece.style.opacity = '1';
-        piece.style.transform = 'none';
+        const outgoing = piece.classList.contains('slide-right') ? 'slide-right-out' : 'slide-left-out';
+        piece.classList.remove('slide-left', 'slide-right');
+        piece.style.animation = '';
+        piece.style.animationDelay = '0s';
+        piece.classList.add(outgoing);
+      });
+      const card = el.closest('article');
+      card?.querySelectorAll<HTMLElement>('[data-offer-cta]').forEach((btn) => {
+        delete btn.dataset.played;
+        delete btn.dataset.held;
+        delete btn.dataset.heldAt;
+        btn.style.animation = '';
+        btn.style.opacity = '';
+        btn.style.transform = '';
+        btn.classList.remove('slide-right');
       });
     };
 
     const consider = (el: HTMLElement) => {
-      if (el.dataset.played === '1') return;
       if (!piecesOf(el).length) return;
       const box = el.getBoundingClientRect();
       if (box.height < 2) return;
       if (document.querySelector('[data-silk-intro]') && box.top < window.innerHeight && box.bottom > 0) return;
       const vh = window.innerHeight;
-      if (box.bottom < vh * 0.12 && box.top < 0) {
-        showNow(el);
+      const inView = box.top < vh * 0.96 && box.bottom > vh * 0.1;
+      if (inView) {
+        play(el);
         return;
       }
-      // Start as the line reaches the bottom edge, before it sits fully in view.
-      if (box.top < vh * 0.96 && box.bottom > vh * 0.08) play(el);
+      if (el.dataset.played === '1' && box.top > vh * 0.96) hide(el);
     };
 
     const watch = (el: HTMLElement) => {
@@ -187,13 +203,11 @@ export default function HeadlineMotion() {
     const tick = () => {
       armed.forEach(consider);
       offerButtons.forEach(syncOfferButton);
-      const waiting = armed.some((el) => el.dataset.played !== '1')
-        || offerButtons.some((el) => el.dataset.played !== '1');
-      if (waiting) {
-        frame = window.requestAnimationFrame(tick);
-      } else {
-        frame = 0;
-      }
+      frame = 0;
+    };
+    const onScroll = () => {
+      if (frame) return;
+      frame = window.requestAnimationFrame(tick);
     };
 
     scan();
@@ -202,11 +216,13 @@ export default function HeadlineMotion() {
     changes.observe(root, { childList: true, subtree: true });
     root.addEventListener('bs-line-change', scan);
     window.addEventListener('bs-motion-refresh', scan);
+    window.addEventListener('scroll', onScroll, { passive: true });
 
     return () => {
       changes.disconnect();
       root.removeEventListener('bs-line-change', scan);
       window.removeEventListener('bs-motion-refresh', scan);
+      window.removeEventListener('scroll', onScroll);
       if (frame) window.cancelAnimationFrame(frame);
       armed.forEach((el) => {
         delete el.dataset.played;
