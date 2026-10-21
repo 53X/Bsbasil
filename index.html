@@ -12,6 +12,19 @@
           }
         } catch (e) {}
         if (location.pathname !== '/') document.documentElement.classList.add('skip-boot');
+        var logo = document.createElement('link');
+        logo.rel = 'preload';
+        logo.as = 'image';
+        logo.href = '/logo-horizontal.webp';
+        document.head.appendChild(logo);
+        if (location.pathname === '/') {
+          var hero = document.createElement('link');
+          hero.rel = 'preload';
+          hero.as = 'image';
+          hero.href = '/hero-cube/romper-640.webp';
+          hero.setAttribute('fetchpriority', 'high');
+          document.head.appendChild(hero);
+        }
       })();
     </script>
     <meta name="referrer" content="same-origin" />
@@ -47,8 +60,15 @@
         justify-content: center;
         gap: 0.7rem;
         padding-inline: 1.25rem;
-        transform: translate3d(0, 46vh, 0);
-        animation: boot-rise 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        max-width: 100%;
+        flex-wrap: wrap;
+        opacity: 1;
+        transform: none;
+      }
+      @media (prefers-reduced-motion: no-preference) {
+        .boot-mark {
+          animation: boot-rise 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+        }
       }
       .boot-welcome {
         margin: 0;
@@ -70,53 +90,11 @@
         animation: boot-lift 0.85s cubic-bezier(0.76, 0, 0.24, 1) forwards;
       }
       @keyframes boot-rise {
-        to { transform: translate3d(0, 0, 0); }
+        from { opacity: 0; transform: translate3d(0, 1rem, 0); }
+        to { opacity: 1; transform: none; }
       }
       @keyframes boot-lift {
         to { transform: translate3d(0, -110%, 0); }
-      }
-      @media (prefers-reduced-motion: reduce) {
-        #boot { display: none !important; }
-      }
-      #hero-lcp {
-        position: absolute;
-        z-index: 2;
-        left: 1rem;
-        right: 1rem;
-        top: 23.8rem;
-        width: calc(100% - 2rem);
-        height: 26rem;
-        object-fit: contain;
-        object-position: center;
-        border-radius: 1.25rem;
-        background: #f4f1ea;
-      }
-      @media (min-width: 1024px) {
-        #hero-lcp {
-          position: fixed;
-          top: 4.2rem;
-          right: max(1rem, calc((100vw - 76rem) / 2));
-          left: auto;
-          width: min(58vw, 48rem);
-          height: calc(100dvh - 4.2rem);
-          object-fit: cover;
-          border-radius: 999px 999px 18px 18px;
-        }
-      }
-      #hero-lcp[data-still] {
-        position: absolute;
-        inset: 0;
-        top: 0;
-        right: 0;
-        bottom: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        max-width: none;
-        z-index: 1;
-        object-fit: cover;
-        object-position: center;
-        border-radius: inherit;
       }
       .hero-cube-scene {
         --cube: min(64vw, calc(100vw - 3.5rem), calc(100svh - 24rem), 17.5rem);
@@ -167,18 +145,9 @@
     <div id="boot" aria-hidden="true">
       <div class="boot-mark">
         <p class="boot-welcome">Welcome to</p>
-        <img class="boot-logo" src="/logo-horizontal.webp" alt="" width="248" height="72" decoding="async" />
+        <img class="boot-logo" src="/logo-horizontal.webp" alt="" width="248" height="72" decoding="async" fetchpriority="high" />
       </div>
     </div>
-    <img
-      id="hero-lcp"
-      src="/hero-cube/romper-640.webp"
-      alt="Rompers"
-      width="640"
-      height="800"
-      fetchpriority="high"
-      decoding="async"
-    />
     <script>
       (function () {
         var boot = document.getElementById('boot');
@@ -188,14 +157,14 @@
         function leave() {
           if (armed || !boot) return;
           armed = true;
-          var wait = Math.max(0, 820 - (performance.now() - started));
+          var wait = Math.max(0, 1400 - (performance.now() - started));
           setTimeout(function () {
             boot.classList.add('is-leave');
             setTimeout(function () { boot.remove(); }, 900);
           }, wait);
         }
         window.addEventListener('bs-boot-ready', leave, { once: true });
-        setTimeout(leave, 2000);
+        setTimeout(leave, 3200);
         boot.addEventListener('animationend', function (event) {
           if (event.animationName === 'boot-lift') boot.remove();
         });

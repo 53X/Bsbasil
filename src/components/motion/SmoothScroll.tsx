@@ -27,7 +27,7 @@ export default function SmoothScroll({ children }: { children: ReactNode }) {
         const lenis = new Lenis({
           lerp: 0.048,
           smoothWheel: true,
-          wheelMultiplier: 0.85,
+          wheelMultiplier: 0.833,
           syncTouch: false,
           prevent: (node) => Boolean(node.closest('[data-hscroll], [data-cube-control]')),
         });

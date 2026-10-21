@@ -40,6 +40,7 @@ export default function Header() {
               className="block h-auto max-h-9 w-auto max-w-[9.5rem] object-contain sm:max-h-11 sm:max-w-[180px]"
               width={180}
               height={48}
+              decoding="async"
             />
           </Link>
 

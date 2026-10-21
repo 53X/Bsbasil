@@ -50,7 +50,7 @@ const KINDS = [
     sub: 'For naps, nights, and every small trip in between.',
   },
   {
-    src: '/hero-cube/dungarees.jpg',
+    src: '/hero-cube/dungarees-640.jpg',
     label: 'Dungarees',
     href: '/catalog?category=Romper',
     lead: 'Play clothes',
@@ -66,7 +66,7 @@ const KINDS = [
     sub: 'A warm layer that still lets them play.',
   },
   {
-    src: '/hero-cube/party-wear.jpg',
+    src: '/hero-cube/party-wear-640.jpg',
     label: 'Party wear',
     href: '/catalog?category=Sets',
     lead: 'Dressed up',
@@ -112,10 +112,6 @@ export default function CinematicHero({ eyebrow }: { eyebrow: string }) {
   const rootRef = useRef<HTMLElement>(null);
   const faceRef = useRef(0);
   const [face, setFace] = useState(0);
-  const [restReady, setRestReady] = useState(false);
-  const [hasPoster] = useState(
-    () => typeof document !== 'undefined' && Boolean(document.getElementById('hero-lcp')),
-  );
 
   useEffect(() => {
     const root = rootRef.current;
@@ -166,7 +162,6 @@ export default function CinematicHero({ eyebrow }: { eyebrow: string }) {
           if (index !== faceRef.current) {
             faceRef.current = index;
             setFace(index);
-            setRestReady(true);
           }
           labels.forEach((label, i) => label.classList.toggle('is-on', i === index));
           faces.forEach((face, i) => {
@@ -314,44 +309,26 @@ export default function CinematicHero({ eyebrow }: { eyebrow: string }) {
   }, []);
 
   useLayoutEffect(() => {
-    const poster = document.getElementById('hero-lcp');
-    const face = rootRef.current?.querySelector('[data-cube-front]');
-    if (poster instanceof HTMLImageElement && face instanceof HTMLElement) {
-      poster.dataset.still = 'true';
-      poster.className = 'h-full w-full object-cover object-center';
-      poster.removeAttribute('style');
-      if (poster.parentElement !== face) face.prepend(poster);
-    }
     window.dispatchEvent(new Event('bs-boot-ready'));
   }, []);
 
   useEffect(() => {
-    const arm = () => {
-      if (window.scrollY > 24) setRestReady(true);
-    };
-    window.addEventListener('scroll', arm, { passive: true });
-    let cancelIdle = () => {};
-    if (typeof window.requestIdleCallback === 'function') {
-      const id = window.requestIdleCallback(() => setRestReady(true), { timeout: 4500 });
-      cancelIdle = () => window.cancelIdleCallback(id);
-    } else {
-      const id = window.setTimeout(() => setRestReady(true), 4500);
-      cancelIdle = () => window.clearTimeout(id);
-    }
     const next = KINDS[1]?.src;
+    if (!next) return;
+    let cancel = () => {};
     const warm = () => {
-      if (!next) return;
       const img = new Image();
       img.decoding = 'async';
       img.src = next;
     };
-    const poster = document.getElementById('hero-lcp');
-    if (poster instanceof HTMLImageElement && poster.complete) warm();
-    else poster?.addEventListener('load', warm, { once: true });
-    return () => {
-      cancelIdle();
-      window.removeEventListener('scroll', arm);
-    };
+    if (typeof window.requestIdleCallback === 'function') {
+      const id = window.requestIdleCallback(warm, { timeout: 2500 });
+      cancel = () => window.cancelIdleCallback(id);
+    } else {
+      const id = window.setTimeout(warm, 2500);
+      cancel = () => window.clearTimeout(id);
+    }
+    return cancel;
   }, []);
 
   return (
@@ -412,18 +389,22 @@ export default function CinematicHero({ eyebrow }: { eyebrow: string }) {
                       style={{ transform: FACE_TRANSFORM[index] }}
                       aria-hidden={index === 0 ? undefined : true}
                     >
-                      {index === 0 && hasPoster ? null : (
-                        <img
-                          alt={kind.label}
-                          src={index === 0 || restReady ? kind.src : undefined}
-                          width={720}
-                          height={900}
-                          decoding="async"
-                          fetchPriority="low"
-                          loading="lazy"
-                          className="h-full w-full object-cover object-center"
-                        />
-                      )}
+                      <img
+                        alt={kind.label}
+                        src={index === 0 ? '/hero-cube/romper-640.webp' : kind.src}
+                        srcSet={
+                          index === 0
+                            ? '/hero-cube/romper-640.webp 640w, /hero-cube/romper.webp 960w'
+                            : undefined
+                        }
+                        sizes="(min-width: 1024px) 24rem, 64vw"
+                        width={640}
+                        height={800}
+                        decoding="async"
+                        fetchPriority={index === 0 ? 'high' : 'low'}
+                        loading="eager"
+                        className="h-full w-full object-cover object-center"
+                      />
                     </div>
                   ))}
                 </div>

@@ -1,5 +1,6 @@
 import { Link } from 'react-router';
 import PriceTag from '@/components/PriceTag';
+import StoreImage from '@/components/StoreImage';
 import { ageLabel, discountBadge } from '@/lib/shopify/map';
 import type { StoreProduct } from '@/lib/shopify/types';
 
@@ -26,13 +27,13 @@ export default function ProductCard({
       <Link to={href} className="relative block aspect-[3/4] overflow-hidden bg-background">
         <span className="absolute inset-x-0 top-0 h-2" style={{ background: PANELS[index % PANELS.length] }} />
         {product.image ? (
-          <img
+          <StoreImage
             src={product.image}
             alt={product.alt}
             className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
             width={520}
             height={700}
-            loading="lazy"
+            sizes="(min-width: 1024px) 22rem, (min-width: 640px) 46vw, 92vw"
           />
         ) : (
           <div className="h-full w-full bg-muted" />

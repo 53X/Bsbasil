@@ -15,6 +15,7 @@ import { useAuth } from '@/contexts/auth-context';
 import { useCart } from '@/contexts/use-cart';
 import { savePendingPurchase } from '@/lib/pending-purchase';
 import PriceTag from '@/components/PriceTag';
+import StoreImage from '@/components/StoreImage';
 import { formatPrice } from '@/lib/stripe/format';
 
 export default function CartPage() {
@@ -121,10 +122,13 @@ export default function CartPage() {
                 >
                   {/* Product Image */}
                   {item.image ? (
-                    <img
+                    <StoreImage
                       src={item.image}
                       alt={item.name}
                       className="h-24 w-24 shrink-0 rounded-xl bg-muted object-contain"
+                      width={192}
+                      height={192}
+                      sizes="96px"
                     />
                   ) : (
                     <div className="w-24 h-24 rounded-xl flex items-center justify-center" style={{ background: 'hsl(var(--muted))' }}>

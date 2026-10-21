@@ -8,6 +8,7 @@ import { savePendingPurchase } from '@/lib/pending-purchase';
 import { photosForColour } from '@/lib/colour-photos';
 import { ageLabel, hasSelectableSizeOption, productRequiresSizeSelection, productSizeLabels, selectionForOption, variantForSelection } from '@/lib/shopify/map';
 import PriceTag from '@/components/PriceTag';
+import StoreImage from '@/components/StoreImage';
 import NotifyMe from '@/components/NotifyMe';
 import type { StoreColor, StoreMedia, StoreProduct, StoreCatalog } from '@/lib/shopify/types';
 
@@ -105,7 +106,14 @@ function ColorChoices({
               }}
             >
               {photo || swatch?.swatchImage ? (
-                <img src={photo || swatch?.swatchImage} alt="" className="w-full h-full object-cover rounded-md" />
+                <StoreImage
+                  src={photo || swatch?.swatchImage || ''}
+                  alt=""
+                  className="w-full h-full object-cover rounded-md"
+                  width={128}
+                  height={128}
+                  sizes="64px"
+                />
               ) : (
                 <span className="block w-full h-full rounded-md" style={{ background: fill || 'hsl(var(--muted))' }} />
               )}
@@ -203,12 +211,14 @@ function MediaFrame({ item }: { item: StoreMedia }) {
     );
   }
   return (
-    <img
-      src={item.url || item.poster}
+    <StoreImage
+      src={item.url || item.poster || ''}
       alt={item.alt}
       className="h-full w-full object-contain"
-      width={800}
-      height={800}
+      width={960}
+      height={960}
+      sizes="(min-width: 1024px) 36rem, 92vw"
+      priority
     />
   );
 }
@@ -404,7 +414,14 @@ export default function ProductPage() {
                     style={{ borderColor: index === mediaIndex ? 'hsl(var(--primary))' : 'hsl(var(--border))' }}
                     aria-label={item.kind === 'image' ? 'Show photo' : 'Play video'}
                   >
-                    <img src={item.kind === 'image' ? item.url : item.poster || item.url} alt="" className="h-full w-full object-contain" />
+                    <StoreImage
+                      src={(item.kind === 'image' ? item.url : item.poster || item.url) || ''}
+                      alt=""
+                      className="h-full w-full object-contain"
+                      width={128}
+                      height={128}
+                      sizes="64px"
+                    />
                   </button>
                 ))}
               </div>
