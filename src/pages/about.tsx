@@ -1,8 +1,8 @@
 import { useEffect } from 'react';
-import { about } from 'virtual:content';
 import { Helmet } from '@dr.pogodin/react-helmet';
-import { Link } from 'react-router';
+import { Link, useLoaderData } from 'react-router';
 import { Leaf, Heart, Globe, ShieldCheck, Sparkles, Baby, Recycle } from 'lucide-react';
+import type { StoreAbout } from '@/lib/shopify/types';
 
 const valuesMeta = [
   {
@@ -31,12 +31,14 @@ const badgesMeta = [
   },
 ];
 
-export default function AboutPage() {
+export function AboutView({ content, embedded = false }: { content: StoreAbout; embedded?: boolean }) {
   const siteUrl = 'https://bsbasil.com';
   const pageUrl = `${siteUrl}/about`;
+  const Frame = embedded ? 'div' : 'main';
 
   return (
     <>
+      {embedded ? null : (
       <Helmet>
         <title>About Bsbasil — Indian Baby Clothing Brand for Ages 0–3</title>
         <meta
@@ -69,7 +71,8 @@ export default function AboutPage() {
           inLanguage: 'en-IN',
         }).replace(/</g, '\\u003c')}</script>
       </Helmet>
-      <main data-script-ink>
+      )}
+      <Frame data-script-ink>
         <AboutReveal />
         {/* ── Hero ── */}
         <section className="relative" style={{ background: 'hsl(var(--muted))' }}>
@@ -91,31 +94,31 @@ export default function AboutPage() {
                 className="text-sm font-semibold tracking-wide mb-sm"
                 style={{ color: 'hsl(var(--brand-ink))' }}
               >
-                Our Story
+                {content.eyebrow}
               </p>
               <h1
                 data-about-reveal
                 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-lg leading-[1.05]"
                 style={{ color: 'hsl(var(--foreground))' }}
               >
-                Made with Love,
-                <em className="mt-[0.55em] block text-[0.92em] leading-[1.15]">Worn with Joy</em>
+                {content.heading}
+                {content.headingAccent ? (
+                  <em className="mt-[0.55em] block text-[0.92em] leading-[1.15]">{content.headingAccent}</em>
+                ) : null}
               </h1>
               <p
                 data-about-reveal
                 className="text-lg md:text-xl max-w-2xl mx-auto mb-lg"
                 style={{ color: 'hsl(var(--mutedForeground, var(--muted-foreground)))' }}
               >
-                Bsbasil was born from a simple belief — every little one deserves clothes that are{' '}
-                <span className="italic-accent text-[1.35em] leading-none">as gentle as they are adorable</span>.
+                <AccentText text={content.lede} phrase="as gentle as they are adorable" />
               </p>
               <p
                 data-about-reveal
                 className="text-base max-w-xl mx-auto"
                 style={{ color: 'hsl(var(--muted-foreground))' }}
               >
-                Founded by parents, for parents. We design every piece with tiny humans in mind —
-                soft fabrics, safe dyes, and thoughtful fits that grow with your baby.
+                {content.story}
               </p>
             </div>
           </div>
@@ -126,31 +129,37 @@ export default function AboutPage() {
           <div className="max-w-content mx-auto px-4">
             <div data-about-reveal className="text-center mb-xl">
               <h2 className="text-3xl md:text-4xl font-bold mb-sm leading-[1.05]" style={{ color: 'hsl(var(--foreground))' }}>
-                What We
-                <em className="mt-[0.55em] block text-[0.92em] leading-[1.15]">Stand For</em>
+                {content.valuesHeading}
+                {content.valuesHeadingAccent ? (
+                  <em className="mt-[0.55em] block text-[0.92em] leading-[1.15]">{content.valuesHeadingAccent}</em>
+                ) : null}
               </h2>
               <p className="text-base" style={{ color: 'hsl(var(--muted-foreground))' }}>
-                Every Bsbasil piece is guided by{' '}
-                <span className="italic-accent text-[1.45em] leading-none">three core promises</span>.
+                <AccentText text={content.valuesIntro} phrase="three core promises" />
               </p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-base">
-              {about.values.map((v, _airoIdx) => {
-                const Icon = valuesMeta[_airoIdx].icon;
+              {content.values.map((v, _airoIdx) => {
+                const Icon = valuesMeta[_airoIdx % valuesMeta.length].icon;
+                const tone = [
+                  { color: 'hsl(var(--success))', bg: 'hsl(var(--muted))' },
+                  { color: 'hsl(var(--primary))', bg: 'hsl(var(--card))' },
+                  { color: 'hsl(var(--info))', bg: 'hsl(var(--muted))' },
+                ][_airoIdx % 3];
 
                 return (
                   <div
                     key={v.title}
                     data-about-reveal
                     className="rounded-2xl p-lg flex flex-col items-center text-center border"
-                    style={{ background: v.bg, borderColor: 'hsl(var(--border))' }}
+                    style={{ background: tone.bg, borderColor: 'hsl(var(--border))' }}
                   >
                     <div
                       className="w-14 h-14 rounded-full flex items-center justify-center mb-base"
                       style={{ background: 'hsl(var(--background))' }}
                     >
-                      <Icon size={28} style={{ color: v.color }} />
+                      <Icon size={28} style={{ color: tone.color }} />
                     </div>
                     <h3 className="italic-accent mb-sm text-[clamp(1.7rem,2.5vw,2.15rem)] leading-[1.2]">
                       {v.title}
@@ -177,27 +186,26 @@ export default function AboutPage() {
                 className="text-3xl md:text-4xl font-bold mb-base leading-[1.05]"
                 style={{ color: 'hsl(var(--foreground))' }}
               >
-                Our Safety
-                <em className="mt-[0.55em] block text-[0.92em] leading-[1.15]">Promise</em>
+                {content.safetyHeading}
+                {content.safetyHeadingAccent ? (
+                  <em className="mt-[0.55em] block text-[0.92em] leading-[1.15]">{content.safetyHeadingAccent}</em>
+                ) : null}
               </h2>
               <p
                 data-about-reveal
                 className="text-base md:text-lg max-w-2xl mx-auto mb-xl leading-relaxed"
                 style={{ color: 'hsl(var(--muted-foreground))' }}
               >
-                Every Bsbasil garment is tested to meet international baby safety standards. We use
-                only OEKO-TEX® certified fabrics — free from harmful chemicals, dyes, and
-                irritants. Because your baby's skin deserves{' '}
-                <span className="italic-accent text-[1.35em] leading-none">nothing less</span>.
+                <AccentText text={content.safetyBody} phrase="nothing less" />
               </p>
 
               <div className="flex flex-wrap justify-center gap-base">
-                {about.badges.map((b, _airoIdx) => {
-                  const Icon = badgesMeta[_airoIdx].icon;
+                {content.badges.map((label, _airoIdx) => {
+                  const Icon = badgesMeta[_airoIdx % badgesMeta.length].icon;
 
                   return (
                     <div
-                      key={b.label}
+                      key={label}
                       data-about-reveal
                       className="flex items-center gap-sm px-lg py-sm rounded-full border font-medium text-sm"
                       style={{
@@ -207,7 +215,7 @@ export default function AboutPage() {
                       }}
                     >
                       <Icon size={18} style={{ color: 'hsl(var(--brand-ink))' }} />
-                      <span>{b.label}</span>
+                      <span>{label}</span>
                     </div>
                   );
                 })}
@@ -233,20 +241,16 @@ export default function AboutPage() {
               </div>
               <div data-about-reveal className="text-center md:text-left">
                 <p className="text-sm font-semibold mb-sm" style={{ color: 'hsl(var(--brand-ink))' }}>
-                  A note from our founder
+                  {content.founderEyebrow}
                 </p>
                 <blockquote
                   className="text-xl md:text-2xl font-medium leading-relaxed mb-base"
                   style={{ color: 'hsl(var(--foreground))' }}
                 >
-                  "When my daughter was born, I couldn't find clothes that were truly soft, safe,
-                  and beautiful all at once. So I made them.{' '}
-                  <span className="italic-accent text-[1.2em] leading-[1.35]">
-                    Bsbasil is my love letter to every parent who wants the very best for their little one."
-                  </span>
+                  “<AccentText text={content.founderQuote} phrase="Bsbasil is my love letter to every parent who wants the very best for their little one." />”
                 </blockquote>
                 <p className="font-semibold" style={{ color: 'hsl(var(--muted-foreground))' }}>
-                  — Founder, Bsbasil
+                  — {content.founderName}
                 </p>
               </div>
             </div>
@@ -261,33 +265,50 @@ export default function AboutPage() {
               className="text-3xl md:text-4xl font-bold mb-base leading-[1.05]"
               style={{ color: 'hsl(var(--foreground))' }}
             >
-              Dress your little one
-              <em className="mt-[0.55em] block text-[0.92em] leading-[1.15]">in love</em>
+              {content.ctaHeading}
+              {content.ctaHeadingAccent ? (
+                <em className="mt-[0.55em] block text-[0.92em] leading-[1.15]">{content.ctaHeadingAccent}</em>
+              ) : null}
             </h2>
             <p
               data-about-reveal
               className="text-lg mb-lg"
               style={{ color: 'hsl(var(--muted-foreground))' }}
             >
-              Explore our collection of{' '}
-              <span className="italic-accent text-[1.35em] leading-none">soft, safe, and adorable</span>{' '}
-              clothes for ages 0–3.
+              <AccentText text={content.ctaBody} phrase="soft, safe, and adorable" />
             </p>
             <div data-about-reveal>
               <Link
-                to="/catalog"
+                to={content.ctaHref}
                 className="inline-block px-xl py-base rounded-full font-bold text-base transition-transform hover:scale-105"
                 style={{
                   background: 'hsl(var(--primary))',
                   color: 'hsl(var(--primary-foreground))',
                 }}
               >
-                Shop Now
+                {content.ctaLabel}
               </Link>
             </div>
           </div>
         </section>
-      </main>
+      </Frame>
+    </>
+  );
+}
+
+export default function AboutPage() {
+  const content = useLoaderData() as StoreAbout;
+  return <AboutView content={content} />;
+}
+
+function AccentText({ text, phrase }: { text: string; phrase: string }) {
+  const index = text.indexOf(phrase);
+  if (index < 0) return <>{text}</>;
+  return (
+    <>
+      {text.slice(0, index)}
+      <span className="italic-accent text-[1.35em] leading-none">{phrase}</span>
+      {text.slice(index + phrase.length)}
     </>
   );
 }

@@ -105,8 +105,10 @@ export default function ArrivalRail({
       <div data-arrival-stage className="sticky top-[6.25rem] py-6 sm:py-8">
         <div className="mx-auto mb-5 flex w-full max-w-content items-end justify-between gap-4 px-4">
           <h2 className="max-w-full text-[clamp(2.2rem,4vw,3.75rem)] leading-none">
-            <span className="align-baseline">{lead}</span>{' '}
-            <em className="ml-[0.12em] inline-block align-baseline text-[1.05em] leading-none">{accent}</em>
+            <span className="align-baseline">{lead}</span>
+            {accent ? (
+              <em className="ml-[0.12em] inline-block align-baseline text-[1.05em] leading-none">{accent}</em>
+            ) : null}
           </h2>
           <Link
             to={href}

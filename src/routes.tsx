@@ -1,6 +1,6 @@
 import { Navigate, redirect, type RouteObject } from 'react-router';
 import HomePage from './pages/index';
-import { catalogLoader, homeLoader, productLoader } from './lib/shopify/storefront';
+import { aboutLoader, catalogLoader, contactLoader, homeLoader, productLoader } from './lib/shopify/storefront';
 // Eager import so renderToString doesn't hit a Suspense boundary on 404 routes
 // and abort to client rendering. The prod 404 page is tiny; the dev-tools
 // variant stays lazy because it pulls in dev-only code we don't want in
@@ -17,6 +17,7 @@ export const routes: RouteObject[] = [
   },
   {
     path: '/about',
+    loader: aboutLoader,
     lazy: () => import('./pages/about').then((m) => ({ Component: m.default })),
   },
   {
@@ -40,6 +41,7 @@ export const routes: RouteObject[] = [
   },
   {
     path: '/contact',
+    loader: contactLoader,
     lazy: () => import('./pages/contact').then((m) => ({ Component: m.default })),
   },
   {

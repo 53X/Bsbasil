@@ -464,6 +464,7 @@ export interface RawProductNode {
   collections?: { nodes: { title: string }[] };
   media?: { nodes: RawMediaNode[] };
   variants?: { nodes: RawVariantNode[] };
+  discountCode?: { value?: string | null } | null;
 }
 
 function mapMedia(node: RawMediaNode, fallbackAlt: string): StoreMedia | null {
@@ -663,6 +664,7 @@ export function mapProduct(node: RawProductNode): StoreProduct {
     priceLabel: formatMoney(price / 100, currency),
     image,
     alt: node.featuredImage?.altText || node.title,
+    discountCode: node.discountCode?.value?.trim() || "",
     available: node.availableForSale,
     media: media.length > 0 ? media : image ? [{ kind: "image", url: image, alt: node.title }] : [],
     options: mapOptions(node.options),

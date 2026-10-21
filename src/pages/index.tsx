@@ -7,14 +7,20 @@ import ArrivalRail from '@/components/motion/ArrivalRail';
 import CinematicHero from '@/components/motion/CinematicHero';
 import Marquee from '@/components/motion/Marquee';
 import MoodRail from '@/components/motion/MoodRail';
-import type { StoreCatalog, StoreProduct, StorePromotion } from '@/lib/shopify/types';
+import type { StoreBestsellerSection, StoreCatalog, StorePromotion } from '@/lib/shopify/types';
 
 export default function HomePage() {
   const siteUrl = 'https://bsbasil.com';
-  const store = useLoaderData() as StoreCatalog & { promotions: StorePromotion[]; bestsellers?: StoreProduct[] };
+  const store = useLoaderData() as StoreCatalog & {
+    promotions: StorePromotion[];
+    bestsellers?: StoreBestsellerSection;
+  };
   const promotions = store.promotions ?? [];
-  const arrivals = store.products ?? [];
-  const bestsellers = store.bestsellers ?? [];
+  const bestsellers = store.bestsellers?.products ?? [];
+  const bestsellerIds = new Set(bestsellers.map((product) => product.id));
+  const arrivals = (store.products ?? []).filter((product) => !bestsellerIds.has(product.id));
+  const bestsellerLead = store.bestsellers?.lead || 'BEST';
+  const bestsellerAccent = store.bestsellers?.accent || 'SELLERS';
   const ageRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
@@ -188,7 +194,7 @@ export default function HomePage() {
         <ArrivalRail products={arrivals} />
 
         {bestsellers.length > 0 ? (
-          <ArrivalRail id="bestsellers" products={bestsellers} lead="BEST" accent="SELLERS" />
+          <ArrivalRail id="bestsellers" products={bestsellers} lead={bestsellerLead} accent={bestsellerAccent} />
         ) : null}
 
         <section className="py-16">
@@ -263,7 +269,7 @@ function PromotionCard({ promotion, index }: { promotion: StorePromotion; index:
               {promotion.offer}
             </p>
           ) : null}
-          <h3 className="text-[clamp(1.98rem,4.4vw,3.74rem)] leading-[0.92]">{promotion.heading}</h3>
+          <h3 className="text-[clamp(1.98rem,4.4vw,3.74rem)] leading-[0.92]">{promotion.heading || promotion.productName}</h3>
           {promotion.message ? (
             <p className="italic-accent mt-5 max-w-md text-[clamp(1.45rem,2.6vw,2rem)] leading-[1.25]">
               {promotion.message}
@@ -296,3 +302,4 @@ function PromotionCard({ promotion, index }: { promotion: StorePromotion; index:
     </article>
   );
 }
+
