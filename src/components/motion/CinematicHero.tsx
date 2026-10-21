@@ -221,10 +221,13 @@ export default function CinematicHero({ eyebrow }: { eyebrow: string }) {
           return box.bottom > 80 && box.top < window.innerHeight;
         };
 
+        const scrollDrivesCube = () => window.matchMedia('(min-width: 1024px)').matches;
+
         const onScroll = () => {
           const y = window.scrollY;
           const dy = y - lastScroll;
           lastScroll = y;
+          if (!scrollDrivesCube()) return;
           if (performance.now() < ignoreScrollUntil) return;
           if (!heroVisible()) return;
           if (Math.abs(dy) < 6) return;
@@ -238,6 +241,7 @@ export default function CinematicHero({ eyebrow }: { eyebrow: string }) {
         }
 
         const onWheel = (event: WheelEvent) => {
+          if (!scrollDrivesCube()) return;
           if (event.target instanceof Element && event.target.closest('[data-cube-control]')) return;
           const delta = event.deltaY + event.deltaX;
           if (!delta || !heroVisible() || !pageBlocked(delta)) return;
@@ -351,8 +355,8 @@ export default function CinematicHero({ eyebrow }: { eyebrow: string }) {
   }, []);
 
   return (
-    <section ref={rootRef} className="relative h-[360svh] bg-background sm:h-[420svh] lg:h-[480vh]">
-      <div className="hero-stage sticky top-[6.25rem] mx-auto grid h-[calc(100svh-6.25rem)] max-w-content grid-rows-[auto_minmax(0,1fr)] items-stretch gap-3 overflow-visible px-4 py-3 sm:gap-4 sm:py-5 lg:h-[calc(100dvh-6.25rem)] lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:grid-rows-none lg:items-center lg:gap-8">
+    <section ref={rootRef} className="relative h-auto bg-background lg:h-[480vh]">
+      <div className="hero-stage relative mx-auto grid h-auto max-w-content grid-rows-[auto_auto] items-start gap-3 overflow-visible px-4 py-3 sm:gap-4 sm:py-5 lg:sticky lg:top-[6.25rem] lg:h-[calc(100dvh-6.25rem)] lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:grid-rows-none lg:items-center lg:gap-8">
         <p data-watermark className="watermark" aria-hidden="true">
           COLOUR
         </p>
@@ -394,7 +398,7 @@ export default function CinematicHero({ eyebrow }: { eyebrow: string }) {
             </Link>
           </div>
         </div>
-        <div className="hero-cube-column relative z-10 flex min-h-0 w-full flex-col items-center justify-center lg:h-full">
+        <div className="hero-cube-column relative z-10 mb-14 flex h-[var(--cube)] w-[var(--cube)] max-w-full shrink-0 flex-col items-center justify-center self-center justify-self-center lg:mb-0 lg:h-full lg:w-full lg:max-w-none lg:shrink lg:self-stretch lg:justify-self-stretch">
           <div data-hero-photo className="hero-cube-scene" aria-hidden="true">
             <div className="hero-cube-tilt">
               <div data-cube-rig className="hero-cube-rig">
