@@ -1,6 +1,7 @@
 import { shopifyConfig } from "./config";
-import { applyCartDiscounts, applyPromotionOffers, htmlToText, mapProduct, mapShopRules, promotionOfferForHandle, saleFromOffer, type RawProductNode } from "./map";
-import type { ShopRules, StoreCart, StoreCatalog, StorePolicy, StoreProduct, StorePromotion } from "./types";
+import { applyCartDiscounts, applyPromotionOffers, discountBadge, htmlToText, mapProduct, mapShopRules, promotionOfferForHandle, saleFromOffer, type RawProductNode } from "./map";
+import { bestsellerProducts, FALLBACK_ABOUT, FALLBACK_BESTSELLER_TITLE, FALLBACK_CONTACT, fieldText, mapAbout, mapContact, type MetaobjectFieldNode } from "./site-content";
+import type { ShopRules, StoreAbout, StoreBestsellerSection, StoreCart, StoreCatalog, StoreContact, StorePolicy, StoreProduct, StorePromotion } from "./types";
 
 const PRODUCT_FIELDS = `
   id
@@ -77,6 +78,7 @@ const PRODUCT_FIELDS = `
       image { url altText }
     }
   }
+  discountCode: metafield(namespace: "custom", key: "discount_code") { value }
 `;
 
 const CART_FIELDS = `
@@ -343,7 +345,7 @@ function mapCart(cart: NonNullable<CartPayload["cart"]>): StoreCart {
 
 const DISCOUNT_PREVIEW_CHUNK = 50;
 
-async function previewDiscountChunk(variantIds: string[]) {
+async function previewDiscountChunk(variantIds: string[], codes: string[] = []) {
   const data = await storefront<{
     cartCreate: {
       cart: {
@@ -358,8 +360,8 @@ async function previewDiscountChunk(variantIds: string[]) {
       } | null;
     };
   }>(
-    `mutation Preview($lines: [CartLineInput!]!) {
-      cartCreate(input: { lines: $lines }) {
+    `mutation Preview($lines: [CartLineInput!]!, $codes: [String!]) {
+      cartCreate(input: { lines: $lines, discountCodes: $codes }) {
         cart {
           lines(first: ${DISCOUNT_PREVIEW_CHUNK}) {
             nodes {
@@ -378,7 +380,7 @@ async function previewDiscountChunk(variantIds: string[]) {
         }
       }
     }`,
-    { lines: variantIds.map((merchandiseId) => ({ merchandiseId, quantity: 1 })) },
+    { lines: variantIds.map((merchandiseId) => ({ merchandiseId, quantity: 1 })), codes },
   );
   return (data.cartCreate.cart?.lines.nodes ?? []).map((line) => ({
     variantId: line.merchandise.id,
@@ -387,6 +389,39 @@ async function previewDiscountChunk(variantIds: string[]) {
     subtotalAmount: line.cost.subtotalAmount.amount,
     title: line.discountAllocations.map((allocation) => allocation.title || allocation.code).filter(Boolean).join(", ") || null,
   }));
+}
+
+/** Order-wide codes, such as FIRSTPURCHASE, change the cart total rather than one line. */
+async function previewPromotionCode(variantIds: string[], code: string) {
+  const lines = await previewDiscountChunk(variantIds, [code]);
+  const data = await storefront<{
+    cartCreate: {
+      cart: {
+        discountCodes: Array<{ code: string; applicable: boolean }>;
+        cost: { totalAmount: { amount: string }; subtotalAmount: { amount: string } };
+      } | null;
+    };
+  }>(
+    `mutation PreviewOrder($lines: [CartLineInput!]!, $codes: [String!]) {
+      cartCreate(input: { lines: $lines, discountCodes: $codes }) {
+        cart {
+          discountCodes { code applicable }
+          cost { totalAmount { amount } subtotalAmount { amount } }
+        }
+      }
+    }`,
+    { lines: variantIds.slice(0, 1).map((merchandiseId) => ({ merchandiseId, quantity: 1 })), codes: [code] },
+  );
+  const cart = data.cartCreate.cart;
+  const subtotal = Number(cart?.cost.subtotalAmount.amount);
+  const total = Number(cart?.cost.totalAmount.amount);
+  const applicable = cart?.discountCodes.some((entry) => entry.applicable) ?? false;
+  let orderOffer: string | null = null;
+  if (applicable && subtotal > total) {
+    const pct = Math.round(((subtotal - total) / subtotal) * 100);
+    if (pct > 0 && pct < 100) orderOffer = `${pct}% off`;
+  }
+  return { lines, orderOffer };
 }
 
 async function previewProductDiscounts(products: StoreProduct[]): Promise<StoreProduct[]> {
@@ -525,6 +560,16 @@ interface PromotionField {
     image?: { url: string; altText?: string | null } | null;
     sources?: { url: string; mimeType?: string | null }[];
     previewImage?: { url: string } | null;
+    products?: { nodes: RawProductNode[] } | null;
+    id?: string;
+    handle?: string;
+    title?: string;
+    discountCode?: { value?: string | null } | null;
+    featuredImage?: { url?: string | null; altText?: string | null } | null;
+    variants?: RawProductNode["variants"];
+    media?: RawProductNode["media"];
+    tags?: string[];
+    availableForSale?: boolean;
   } | null;
 }
 
@@ -539,22 +584,72 @@ function fieldReference(fields: PromotionField[], key: string) {
 function mapPromotion(node: { id: string; fields: PromotionField[] }): StorePromotion[] {
   const fields = node.fields;
   const heading = fieldValue(fields, "heading");
-  if (!heading) return [];
   const picture = fieldReference(fields, "picture");
   const clip = fieldReference(fields, "clip");
+  const collection = fieldReference(fields, "collection");
+  const productReference = fieldReference(fields, "product");
+  const product = productReference?.handle ? mapProduct(productReference as RawProductNode) : null;
   const video = clip?.sources?.find((source) => source.url)?.url || null;
+  if (!heading && !product) return [];
   return [{
     id: node.id,
-    heading,
+    heading: heading || product?.name || "",
     message: fieldValue(fields, "message"),
-    offer: fieldValue(fields, "offer"),
+    offer: "",
     buttonLabel: fieldValue(fields, "button_label") || "Shop now",
-    href: fieldValue(fields, "link") || "/catalog",
-    imageUrl: picture?.image?.url || null,
-    imageAlt: picture?.image?.altText || heading,
-    videoUrl: video,
-    posterUrl: clip?.previewImage?.url || picture?.image?.url || null,
+    href: product ? `/products/${product.handle}` : fieldValue(fields, "link") || "/catalog",
+    imageUrl: product?.image || picture?.image?.url || null,
+    imageAlt: product?.alt || picture?.image?.altText || heading,
+    videoUrl: product ? null : video,
+    posterUrl: product ? null : clip?.previewImage?.url || picture?.image?.url || null,
+    productName: product?.name || "",
+    discountCode: fieldValue(fields, "discount_code") || product?.discountCode || "",
+    products: product
+      ? [product]
+      : (collection?.products?.nodes ?? []).map((item) => mapProduct(item)),
   }];
+}
+
+/** The amount off is whatever Shopify calculates for the discount code on this card. */
+async function applyPromotionDiscountCodes(promotions: StorePromotion[]): Promise<StorePromotion[]> {
+  const next: StorePromotion[] = [];
+  for (const promotion of promotions) {
+    const sample = promotion.products.find((product) => product.variants.some((variant) => variant.available));
+    if (!promotion.discountCode || !sample) {
+      next.push(promotion);
+      continue;
+    }
+    const targets = promotion.productName ? promotion.products : [sample];
+    const variantIds = targets
+      .flatMap((product) => product.variants.filter((variant) => variant.available).map((variant) => variant.id))
+      .slice(0, DISCOUNT_PREVIEW_CHUNK);
+    if (variantIds.length === 0) {
+      next.push(promotion);
+      continue;
+    }
+    try {
+      const { lines, orderOffer } = await previewPromotionCode(variantIds, promotion.discountCode);
+      const priced = applyCartDiscounts(targets, lines);
+      const product = priced[0];
+      const lineOffer = product ? discountBadge(product.price, product.compareAtPrice, product.discountTitle) : null;
+      const offer = lineOffer || orderOffer || "";
+      if (promotion.productName && product) {
+        next.push({
+          ...promotion,
+          offer: offer || "",
+          imageUrl: product.image || promotion.imageUrl,
+          imageAlt: product.alt || promotion.imageAlt,
+          productName: product.name,
+          products: priced,
+        });
+      } else {
+        next.push({ ...promotion, offer: offer || "" });
+      }
+    } catch {
+      next.push(promotion);
+    }
+  }
+  return next;
 }
 
 export async function loadPromotions(): Promise<StorePromotion[]> {
@@ -580,6 +675,10 @@ export async function loadPromotions(): Promise<StorePromotion[]> {
                 reference {
                   ... on MediaImage { image { url altText } }
                   ... on Video { sources { url mimeType } previewImage { url } }
+                  ... on Collection {
+                    products(first: 24) { nodes { ${PRODUCT_FIELDS} } }
+                  }
+                  ... on Product { ${PRODUCT_FIELDS} }
                 }
               }
             }
@@ -592,13 +691,84 @@ export async function loadPromotions(): Promise<StorePromotion[]> {
       if (!data.metaobjects.pageInfo.hasNextPage || !nextCursor || nextCursor === cursor) break;
       cursor = nextCursor;
     }
-    return promotions;
+    return applyPromotionDiscountCodes(promotions);
   } catch {
     return promotions;
   }
 }
 
 const BESTSELLER_HANDLES = ['bestsellers', 'best-sellers'];
+
+const METAOBJECT_FIELDS = `
+  key
+  value
+  reference {
+    ... on Collection {
+      handle
+      products(first: 24) { nodes { ${PRODUCT_FIELDS} } }
+    }
+  }
+  references(first: 20) {
+    nodes {
+      ... on Metaobject {
+        fields { key value }
+      }
+    }
+  }
+`;
+
+async function loadMetaobject(type: string, handle: string): Promise<MetaobjectFieldNode[] | null> {
+  if (!shopifyConfig()) return null;
+  const data = await storefront<{
+    metaobject: { fields: MetaobjectFieldNode[] } | null;
+  }>(
+    `query SiteMetaobject($handle: MetaobjectHandleInput!) {
+      metaobject(handle: $handle) { fields { ${METAOBJECT_FIELDS} } }
+    }`,
+    { handle: { type, handle } },
+  );
+  return data.metaobject?.fields ?? null;
+}
+
+/** About page copy from the `about_page` metaobject. Add story points, then attach them under Values. */
+export async function loadAboutPage(): Promise<StoreAbout> {
+  try {
+    const fields = await loadMetaobject('about_page', 'about');
+    return (fields && mapAbout(fields)) || FALLBACK_ABOUT;
+  } catch {
+    return FALLBACK_ABOUT;
+  }
+}
+
+/** Contact page copy from the `contact_page` metaobject. */
+export async function loadContactPage(): Promise<StoreContact> {
+  try {
+    const fields = await loadMetaobject('contact_page', 'contact');
+    return (fields && mapContact(fields)) || FALLBACK_CONTACT;
+  } catch {
+    return FALLBACK_CONTACT;
+  }
+}
+
+/** Products from the collection on the Bestseller section metaobject, then the Bestsellers collection. */
+export async function loadBestsellerSection(): Promise<StoreBestsellerSection> {
+  const empty: StoreBestsellerSection = { ...FALLBACK_BESTSELLER_TITLE, products: [] };
+  if (!shopifyConfig()) return empty;
+  try {
+    const fields = await loadMetaobject('bestseller_section', 'bestsellers');
+    if (fields) {
+      const products = bestsellerProducts(fields, (node) => mapProduct(node as RawProductNode));
+      return {
+        lead: fieldText(fields, 'lead') || FALLBACK_BESTSELLER_TITLE.lead,
+        accent: fieldText(fields, 'accent') || FALLBACK_BESTSELLER_TITLE.accent,
+        products,
+      };
+    }
+  } catch {
+    /* fall through to the collection handle */
+  }
+  return { ...FALLBACK_BESTSELLER_TITLE, products: await loadBestsellers() };
+}
 
 /** Products from the Shopify collection named Bestsellers. Reorder or swap them in Admin. */
 export async function loadBestsellers(): Promise<StoreProduct[]> {
@@ -628,14 +798,28 @@ export async function homeLoader() {
   const [catalog, promotions, bestsellers] = await Promise.all([
     loadCatalog(),
     loadPromotions(),
-    loadBestsellers(),
+    loadBestsellerSection(),
   ]);
   return {
     ...catalog,
     products: applyPromotionOffers(catalog.products, promotions),
-    bestsellers: applyPromotionOffers(bestsellers, promotions),
-    promotions,
+    bestsellers: {
+      ...bestsellers,
+      products: applyPromotionOffers(bestsellers.products, promotions),
+    },
+    promotions: promotions.map((promotion) => ({
+      ...promotion,
+      products: applyPromotionOffers(promotion.products, promotions),
+    })),
   };
+}
+
+export async function aboutLoader() {
+  return loadAboutPage();
+}
+
+export async function contactLoader() {
+  return loadContactPage();
 }
 
 export async function productLoader({ params }: { params: { handle?: string } }) {

@@ -66,6 +66,8 @@ export interface StoreProduct {
   priceLabel: string;
   image: string;
   alt: string;
+  /** Coupon code from the product. The amount off is calculated from that Shopify discount. */
+  discountCode?: string;
   available: boolean;
   media: StoreMedia[];
   options: StoreOption[];
@@ -92,6 +94,67 @@ export interface StorePromotion {
   imageAlt: string;
   videoUrl: string | null;
   posterUrl: string | null;
+  /** Name of the product chosen on this entry. */
+  productName: string;
+  /** Coupon code on that product, when one is set. */
+  discountCode: string;
+  /** Products from the collection chosen on this Homepage promotion entry. */
+  products: StoreProduct[];
+}
+
+/** Story, values, and founder note. Edited as the About page metaobject in Shopify. */
+export interface StoreAbout {
+  eyebrow: string;
+  heading: string;
+  headingAccent: string;
+  lede: string;
+  story: string;
+  valuesHeading: string;
+  valuesHeadingAccent: string;
+  valuesIntro: string;
+  values: { title: string; description: string }[];
+  safetyHeading: string;
+  safetyHeadingAccent: string;
+  safetyBody: string;
+  badges: string[];
+  founderEyebrow: string;
+  founderQuote: string;
+  founderName: string;
+  ctaHeading: string;
+  ctaHeadingAccent: string;
+  ctaBody: string;
+  ctaLabel: string;
+  ctaHref: string;
+}
+
+/** Contact details and form copy. Edited as the Contact page metaobject in Shopify. */
+export interface StoreContact {
+  eyebrow: string;
+  heading: string;
+  headingAccent: string;
+  subheading: string;
+  detailsHeading: string;
+  detailsBody: string;
+  email: string;
+  phone: string;
+  phoneHref: string;
+  location: string;
+  hours: string;
+  responseTime: string;
+  trustLabel: string;
+  trustBody: string;
+  formHeading: string;
+  formHeadingAccent: string;
+  successHeading: string;
+  successBody: string;
+  successCta: string;
+}
+
+/** Homepage bestseller rail. The collection is chosen on the Bestseller section metaobject. */
+export interface StoreBestsellerSection {
+  lead: string;
+  accent: string;
+  products: StoreProduct[];
 }
 
 export interface StoreCatalog {

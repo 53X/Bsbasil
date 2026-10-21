@@ -1,12 +1,14 @@
 import { useEffect, useState, type FormEvent } from 'react';
 import { Helmet } from '@dr.pogodin/react-helmet';
+import { useLoaderData } from 'react-router';
 import { Mail, Phone, MapPin, Clock, Send, CheckCircle } from 'lucide-react';
-import { contact } from 'virtual:content';
+import type { StoreContact } from '@/lib/shopify/types';
 
 type FormStatus = 'idle' | 'sending' | 'success' | 'error';
 
-export default function ContactPage() {
+export function ContactView({ content, embedded = false }: { content: StoreContact; embedded?: boolean }) {
   const [status, setStatus] = useState<FormStatus>('idle');
+  const Frame = embedded ? 'div' : 'main';
   const [errorMsg, setErrorMsg] = useState('');
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
@@ -56,7 +58,7 @@ export default function ContactPage() {
       '',
       message,
     ];
-    const whatsappNumber = contact.details.phoneHref.replace(/\D/g, '');
+    const whatsappNumber = content.phoneHref.replace(/\D/g, '');
     const url = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(lines.join('\n'))}`;
     const opened = window.open(url, '_blank', 'noopener,noreferrer');
     if (!opened) window.location.assign(url);
@@ -67,6 +69,7 @@ export default function ContactPage() {
 
   return (
     <>
+      {embedded ? null : (
       <Helmet>
         <title>Contact Bsbasil — Baby Clothes Enquiries & Orders | India</title>
         <meta
@@ -96,8 +99,8 @@ export default function ContactPage() {
           inLanguage: 'en-IN',
         }).replace(/</g, '\\u003c')}</script>
       </Helmet>
-
-      <main data-script-ink>
+      )}
+      <Frame data-script-ink>
         <ContactReveal />
         {/* Hero */}
         <section className="py-xxl text-center" style={{ background: 'hsl(var(--butter))' }}>
@@ -107,24 +110,24 @@ export default function ContactPage() {
               className="text-sm font-semibold mb-sm tracking-wide uppercase"
               style={{ color: 'hsl(var(--brand-ink))' }}
             >
-              {contact.hero.eyebrow}
+              {content.eyebrow}
             </p>
             <h1
               data-about-reveal
               className="text-4xl md:text-5xl font-bold mb-base leading-[1.05]"
               style={{ color: 'hsl(var(--foreground))' }}
             >
-              {contact.hero.heading.replace(/\s*hear from you\s*$/i, '')}
-              <em className="mt-[0.55em] block text-[0.92em] leading-[1.15]">hear from you</em>
+              {content.heading}
+              {content.headingAccent ? (
+                <em className="mt-[0.55em] block text-[0.92em] leading-[1.15]">{content.headingAccent}</em>
+              ) : null}
             </h1>
             <p
               data-about-reveal
               className="text-lg max-w-xl mx-auto"
               style={{ color: 'hsl(var(--muted-foreground))' }}
             >
-              Questions about sizing, orders, or our fabrics?{' '}
-              <span className="italic-accent text-[1.35em] leading-none">Drop us a message</span>{' '}
-              and we'll get back to you within 24 hours.
+              <AccentText text={content.subheading} phrase="Drop us a message" />
             </p>
           </div>
         </section>
@@ -142,15 +145,14 @@ export default function ContactPage() {
                     className="text-2xl font-bold mb-base"
                     style={{ color: 'hsl(var(--foreground))' }}
                   >
-                    {contact.details.heading}
+                    {content.detailsHeading}
                   </h2>
                   <p
                     data-about-reveal
                     className="text-base"
                     style={{ color: 'hsl(var(--muted-foreground))' }}
                   >
-                    Reach out through any of the channels below, or fill in the form and{' '}
-                    <span className="italic-accent text-[1.35em] leading-none">we'll respond promptly</span>.
+                    <AccentText text={content.detailsBody} phrase="we'll respond promptly" />
                   </p>
                 </div>
 
@@ -166,11 +168,11 @@ export default function ContactPage() {
                     <div>
                       <p className="text-sm font-semibold mb-1" style={{ color: 'hsl(var(--foreground))' }}>Email</p>
                       <a
-                        href={`mailto:${contact.details.email}`}
+                        href={`mailto:${content.email}`}
                         className="text-sm transition-colors hover:underline"
                         style={{ color: 'hsl(var(--brand-ink))' }}
                       >
-                        {contact.details.email}
+                        {content.email}
                       </a>
                     </div>
                   </div>
@@ -186,11 +188,11 @@ export default function ContactPage() {
                     <div>
                       <p className="text-sm font-semibold mb-1" style={{ color: 'hsl(var(--foreground))' }}>Phone / WhatsApp</p>
                       <a
-                        href={contact.details.phoneHref}
+                        href={content.phoneHref}
                         className="text-sm transition-colors hover:underline"
                         style={{ color: 'hsl(var(--brand-ink))' }}
                       >
-                        {contact.details.phone}
+                        {content.phone}
                       </a>
                     </div>
                   </div>
@@ -205,7 +207,7 @@ export default function ContactPage() {
                     </div>
                     <div>
                       <p className="text-sm font-semibold mb-1" style={{ color: 'hsl(var(--foreground))' }}>Location</p>
-                      <p className="text-sm" style={{ color: 'hsl(var(--muted-foreground))' }}>{contact.details.location}</p>
+                      <p className="text-sm" style={{ color: 'hsl(var(--muted-foreground))' }}>{content.location}</p>
                     </div>
                   </div>
 
@@ -220,9 +222,9 @@ export default function ContactPage() {
                     <div>
                       <p className="text-sm font-semibold mb-1" style={{ color: 'hsl(var(--foreground))' }}>Response time</p>
                       <p className="text-sm" style={{ color: 'hsl(var(--muted-foreground))' }}>
-                        {contact.details.hours}
+                        {content.hours}
                         <br />
-                        <span className="italic-accent text-[1.35em] leading-none">{contact.details.responseTime}</span>
+                        <span className="italic-accent text-[1.35em] leading-none">{content.responseTime}</span>
                       </p>
                     </div>
                   </div>
@@ -238,10 +240,10 @@ export default function ContactPage() {
                   }}
                 >
                   <p className="text-sm font-semibold mb-1" style={{ color: 'hsl(var(--brand-ink))' }}>
-                    💛 <span className="italic-accent text-[1.45em] leading-none">Parents first</span>
+                    💛 <span className="italic-accent text-[1.45em] leading-none">{content.trustLabel}</span>
                   </p>
                   <p className="text-sm" style={{ color: 'hsl(var(--muted-foreground))' }}>
-                    {contact.trust.body}
+                    {content.trustBody}
                   </p>
                 </div>
               </div>
@@ -261,18 +263,17 @@ export default function ContactPage() {
                         <CheckCircle size={32} style={{ color: 'hsl(var(--brand-ink))' }} />
                       </div>
                       <h3 className="text-2xl font-bold" style={{ color: 'hsl(var(--foreground))' }}>
-                        {contact.form.successHeading}
+                        {content.successHeading}
                       </h3>
                       <p style={{ color: 'hsl(var(--muted-foreground))' }}>
-                        Your message is ready in WhatsApp. Tap send there and we'll get back to you{' '}
-                        <span className="italic-accent text-[1.25em] leading-none">within 24 hours</span>.
+                        <AccentText text={content.successBody} phrase="within 24 hours" />
                       </p>
                       <button
                         onClick={() => setStatus('idle')}
                         className="mt-sm px-6 py-3 rounded-full text-sm font-semibold transition-colors"
                         style={{ background: 'hsl(var(--primary))', color: 'hsl(var(--primary-foreground))' }}
                       >
-                        {contact.form.successCta}
+                        {content.successCta}
                       </button>
                     </div>
                   ) : (
@@ -292,8 +293,10 @@ export default function ContactPage() {
                         className="text-2xl font-bold mb-lg leading-[1.05]"
                         style={{ color: 'hsl(var(--foreground))' }}
                       >
-                        {contact.form.heading.replace(/\s*a message\s*$/i, '')}
-                        <em className="mt-[0.55em] block text-[1.05em] leading-[1.15]">a message</em>
+                        {content.formHeading}
+                        {content.formHeadingAccent ? (
+                          <em className="mt-[0.55em] block text-[1.05em] leading-[1.15]">{content.formHeadingAccent}</em>
+                        ) : null}
                       </h2>
 
                       <div data-about-reveal className="grid grid-cols-1 sm:grid-cols-2 gap-base mb-base">
@@ -470,7 +473,24 @@ export default function ContactPage() {
             </div>
           </div>
         </section>
-      </main>
+      </Frame>
+    </>
+  );
+}
+
+export default function ContactPage() {
+  const content = useLoaderData() as StoreContact;
+  return <ContactView content={content} />;
+}
+
+function AccentText({ text, phrase }: { text: string; phrase: string }) {
+  const index = text.indexOf(phrase);
+  if (index < 0) return <>{text}</>;
+  return (
+    <>
+      {text.slice(0, index)}
+      <span className="italic-accent text-[1.35em] leading-none">{phrase}</span>
+      {text.slice(index + phrase.length)}
     </>
   );
 }
