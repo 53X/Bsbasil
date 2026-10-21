@@ -44,12 +44,11 @@ A modern, production-ready web application template built with Vite, React, and 
 v8-app-template/
 ├── src/
 │   ├── components/       # React components
-│   │   ├── ui/           # shadcn/ui base components (40+ components)
+│   │   ├── ui/           # Shared UI primitives
 │   │   └── Spinner.tsx
 │   ├── layouts/          # Layout systems
 │   │   ├── RootLayout.tsx    # Centralized layout wrapper
 │   │   ├── Website.tsx       # Structural container
-│   │   ├── Dashboard.tsx     # Dashboard layout
 │   │   ├── RootLayout.md     # RootLayout documentation
 │   │   ├── Website.md        # Website layout documentation
 │   │   └── parts/            # Layout components
@@ -59,8 +58,7 @@ v8-app-template/
 │   │   ├── index.tsx     # Homepage
 │   │   └── _404.tsx      # 404 page
 │   ├── lib/              # Utilities and API
-│   │   ├── utils.ts      # Utility functions
-│   │   └── api-client.ts # API client
+│   │   └── utils.ts      # Utility functions
 │   ├── server/           # Express API routes and SSR entry point
 │   │   ├── api/health/GET.ts
 │   │   └── entry.ts
@@ -159,7 +157,6 @@ The dev-tools package provides:
 The template includes:
 
 - `GET /api/health` - Health check endpoint
-- Extensible API client setup in `src/lib/api-client.ts`
 
 ### Layout System
 
@@ -200,7 +197,6 @@ export default function HomePage() {
 
 - **RootLayout** (`src/layouts/RootLayout.tsx`) - Centralized header/footer wrapper
 - **Website** (`src/layouts/Website.tsx`) - Structural container (used by RootLayout)
-- **Dashboard** (`src/layouts/Dashboard.tsx`) - Admin panels and dashboards
 
 See `src/layouts/*.md` for detailed usage documentation.
 

@@ -212,13 +212,9 @@ function toPosix(relPath: string): string {
  *
  * Same category as `src/components/ui/`: infrastructure the customer never authors. `CookieBanner`
  * is consent UI whose copy is legal rather than editorial (a skill deliberately declines to override
- * it — see `skills/online-appointments/tools/analytics-wiring.ts`), and `DemoContent` is the starter
- * placeholder the agent replaces on its first build.
+ * it — see `skills/online-appointments/tools/analytics-wiring.ts`).
  *
  * Named exactly rather than pattern-matched, so the list cannot quietly widen.
- *
- * `src/layouts/Dashboard.tsx` is here for the same reason: its sites are dashboard chrome
- * ("Profile", "Settings", "Help", "Log out"), not customer copy.
  */
 /**
  * Test modules, which ship with the template and grade the harness rather than the agent. Shared by
@@ -230,8 +226,6 @@ const TEST_MODULE: RegExp = /\.test\.[jt]sx?$/;
 const FRAMEWORK_FILES: ReadonlySet<string> = new Set([
   'src/components/CookieBanner.tsx',
   'src/components/CookieBannerErrorBoundary.tsx',
-  'src/components/DemoContent.tsx',
-  'src/layouts/Dashboard.tsx',
 ]);
 
 /**
