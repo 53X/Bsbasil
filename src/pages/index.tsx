@@ -3,6 +3,7 @@ import { Helmet } from '@dr.pogodin/react-helmet';
 import { Link, useLoaderData } from 'react-router';
 import { ArrowRight } from 'lucide-react';
 import { home } from 'virtual:content';
+import StoreImage from '@/components/StoreImage';
 import ArrivalRail from '@/components/motion/ArrivalRail';
 import CinematicHero from '@/components/motion/CinematicHero';
 import Marquee from '@/components/motion/Marquee';
@@ -287,14 +288,13 @@ function PromotionCard({ promotion, index }: { promotion: StorePromotion; index:
               src={promotion.videoUrl}
             />
           ) : promotion.imageUrl ? (
-            <img
+            <StoreImage
               src={promotion.imageUrl}
               alt={promotion.imageAlt}
               className="mx-auto block h-auto max-h-[min(70vh,36rem)] w-auto max-w-full"
               width={800}
               height={1000}
-              loading="lazy"
-              decoding="async"
+              sizes="(min-width: 1024px) 36rem, 92vw"
             />
           ) : null}
         </div>

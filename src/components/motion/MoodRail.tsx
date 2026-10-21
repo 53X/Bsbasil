@@ -153,6 +153,7 @@ export default function MoodRail() {
                     className="absolute inset-0 h-full w-full object-cover"
                     width={480}
                     height={640}
+                    sizes="(min-width: 1024px) 420px, 72vw"
                     loading="lazy"
                     decoding="async"
                     fetchPriority="low"

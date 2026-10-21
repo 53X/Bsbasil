@@ -83,8 +83,10 @@ export function AboutView({ content, embedded = false }: { content: StoreAbout; 
               className="w-full h-full object-cover opacity-20"
               width={1400}
               height={600}
-              loading="eager"
-              fetchPriority="high"
+              sizes="100vw"
+              loading="lazy"
+              decoding="async"
+              fetchPriority="low"
             />
           </div>
           <div className="relative max-w-content mx-auto px-4 py-xxxl text-center">
@@ -236,7 +238,9 @@ export function AboutView({ content, embedded = false }: { content: StoreAbout; 
                   style={{ borderColor: 'hsl(var(--primary))' }}
                   width={256}
                   height={256}
+                  sizes="(min-width: 768px) 256px, 192px"
                   loading="lazy"
+                  decoding="async"
                 />
               </div>
               <div data-about-reveal className="text-center md:text-left">
