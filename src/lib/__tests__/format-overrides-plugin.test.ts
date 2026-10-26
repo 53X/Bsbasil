@@ -1,12 +1,11 @@
 import { mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises'
-import { EventEmitter } from 'node:events'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import type { Plugin } from 'vite'
 
-import { FORMAT_OVERRIDES_MODULE_ID, formatOverridesPlugin } from '../../../format-overrides-plugin'
+import { FORMAT_OVERRIDES_MODULE_ID, formatOverridesPlugin } from '../../../export-plugins/format-overrides-plugin'
 
 interface DirectPluginHooks {
   resolveId: (id: string) => unknown
@@ -16,22 +15,6 @@ interface DirectPluginHooks {
 
 function directHooks(plugin: Plugin): DirectPluginHooks {
   return plugin as Plugin & DirectPluginHooks
-}
-
-function fakeViteServer() {
-  const watcher = new EventEmitter() as EventEmitter & { add: ReturnType<typeof vi.fn> }
-  watcher.add = vi.fn()
-  const moduleNode = { id: '\0virtual:format-overrides' }
-  return {
-    watcher,
-    moduleGraph: {
-      getModuleById: vi.fn(() => moduleNode),
-      invalidateModule: vi.fn(),
-    },
-    ws: {
-      send: vi.fn(),
-    },
-  }
 }
 
 async function withTempRoot<T>(fn: (root: string) => Promise<T>): Promise<T> {
@@ -109,10 +92,7 @@ describe('formatOverridesPlugin', () => {
       expect(String(loaded)).toContain('"version":1')
       expect(String(loaded)).toContain('"pages/index"')
       expect(String(loaded)).toContain('"overrides":{}')
-      expect(JSON.parse(String(warn.mock.calls[0][0]))).toMatchObject({
-        event: 'format-overrides.sidecar.invalid',
-        scope: 'pages/index',
-      })
+      expect(warn).not.toHaveBeenCalled()
     })
   })
 
@@ -132,10 +112,7 @@ describe('formatOverridesPlugin', () => {
       expect(String(loaded)).toContain('"shared"')
       expect(String(loaded)).toContain('"overrides":{}')
       expect(String(loaded)).not.toContain('abc123')
-      expect(JSON.parse(String(warn.mock.calls[0][0]))).toMatchObject({
-        event: 'format-overrides.sidecar.invalid',
-        scope: 'shared',
-      })
+      expect(warn).not.toHaveBeenCalled()
     })
   })
 
@@ -150,12 +127,10 @@ describe('formatOverridesPlugin', () => {
         await writeFile(join(root, 'format-overrides/pages/index.json'), '{not json')
 
         const plugin = directHooks(formatOverridesPlugin(root))
-        await plugin.load('\0virtual:format-overrides')
+        const loaded = await plugin.load('\0virtual:format-overrides')
 
-        expect(JSON.parse(String(warn.mock.calls[0][0]))).toMatchObject({
-          event: 'format-overrides.sidecar.invalid',
-          scope: 'pages/index',
-        })
+        expect(String(loaded)).toContain('"overrides":{}')
+        expect(warn).not.toHaveBeenCalled()
       })
     } finally {
       if (previousNodeEnv === undefined) {
@@ -166,52 +141,8 @@ describe('formatOverridesPlugin', () => {
     }
   })
 
-  it('pushes sidecar updates through custom HMR without full page reload', async () => {
-    await withTempRoot(async (root) => {
-      const expressionHash = `sha256:${'a'.repeat(64)}`
-      const sidecarPath = join(root, 'format-overrides/pages/index.json')
-      await mkdir(join(root, 'format-overrides/pages'), { recursive: true })
-      await writeFile(
-        sidecarPath,
-        JSON.stringify({
-          version: 1,
-          overrides: {
-            abc123: {
-              target: {
-                file: 'src/pages/index.tsx',
-                tagName: 'h1',
-                sourceKind: 'bound-expression',
-                contentKey: null,
-                contentKeyTemplate: null,
-                expressionHash,
-              },
-              marks: { bold: true },
-              updatedAt: '2026-05-28T12:00:00.000Z',
-            },
-          },
-        }),
-      )
-
-      const plugin = directHooks(formatOverridesPlugin(root))
-      const server = fakeViteServer()
-      plugin.configureServer?.(server)
-
-      server.watcher.emit('change', sidecarPath)
-
-      expect(server.moduleGraph.invalidateModule).toHaveBeenCalled()
-      expect(server.ws.send).toHaveBeenCalledWith('format-overrides:update', expect.objectContaining({
-        version: 1,
-        scopes: expect.objectContaining({
-          'pages/index': expect.objectContaining({
-            overrides: expect.objectContaining({
-              abc123: expect.objectContaining({
-                marks: { bold: true },
-              }),
-            }),
-          }),
-        }),
-      }))
-      expect(server.ws.send).not.toHaveBeenCalledWith({ type: 'full-reload' })
-    })
+  it('ships as a build shim without a dev-server hook', () => {
+    const plugin = directHooks(formatOverridesPlugin())
+    expect(plugin.configureServer).toBeUndefined()
   })
 })
