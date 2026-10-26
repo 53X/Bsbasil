@@ -153,7 +153,7 @@ export default function HomePage() {
           <MoodRail />
         </div>
 
-        <section ref={ageRef} className="border-t border-foreground/10 py-16">
+        <section ref={ageRef} className="cv-auto border-t border-foreground/10 py-16">
           <div className="mx-auto grid max-w-content gap-10 px-4 lg:grid-cols-[0.8fr_1.2fr] lg:items-start">
             <div>
               <p data-subhead className="mb-3 text-xs font-semibold uppercase tracking-[0.22em]" style={{ color: 'hsl(var(--brand-ink))' }}>
@@ -192,7 +192,7 @@ export default function HomePage() {
           <ArrivalRail id="bestsellers" products={bestsellers} lead={bestsellerLead} accent={bestsellerAccent} />
         ) : null}
 
-        <section className="py-16">
+        <section className="cv-auto py-16">
           <div className="mx-auto mb-10 max-w-content px-4">
             <h2 className="text-[clamp(2.53rem,5.75vw,4.83rem)] uppercase leading-[0.9]">{home.featuredSection.title}</h2>
             <p className="italic-accent mt-4 max-w-lg text-[clamp(1.55rem,3vw,2.2rem)] leading-[1.2]">

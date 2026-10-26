@@ -1,4 +1,4 @@
-import { lazy, Suspense } from 'react';
+import { lazy, Suspense, useEffect, useState } from 'react';
 import { Outlet, createBrowserRouter, type RouteObject } from 'react-router';
 import { RouterProvider } from 'react-router/dom';
 
@@ -54,19 +54,24 @@ const routeTree: RouteObject[] = [
 const router = createBrowserRouter(routeTree);
 
 export default function App() {
+  const [showConsent, setShowConsent] = useState(false);
+  useEffect(() => {
+    setShowConsent(true);
+  }, []);
   return (
     <>
       <RouterProvider router={router} />
       {/*
-        CookieBanner reads document.cookie and subscribes to browser events.
-        App.tsx is client-only (entry-server.tsx renders the route tree
-        directly without importing App), so no SSR gate is needed here.
+        The banner is absent from the prerendered HTML. Mount it after
+        hydration so the first client render matches the server tree.
       */}
-      <CookieBannerErrorBoundary>
-        <Suspense fallback={null}>
-          <CookieBanner />
-        </Suspense>
-      </CookieBannerErrorBoundary>
+      {showConsent ? (
+        <CookieBannerErrorBoundary>
+          <Suspense fallback={null}>
+            <CookieBanner />
+          </Suspense>
+        </CookieBannerErrorBoundary>
+      ) : null}
     </>
   );
 }

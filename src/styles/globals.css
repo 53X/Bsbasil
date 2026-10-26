@@ -28,6 +28,12 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Skip layout for sections the first screen does not show. */
+.cv-auto {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 50rem;
+}
+
 @layer base {
   :root {
     /* Ivory paper, ink, and the logo green #62A848. */

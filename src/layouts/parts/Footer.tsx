@@ -44,7 +44,7 @@ export default function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="mt-auto bg-[#122117] text-[#F6F3EA]">
+    <footer className="cv-auto mt-auto bg-[#122117] text-[#F6F3EA]">
       <div className="mx-auto grid max-w-content gap-10 px-4 py-14 md:grid-cols-[1.3fr_1fr_1fr]">
         <div>
           <img

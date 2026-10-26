@@ -121,7 +121,7 @@ export default function MoodRail() {
   }, []);
 
   return (
-    <section ref={sectionRef} className="relative bg-background">
+    <section ref={sectionRef} className="cv-auto relative bg-background">
       <div
         data-mood-stage
         data-hscroll
