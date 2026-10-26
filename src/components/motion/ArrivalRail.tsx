@@ -97,7 +97,7 @@ export default function ArrivalRail({
   if (products.length === 0) return null;
 
   return (
-    <section ref={rootRef} id={id} className="relative bg-background">
+    <section ref={rootRef} id={id} className="cv-auto relative bg-background">
       <div data-arrival-stage className="sticky top-[6.25rem] py-6 sm:py-8">
         <div className="mx-auto mb-5 flex w-full max-w-content items-end justify-between gap-4 px-4">
           <h2 className="max-w-full text-[clamp(2.2rem,4vw,3.75rem)] leading-none">
