@@ -57,3 +57,24 @@ export function colourForMedia(item: StoreMedia, colourNames: string[]): string 
 export function photosForColour(media: StoreMedia[], colourNames: string[], colour: string): StoreMedia[] {
   return media.filter((item) => colourForMedia(item, colourNames) === colour);
 }
+
+/**
+ * Gallery for the selected colour. When a colourway has no labelled photo,
+ * show the product's own pictures instead of an empty frame.
+ */
+export function galleryForColour(
+  media: StoreMedia[],
+  colourNames: string[],
+  colour: string | null,
+  fallbackImage?: { url: string; alt: string },
+): StoreMedia[] {
+  const withFallback = (): StoreMedia[] => {
+    if (!fallbackImage?.url) return media;
+    const rest = media.filter((item) => item.url !== fallbackImage.url);
+    const lead: StoreMedia = { kind: 'image', url: fallbackImage.url, alt: fallbackImage.alt };
+    return [lead, ...rest];
+  };
+  if (!colour || colourNames.length < 2) return withFallback();
+  const matched = photosForColour(media, colourNames, colour);
+  return matched.length > 0 ? matched : withFallback();
+}

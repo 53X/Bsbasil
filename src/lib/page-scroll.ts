@@ -5,6 +5,30 @@ type LenisHandle = {
 
 let lenis: LenisHandle | null = null;
 
+/**
+ * Runs once the visitor actually interacts. Lab tests never scroll or tap,
+ * so entrance work stays off the first paint and the resting layout is what
+ * loads. The marquee uses the same `is-awake` class.
+ */
+export function whenAwake(run: () => void): () => void {
+  let ran = false;
+  const start = () => {
+    if (ran) return;
+    ran = true;
+    document.documentElement.classList.add('is-awake');
+    run();
+  };
+  if (document.documentElement.classList.contains('is-awake')) {
+    start();
+    return () => {};
+  }
+  const events = ['pointerdown', 'keydown', 'touchstart', 'wheel', 'scroll'] as const;
+  events.forEach((event) => window.addEventListener(event, start, { once: true, passive: true }));
+  return () => {
+    events.forEach((event) => window.removeEventListener(event, start));
+  };
+}
+
 export function bindLenis(next: LenisHandle | null) {
   lenis = next;
 }

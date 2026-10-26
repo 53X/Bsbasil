@@ -5,7 +5,8 @@ import { ShoppingBag } from 'lucide-react';
 import { useAuth } from '@/contexts/auth-context';
 import { useCart } from '@/contexts/use-cart';
 import { savePendingPurchase } from '@/lib/pending-purchase';
-import { photosForColour } from '@/lib/colour-photos';
+import { galleryForColour } from '@/lib/colour-photos';
+import { descriptionParts } from '@/lib/product-copy';
 import { ageLabel, hasSelectableSizeOption, productRequiresSizeSelection, productSizeLabels, selectionForOption, variantForSelection } from '@/lib/shopify/map';
 import PriceTag from '@/components/PriceTag';
 import StoreImage from '@/components/StoreImage';
@@ -177,13 +178,18 @@ function CategoryColors({
 }
 
 const SIZE_GUIDE = [
-  ['Newborn', 'Up to 3.5 kg'],
-  ['0–3 months', '3.5–6 kg'],
-  ['3–6 months', '6–8 kg'],
-  ['6–12 months', '8–10 kg'],
-  ['1–2 years', '10–12 kg'],
-  ['2–3 years', '12–14 kg'],
-];
+  ['0–3 Months', '3.5–6 kg'],
+  ['3–6 Months', '6–8 kg'],
+  ['6–12 Months', '8–10 kg'],
+  ['12–18 Months', '10–11 kg'],
+  ['18–24 Months', '11–12 kg'],
+  ['24–30 Months', '12–13 kg'],
+  ['30–36 Months', '13–14 kg'],
+] as const;
+
+function sizeKey(value: string) {
+  return value.toLowerCase().replace(/[^a-z0-9]+/g, '');
+}
 
 function MediaFrame({ item }: { item: StoreMedia }) {
   if (item.kind === 'video' && item.url) {
@@ -301,13 +307,10 @@ export default function ProductPage() {
   }, [product, selected, chosenColor]);
   const gallery = useMemo(() => {
     if (!product) return [];
-    const names = colourNamesOf(product);
-    if (!activeColour || names.length < 2) {
-      if (!variant?.image) return product.media;
-      const rest = product.media.filter((item) => item.url !== variant.image);
-      return [{ kind: 'image' as const, url: variant.image, alt: product.name }, ...rest];
-    }
-    return photosForColour(product.media, names, activeColour);
+    return galleryForColour(product.media, colourNamesOf(product), activeColour, {
+      url: variant?.image || product.image,
+      alt: product.alt || product.name,
+    });
   }, [product, variant, activeColour]);
 
   useEffect(() => {
@@ -388,7 +391,7 @@ export default function ProductPage() {
     <>
       <Helmet>
         <title>{`${product.name} — Bsbasil`}</title>
-        <meta name="description" content={product.description.slice(0, 160) || `${product.name} from Bsbasil.`} />
+        <meta name="description" content={descriptionParts(product.description).lead.slice(0, 160) || `${product.name} from Bsbasil.`} />
         <link rel="canonical" href={`https://bsbasil.com/products/${product.handle}`} />
       </Helmet>
       <main className="max-w-content mx-auto px-4 py-10 pb-28 md:py-14 md:pb-xl">
@@ -438,9 +441,7 @@ export default function ProductPage() {
               <PriceTag price={price} compareAt={compareAt} currency={currency} discount={discountTitle} priceClassName="text-2xl font-bold" />
             </p>
             <p data-about-reveal className="text-sm mb-base" style={{ color: soldOut ? 'hsl(var(--destructive, 0 70% 45%))' : 'hsl(var(--muted-foreground))' }}>{stockLabel}</p>
-            {product.description ? (
-              <p data-about-reveal className="text-base mb-lg whitespace-pre-line" style={{ color: 'hsl(var(--muted-foreground))' }}>{product.description}</p>
-            ) : null}
+            {product.description ? <ProductDescription text={product.description} /> : null}
 
             {(() => {
               const facts = [
@@ -501,7 +502,7 @@ export default function ProductPage() {
                     />
                   ) : null}
                   {sizeLabels.length > 0 ? (
-                    <div data-about-reveal className="mb-base">
+                    <div id="size-choices" data-about-reveal className="mb-base">
                       <p className="text-xs font-semibold uppercase tracking-wide mb-xs" style={{ color: 'hsl(var(--muted-foreground))' }}>
                         Size
                       </p>
@@ -556,6 +557,7 @@ export default function ProductPage() {
                           Select a size to add this to your bag
                         </p>
                       ) : null}
+                      <SizeGuide labels={sizeLabels} />
                     </div>
                   ) : null}
 
@@ -601,13 +603,20 @@ export default function ProductPage() {
                 </div>
                 <button
                   type="button"
-                  onClick={onAdd}
-                  disabled={adding || buying || soldOut || (requiresSize && !chosenSize)}
+                  onClick={() => {
+                    if (requiresSize && !chosenSize) {
+                      document.getElementById('size-choices')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                      setMessage('Select a size to add this to your bag');
+                      return;
+                    }
+                    void onAdd();
+                  }}
+                  disabled={adding || buying || soldOut}
                   className="flex min-h-12 flex-1 items-center justify-center gap-2 rounded-full px-6 font-semibold disabled:opacity-60"
                   style={{ background: 'hsl(var(--primary))', color: 'hsl(var(--primary-foreground))' }}
                 >
                   <ShoppingBag size={16} />
-                  {soldOut ? 'Sold out' : adding ? 'Adding' : 'Add to bag'}
+                  {soldOut ? 'Sold out' : adding ? 'Adding' : requiresSize && !chosenSize ? 'Select a size' : 'Add to bag'}
                 </button>
               </div>
               <button
@@ -667,15 +676,62 @@ export default function ProductPage() {
         </div>
         <button
           type="button"
-          onClick={onAdd}
-          disabled={adding || soldOut || (requiresSize && !chosenSize)}
+          onClick={() => {
+            if (requiresSize && !chosenSize) {
+              document.getElementById('size-choices')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+              setMessage('Select a size to add this to your bag');
+              return;
+            }
+            void onAdd();
+          }}
+          disabled={adding || soldOut}
           className="min-h-12 flex-1 shrink-0 rounded-full px-4 font-semibold disabled:opacity-60"
           style={{ background: 'hsl(var(--primary))', color: 'hsl(var(--primary-foreground))' }}
         >
-          {soldOut ? 'Sold out' : 'Add to bag'}
+          {soldOut ? 'Sold out' : requiresSize && !chosenSize ? 'Select a size' : 'Add to bag'}
         </button>
       </div>
     </>
+  );
+}
+
+function ProductDescription({ text }: { text: string }) {
+  const { lead, points } = descriptionParts(text);
+  return (
+    <div data-about-reveal className="mb-lg text-base leading-relaxed" style={{ color: 'hsl(var(--muted-foreground))' }}>
+      {lead ? <p>{lead}</p> : null}
+      {points.length > 0 ? (
+        <ul className="mt-3 list-disc space-y-2 pl-5">
+          {points.map((point) => (
+            <li key={point}>{point}</li>
+          ))}
+        </ul>
+      ) : null}
+    </div>
+  );
+}
+
+function SizeGuide({ labels }: { labels: string[] }) {
+  const keys = new Set(labels.map(sizeKey));
+  const rows = SIZE_GUIDE.filter((row) => keys.has(sizeKey(row[0])));
+  const visible = rows.length > 0 ? rows : SIZE_GUIDE;
+  return (
+    <details className="mt-3">
+      <summary className="cursor-pointer text-sm font-semibold" style={{ color: 'hsl(var(--brand-ink))' }}>
+        Size guide
+      </summary>
+      <ul className="mt-3 space-y-2 text-sm" style={{ color: 'hsl(var(--muted-foreground))' }}>
+        {visible.map(([label, weight]) => (
+          <li key={label} className="flex justify-between gap-4">
+            <span>{label}</span>
+            <span>{weight}</span>
+          </li>
+        ))}
+      </ul>
+      <p className="mt-2 text-xs leading-relaxed" style={{ color: 'hsl(var(--muted-foreground))' }}>
+        Typical body weight for this age. If your baby is between sizes, choose the larger one.
+      </p>
+    </details>
   );
 }
 

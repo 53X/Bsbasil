@@ -9,11 +9,15 @@ const PANELS = ['#62A848'];
 export default function ProductCard({
   product,
   index = 0,
+  imageSizes = '(min-width: 1024px) 24rem, (min-width: 640px) 46vw, 92vw',
+  imageWidth = 720,
 }: {
   product: StoreProduct;
   /** Kept for catalog callers; sizes are chosen on the product page. */
   ageHighlight?: string;
   index?: number;
+  imageSizes?: string;
+  imageWidth?: number;
 }) {
   const href = `/products/${product.handle}`;
   const sizes = product.ageRanges;
@@ -31,9 +35,9 @@ export default function ProductCard({
             src={product.image}
             alt={product.alt}
             className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
-            width={520}
-            height={700}
-            sizes="(min-width: 1024px) 22rem, (min-width: 640px) 46vw, 92vw"
+            width={imageWidth}
+            height={Math.round(imageWidth * 4 / 3)}
+            sizes={imageSizes}
           />
         ) : (
           <div className="h-full w-full bg-muted" />
@@ -44,18 +48,17 @@ export default function ProductCard({
           </span>
         ) : null}
         {sale ? (
-          <span className="absolute right-3 top-5 rounded-full bg-[#62A848] px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-[#122117]">
+          <span className="absolute right-3 top-5 rounded-full bg-primary px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-primary-foreground">
             {sale}
           </span>
         ) : null}
-        <span className="view-disc">View</span>
       </Link>
 
       <div className="flex flex-1 flex-col gap-2 pt-4">
         <p className="text-[11px] font-semibold uppercase tracking-[0.18em]" style={{ color: 'hsl(var(--brand-ink))' }}>
           {product.category || 'Bsbasil'}
         </p>
-        <Link to={href} className="break-words font-sans text-base font-semibold leading-snug sm:text-lg">
+        <Link to={href} className="font-sans text-base font-semibold leading-snug [overflow-wrap:anywhere] sm:text-lg">
           {product.name}
         </Link>
         <PriceTag
@@ -68,14 +71,13 @@ export default function ProductCard({
         {sizes.length > 0 ? (
           <div className="mt-1 flex flex-wrap gap-1.5" aria-label="Sizes">
             {sizes.map((code) => (
-              <Link
+              <span
                 key={code}
-                to={`${href}?age=${encodeURIComponent(code)}`}
-                className="inline-flex min-h-9 items-center rounded-full border px-3 text-xs font-medium"
-                style={{ borderColor: 'hsl(var(--border))' }}
+                className="inline-flex min-h-8 items-center rounded-full border px-3 text-xs font-medium"
+                style={{ borderColor: 'hsl(var(--border))', color: 'hsl(var(--muted-foreground))' }}
               >
                 {ageLabel(code)}
-              </Link>
+              </span>
             ))}
           </div>
         ) : null}

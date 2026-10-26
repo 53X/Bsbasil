@@ -45,6 +45,7 @@ export default defineConfig({
       '@/lib': path.resolve(__dirname, './src/lib'),
       '@/api': path.resolve(__dirname, './src/server/api'),
       '@/db': path.resolve(__dirname, './src/server/db'),
+      '@/contexts': path.resolve(__dirname, './src/contexts'),
       '@/layouts': path.resolve(__dirname, './src/layouts'),
       '@/patterns': path.resolve(__dirname, './src/patterns'),
       '@/pages': path.resolve(__dirname, './src/pages'),

@@ -1,6 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 import type { Session, User } from '@supabase/supabase-js';
 import { getSupabase, isSupabaseConfigured } from '@/lib/supabase';
+import { whenAwake } from '@/lib/page-scroll';
 
 interface AuthContextType {
   user: User | null;
@@ -38,17 +39,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       unsubscribe = () => data.subscription.unsubscribe();
     });
     };
-    let cancelIdle = () => {};
-    if (typeof window.requestIdleCallback === 'function') {
-      const id = window.requestIdleCallback(load, { timeout: 2500 });
-      cancelIdle = () => window.cancelIdleCallback(id);
-    } else {
-      const id = window.setTimeout(load, 1500);
-      cancelIdle = () => window.clearTimeout(id);
-    }
+    const cancelAwake = whenAwake(load);
     return () => {
       active = false;
-      cancelIdle();
+      cancelAwake();
       unsubscribe();
     };
   }, []);

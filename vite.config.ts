@@ -24,19 +24,6 @@ function extractHostname(value: string): string {
     return value;
   }
 }
-function deferStylesheetPlugin(): Plugin {
-  return {
-    name: "defer-render-blocking-css",
-    apply: "build",
-    transformIndexHtml(html) {
-      return html.replace(
-        /<link rel="stylesheet" crossorigin href="([^"]+\.css)">/g,
-        '<link rel="stylesheet" crossorigin href="$1" media="print" onload="this.media=\'all\'"><noscript><link rel="stylesheet" href="$1"></noscript>',
-      );
-    },
-  };
-}
-
 function apiDevPlugin(): Plugin {
   return {
     name: "api-dev",
@@ -349,9 +336,10 @@ if (corsOrigins.length === 0) {
   corsOrigins.push("*");
 }
 export default defineConfig(async ({ mode, isSsrBuild }: ConfigEnv): Promise<UserConfig> => {
+  const prerenderBuild = process.argv.some((arg) => arg.includes("prerender-entry"));
   const base: UserConfig = {
     envPrefix: ["VITE_", "SITE_"],
-    plugins: [deferStylesheetPlugin(), react({
+    plugins: [react({
       babel: {
         plugins: []
       }
@@ -404,22 +392,25 @@ export default defineConfig(async ({ mode, isSsrBuild }: ConfigEnv): Promise<Use
       }
     },
     build: isSsrBuild ? {
-      outDir: "dist",
-      emptyOutDir: false,
+      outDir: prerenderBuild ? "dist/prerender" : "dist",
+      emptyOutDir: prerenderBuild,
       copyPublicDir: false,
-      ssr: "src/server/entry.ts",
+      ssr: prerenderBuild ? "src/server/prerender-entry.ts" : "src/server/entry.ts",
       rollupOptions: {
         output: {
           format: "es",
-          entryFileNames: "server.bundle.mjs",
-          chunkFileNames: "bin/[name]-[hash].js",
-          banner: "import { createRequire } from 'module';\nconst require = createRequire(import.meta.url);"
+          entryFileNames: prerenderBuild ? "prerender.mjs" : "server.bundle.mjs",
+          chunkFileNames: prerenderBuild ? "chunks/[name]-[hash].js" : "bin/[name]-[hash].js",
+          ...(prerenderBuild ? {} : {
+            banner: "import { createRequire } from 'module';\nconst require = createRequire(import.meta.url);"
+          })
         }
       }
     } : {
       outDir: "dist/client",
       emptyOutDir: true,
       copyPublicDir: true,
+      sourcemap: true,
       rollupOptions: {
         output: {
           manualChunks: {

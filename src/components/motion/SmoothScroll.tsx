@@ -1,5 +1,5 @@
 import { useEffect, type ReactNode } from 'react';
-import { bindLenis } from '@/lib/page-scroll';
+import { bindLenis, whenAwake } from '@/lib/page-scroll';
 
 /**
  * Lenis smooth scroll, kept in step with GSAP ScrollTrigger.
@@ -12,7 +12,6 @@ export default function SmoothScroll({ children }: { children: ReactNode }) {
 
     let destroyed = false;
     let stop = () => {};
-    let cancelIdle = () => {};
 
     const start = () => {
       if (destroyed) return;
@@ -56,17 +55,11 @@ export default function SmoothScroll({ children }: { children: ReactNode }) {
     );
     };
 
-    if (typeof window.requestIdleCallback === 'function') {
-      const id = window.requestIdleCallback(start, { timeout: 400 });
-      cancelIdle = () => window.cancelIdleCallback(id);
-    } else {
-      const id = window.setTimeout(start, 120);
-      cancelIdle = () => window.clearTimeout(id);
-    }
+    const cancelAwake = whenAwake(start);
 
     return () => {
       destroyed = true;
-      cancelIdle();
+      cancelAwake();
       stop();
     };
   }, []);

@@ -11,17 +11,14 @@
             history.replaceState(null, '', u.toString());
           }
         } catch (e) {}
-        if (location.pathname !== '/') document.documentElement.classList.add('skip-boot');
-        var logo = document.createElement('link');
-        logo.rel = 'preload';
-        logo.as = 'image';
-        logo.href = '/logo-horizontal.webp';
-        document.head.appendChild(logo);
+        document.documentElement.classList.add('skip-boot');
         if (location.pathname === '/') {
           var hero = document.createElement('link');
           hero.rel = 'preload';
           hero.as = 'image';
-          hero.href = '/hero-cube/romper-640.webp';
+          hero.href = '/hero-cube/romper-520.webp';
+          hero.setAttribute('imagesrcset', '/hero-cube/romper-400.webp 400w, /hero-cube/romper-440.webp 440w, /hero-cube/romper-520.webp 520w, /hero-cube/romper.webp 800w');
+          hero.setAttribute('imagesizes', '(min-width: 1024px) 384px, 280px');
           hero.setAttribute('fetchpriority', 'high');
           document.head.appendChild(hero);
         }
@@ -31,17 +28,26 @@
     <link rel="icon" href="/logo-favicon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="google-site-verification" content="EPnSQcE_GnvhBqH5IdMfdEEyJAeywleg2h69eZgeOQk">
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://cdn.shopify.com" crossorigin />
+    <link rel="preload" href="/fonts/oswald-latin.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/Brimula.woff2" as="font" type="font/woff2" crossorigin />
     <style>
       html, body { margin: 0; background: hsl(42 38% 96%); }
       @font-face {
+        font-family: "Oswald";
+        src: url("/fonts/oswald-latin.woff2") format("woff2");
+        font-weight: 400 600;
+        font-style: normal;
+        font-display: swap;
+      }
+      @font-face {
         font-family: "Brimula";
-        src: url("/fonts/Brimula.otf") format("opentype");
+        src: url("/fonts/Brimula.woff2") format("woff2");
         font-weight: 400;
         font-style: normal;
         font-display: swap;
       }
+      body { font-family: Oswald, "Arial Narrow", sans-serif; color: #1c241e; }
       #boot {
         position: fixed;
         inset: 0;
@@ -117,7 +123,11 @@
         overflow: hidden;
         border-radius: 1rem;
         background: #f4f1ea;
+        backface-visibility: hidden;
       }
+      .hero-cube-tilt,
+      .hero-cube-rig,
+      .hero-cube { transform-style: preserve-3d; }
       @media (min-width: 640px) {
         .hero-cube-scene { --cube: min(40vw, calc(100svh - 20rem), 20rem); }
       }
@@ -128,15 +138,6 @@
         .hero-cube-scene { --cube: min(30vw, 40svh, 14rem); }
       }
     </style>
-    <link
-      rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600&display=swap"
-      media="print"
-      onload="this.media='all'"
-    />
-    <noscript>
-      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600&display=swap" />
-    </noscript>
     <!--app-head-->
     <script src="/airo-video-slots.js" defer></script>
     <script src="/airo-logo-orientation.js" defer></script>
@@ -145,7 +146,6 @@
     <div id="boot" aria-hidden="true">
       <div class="boot-mark">
         <p class="boot-welcome">Welcome to</p>
-        <img class="boot-logo" src="/logo-horizontal.webp" alt="" width="248" height="72" decoding="async" fetchpriority="high" />
       </div>
     </div>
     <script>

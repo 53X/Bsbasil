@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { Link } from 'react-router';
-import { bindPointerScrub, scrollPageBy } from '@/lib/page-scroll';
+import { heroSources, MOOD_SIZES } from '@/lib/hero-image';
+import { bindPointerScrub, scrollPageBy, whenAwake } from '@/lib/page-scroll';
 
 const KINDS = [
   { src: '/hero-cube/romper.webp', label: 'Rompers', href: '/catalog?category=Romper' },
@@ -111,10 +112,10 @@ export default function MoodRail() {
     });
     };
 
-    const idle = window.setTimeout(run, 80);
+    const cancelAwake = whenAwake(run);
     return () => {
       cancelled = true;
-      window.clearTimeout(idle);
+      cancelAwake();
       revert();
     };
   }, []);
@@ -148,12 +149,12 @@ export default function MoodRail() {
               <div className="arch-frame relative flex h-[min(46svh,34rem)] items-end overflow-hidden bg-[#62A848] sm:h-[min(56vh,34rem)]">
                 {kind.src ? (
                   <img
-                    src={kind.src}
+                    {...heroSources(kind.src)}
                     alt=""
                     className="absolute inset-0 h-full w-full object-cover"
-                    width={480}
-                    height={640}
-                    sizes="(min-width: 1024px) 420px, 72vw"
+                    width={800}
+                    height={950}
+                    sizes={MOOD_SIZES}
                     loading="lazy"
                     decoding="async"
                     fetchPriority="low"

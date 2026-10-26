@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
+import { whenAwake } from '@/lib/page-scroll';
 
 const COOKIE_CONSENT_KEY = 'c2_analytics_consent';
 const COOKIE_CONSENT_EXPIRES_DAYS = 365;
@@ -116,14 +117,14 @@ export default function CookieBanner() {
   useEffect(function checkConsent() {
     if (typeof window === 'undefined') return;
 
-    initTracking();
+    const cancelTracking = whenAwake(() => initTracking());
 
     const consentData = localStorage.getItem(COOKIE_CONSENT_KEY);
 
     if (!consentData) {
       setShowBanner(true);
       setIsLoaded(true);
-      return;
+      return cancelTracking;
     }
 
     try {
@@ -142,6 +143,7 @@ export default function CookieBanner() {
     }
 
     setIsLoaded(true);
+    return cancelTracking;
   }, []);
 
   function saveConsent(analytics: boolean) {

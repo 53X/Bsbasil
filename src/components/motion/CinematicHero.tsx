@@ -1,7 +1,8 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Link } from 'react-router';
 import { ArrowRight } from 'lucide-react';
-import { bindCubeSteer, scrollPageBy } from '@/lib/page-scroll';
+import { heroSources, HERO_SIZES } from '@/lib/hero-image';
+import { bindCubeSteer, scrollPageBy, whenAwake } from '@/lib/page-scroll';
 import '../HeroCube.css';
 
 const COUNT = 6;
@@ -50,7 +51,7 @@ const KINDS = [
     sub: 'For naps, nights, and every small trip in between.',
   },
   {
-    src: '/hero-cube/dungarees-640.jpg',
+    src: '/hero-cube/dungarees.webp',
     label: 'Dungarees',
     href: '/catalog?category=Romper',
     lead: 'Play clothes',
@@ -66,7 +67,7 @@ const KINDS = [
     sub: 'A warm layer that still lets them play.',
   },
   {
-    src: '/hero-cube/party-wear-640.jpg',
+    src: '/hero-cube/party-wear.webp',
     label: 'Party wear',
     href: '/catalog?category=Sets',
     lead: 'Dressed up',
@@ -112,6 +113,7 @@ export default function CinematicHero({ eyebrow }: { eyebrow: string }) {
   const rootRef = useRef<HTMLElement>(null);
   const faceRef = useRef(0);
   const [face, setFace] = useState(0);
+  const [showAllFaces, setShowAllFaces] = useState(false);
 
   useEffect(() => {
     const root = rootRef.current;
@@ -123,6 +125,7 @@ export default function CinematicHero({ eyebrow }: { eyebrow: string }) {
     let cancelled = false;
 
     const run = () => {
+    setShowAllFaces(true);
     void Promise.all([import('gsap'), import('gsap/ScrollTrigger')]).then(([gsapMod, scrollMod]) => {
       if (cancelled || !rootRef.current) return;
       const gsap = gsapMod.default;
@@ -257,19 +260,6 @@ export default function CinematicHero({ eyebrow }: { eyebrow: string }) {
           );
         }
 
-        gsap.fromTo('[data-watermark]', {
-          xPercent: -4,
-        }, {
-          xPercent: 8,
-          ease: 'none',
-          scrollTrigger: {
-            trigger: root,
-            start: 'top 6.25rem',
-            end: 'bottom bottom',
-            scrub: true,
-          },
-        });
-
         window.addEventListener('scroll', onScroll, { passive: true });
         root.addEventListener('wheel', onWheel, { passive: false });
         showFace(0);
@@ -297,13 +287,11 @@ export default function CinematicHero({ eyebrow }: { eyebrow: string }) {
     });
     };
 
-    let cancelIdle = () => {};
-    const idle = window.setTimeout(run, 80);
-    cancelIdle = () => window.clearTimeout(idle);
+    const cancelAwake = whenAwake(run);
 
     return () => {
       cancelled = true;
-      cancelIdle();
+      cancelAwake();
       revert();
     };
   }, []);
@@ -312,31 +300,9 @@ export default function CinematicHero({ eyebrow }: { eyebrow: string }) {
     window.dispatchEvent(new Event('bs-boot-ready'));
   }, []);
 
-  useEffect(() => {
-    const next = KINDS[1]?.src;
-    if (!next) return;
-    let cancel = () => {};
-    const warm = () => {
-      const img = new Image();
-      img.decoding = 'async';
-      img.src = next;
-    };
-    if (typeof window.requestIdleCallback === 'function') {
-      const id = window.requestIdleCallback(warm, { timeout: 2500 });
-      cancel = () => window.cancelIdleCallback(id);
-    } else {
-      const id = window.setTimeout(warm, 2500);
-      cancel = () => window.clearTimeout(id);
-    }
-    return cancel;
-  }, []);
-
   return (
-    <section ref={rootRef} className="relative h-auto bg-background lg:h-[480vh]">
-      <div className="hero-stage relative mx-auto grid h-auto max-w-content grid-rows-[auto_auto] items-start gap-3 overflow-visible px-4 py-3 sm:gap-4 sm:py-5 lg:sticky lg:top-[6.25rem] lg:h-[calc(100dvh-6.25rem)] lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:grid-rows-none lg:items-center lg:gap-8">
-        <p data-watermark className="watermark" aria-hidden="true">
-          COLOUR
-        </p>
+    <section ref={rootRef} className="relative bg-background">
+      <div className="hero-stage relative mx-auto grid h-auto max-w-content grid-rows-[auto_auto] items-start gap-3 overflow-visible px-4 py-3 sm:gap-4 sm:py-5 lg:min-h-[calc(100dvh-6.25rem)] lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:grid-rows-none lg:items-center lg:gap-8">
         <div className="relative z-10 min-h-0 min-w-0">
           <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.16em] sm:mb-5 sm:text-xs sm:tracking-[0.24em]" style={{ color: 'hsl(var(--brand-ink))' }}>
             {eyebrow}
@@ -352,13 +318,13 @@ export default function CinematicHero({ eyebrow }: { eyebrow: string }) {
           <p data-hero-sub className="mt-2 line-clamp-2 max-w-md text-sm leading-relaxed sm:mt-5 sm:text-base md:text-lg lg:line-clamp-none" style={{ color: 'hsl(var(--foreground) / 0.78)' }}>
             {KINDS[0].sub}
           </p>
-          <ul className="mt-3 grid grid-cols-3 gap-1.5 sm:mt-5 sm:flex sm:flex-wrap sm:gap-2" aria-label="Clothing types">
+          <ul className="mt-3 grid grid-cols-3 gap-1.5 sm:mt-5" aria-label="Clothing types">
             {KINDS.map((kind, index) => (
-              <li key={kind.label} className="min-w-0 sm:shrink-0">
+              <li key={kind.label} className="min-w-0">
                 <Link
                   data-type
                   to={kind.href}
-                  className={`flex min-h-8 w-full items-center justify-center rounded-full border px-1 text-center text-[10px] font-semibold uppercase leading-none tracking-tight sm:inline-flex sm:min-h-9 sm:w-auto sm:px-3 sm:text-xs sm:tracking-[0.12em] ${index === 0 ? 'is-on' : ''}`}
+                  className={`flex min-h-9 w-full items-center justify-center whitespace-nowrap rounded-full border px-2 text-center text-[10px] font-semibold uppercase leading-none tracking-tight sm:text-[11px] ${index === 0 ? 'is-on' : ''}`}
                 >
                   {kind.label}
                 </Link>
@@ -375,7 +341,7 @@ export default function CinematicHero({ eyebrow }: { eyebrow: string }) {
             </Link>
           </div>
         </div>
-        <div className="hero-cube-column relative z-10 mb-14 flex h-[var(--cube)] w-[var(--cube)] max-w-full shrink-0 flex-col items-center justify-center self-center justify-self-center lg:mb-0 lg:h-full lg:w-full lg:max-w-none lg:shrink lg:self-stretch lg:justify-self-stretch">
+        <div className="hero-cube-column relative z-10 mt-8 flex h-[var(--cube)] w-[var(--cube)] max-w-full shrink-0 flex-col items-center justify-center self-center justify-self-center lg:mt-0 lg:h-full lg:w-full lg:max-w-none lg:shrink lg:self-stretch lg:justify-self-stretch">
           <div data-hero-photo className="hero-cube-scene" aria-hidden="true">
             <div className="hero-cube-tilt">
               <div data-cube-rig className="hero-cube-rig">
@@ -389,22 +355,19 @@ export default function CinematicHero({ eyebrow }: { eyebrow: string }) {
                       style={{ transform: FACE_TRANSFORM[index] }}
                       aria-hidden={index === 0 ? undefined : true}
                     >
-                      <img
-                        alt={kind.label}
-                        src={index === 0 ? '/hero-cube/romper-640.webp' : kind.src}
-                        srcSet={
-                          index === 0
-                            ? '/hero-cube/romper-640.webp 640w, /hero-cube/romper.webp 960w'
-                            : undefined
-                        }
-                        sizes="(min-width: 1024px) 24rem, 64vw"
-                        width={640}
-                        height={800}
-                        decoding="async"
-                        fetchPriority={index === 0 ? 'high' : 'low'}
-                        loading="eager"
-                        className="h-full w-full object-cover object-center"
-                      />
+                      {index === 0 || showAllFaces ? (
+                        <img
+                          alt={kind.label}
+                          {...heroSources(index === 0 ? '/hero-cube/romper.webp' : kind.src)}
+                          sizes={HERO_SIZES}
+                          width={520}
+                          height={616}
+                          decoding={index === 0 ? 'sync' : 'async'}
+                          fetchPriority={index === 0 ? 'high' : 'low'}
+                          loading={index === 0 ? 'eager' : 'lazy'}
+                          className="h-full w-full object-cover object-center"
+                        />
+                      ) : null}
                     </div>
                   ))}
                 </div>
@@ -419,7 +382,7 @@ export default function CinematicHero({ eyebrow }: { eyebrow: string }) {
           />
         </div>
         <div className="absolute bottom-4 left-4 right-4 z-10 hidden h-px bg-foreground/15 lg:block">
-          <div data-film-bar className="h-px origin-left scale-x-0 bg-[#62A848]" />
+          <div data-film-bar className="h-px origin-left scale-x-0 bg-primary" />
         </div>
       </div>
     </section>

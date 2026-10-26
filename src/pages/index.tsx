@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { whenAwake } from '@/lib/page-scroll';
 import { Helmet } from '@dr.pogodin/react-helmet';
 import { Link, useLoaderData } from 'react-router';
 import { ArrowRight } from 'lucide-react';
@@ -57,17 +58,10 @@ export default function HomePage() {
       revert = () => ctx.revert();
     });
     };
-    let cancelIdle = () => {};
-    if (typeof window.requestIdleCallback === 'function') {
-      const id = window.requestIdleCallback(run, { timeout: 1800 });
-      cancelIdle = () => window.cancelIdleCallback(id);
-    } else {
-      const id = window.setTimeout(run, 1200);
-      cancelIdle = () => window.clearTimeout(id);
-    }
+    const cancelAwake = whenAwake(run);
     return () => {
       cancelled = true;
-      cancelIdle();
+      cancelAwake();
       revert();
     };
   }, []);
@@ -215,7 +209,7 @@ export default function HomePage() {
             </p>
           ) : (
             <div className="flex flex-col">
-              {promotions.map((promotion, index) => (
+              {promotions.filter((promotion) => promotion.imageUrl || promotion.videoUrl).map((promotion, index) => (
                 <PromotionCard key={promotion.id} promotion={promotion} index={index} />
               ))}
             </div>
@@ -248,7 +242,7 @@ function PromotionCard({ promotion, index }: { promotion: StorePromotion; index:
   const internal = to.startsWith('/');
   const flip = index % 2 === 1;
   const actionClass =
-    'inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-[#62A848] px-6 text-sm font-semibold uppercase tracking-[0.12em] text-[#122117] sm:w-auto';
+    'inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-primary px-6 text-sm font-semibold uppercase tracking-[0.12em] text-primary-foreground sm:w-auto';
   const action = internal ? (
     <Link to={to} className={actionClass} data-offer-cta>
       Shop Now
@@ -270,7 +264,7 @@ function PromotionCard({ promotion, index }: { promotion: StorePromotion; index:
               {promotion.offer}
             </p>
           ) : null}
-          <h3 className="text-[clamp(1.98rem,4.4vw,3.74rem)] leading-[0.92]">{promotion.heading || promotion.productName}</h3>
+          <h3 className="text-[clamp(1.98rem,4.4vw,3.74rem)] leading-[0.92]">{promotion.productName || promotion.heading}</h3>
           {promotion.message ? (
             <p className="italic-accent mt-5 max-w-md text-[clamp(1.45rem,2.6vw,2rem)] leading-[1.25]">
               {promotion.message}

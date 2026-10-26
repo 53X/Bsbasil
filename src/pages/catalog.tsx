@@ -17,6 +17,19 @@ const AGE_FILTERS = [
   { value: '30-36M', label: '30–36 Months' },
 ] as const;
 const CATEGORY_FILTERS = ['All Categories', 'Romper', 'Sleepwear', 'Sets', 'Winter wear', 'Accessories'] as const;
+const SORTS = [
+  { value: 'featured', label: 'Featured' },
+  { value: 'price-asc', label: 'Price: low to high' },
+  { value: 'price-desc', label: 'Price: high to low' },
+  { value: 'name', label: 'Name' },
+] as const;
+
+function matchesQuery(name: string, category: string, description: string, query: string) {
+  const words = query.toLowerCase().split(/\s+/).filter(Boolean);
+  if (words.length === 0) return true;
+  const hay = `${name} ${category} ${description}`.toLowerCase();
+  return words.every((word) => hay.includes(word));
+}
 
 export default function CatalogPage() {
   const store = useLoaderData() as StoreCatalog & { promotions?: StorePromotion[] };
@@ -39,25 +52,37 @@ export default function CatalogPage() {
     (CATEGORY_FILTERS as readonly string[]).includes(categoryFromUrl)
       ? categoryFromUrl
       : 'All Categories';
+  const query = params.get('q') ?? '';
+  const sortParam = params.get('sort');
+  const sort = SORTS.some((item) => item.value === sortParam) ? sortParam! : 'featured';
   const products = store.products;
 
-  const setFilters = (age: string, category: string) => {
+  const setFilters = (age: string, category: string, nextQuery = query, nextSort = sort) => {
     const next = new URLSearchParams();
     // All Ages / All Categories omit that param = no filter on that axis.
     if (age !== 'All Ages') next.set('age', age);
     if (category !== 'All Categories' && category !== 'All') next.set('category', category);
+    const trimmed = nextQuery.trim();
+    if (trimmed) next.set('q', trimmed);
+    if (nextSort !== 'featured') next.set('sort', nextSort);
     setSearchParams(next, { replace: true });
   };
 
-  const clearFilters = () => setFilters('All Ages', 'All Categories');
+  const clearFilters = () => setFilters('All Ages', 'All Categories', '', sort);
 
-  const hasActiveFilters = selectedAge !== 'All Ages' || selectedCategory !== 'All Categories';
+  const hasActiveFilters = selectedAge !== 'All Ages' || selectedCategory !== 'All Categories' || query.trim().length > 0;
 
   // All Ages = ignore age. All Categories = ignore category. Otherwise AND both.
   // One catalog card per Shopify product — ages are sizes on the product page.
-  const filteredProducts = products.filter((p) =>
-    productMatchesFilters(p, selectedAge, selectedCategory),
-  );
+  const filteredProducts = products
+    .filter((p) => productMatchesFilters(p, selectedAge, selectedCategory))
+    .filter((p) => matchesQuery(p.name, p.category, p.description, query))
+    .sort((a, b) => {
+      if (sort === 'price-asc') return a.price - b.price;
+      if (sort === 'price-desc') return b.price - a.price;
+      if (sort === 'name') return a.name.localeCompare(b.name);
+      return 0;
+    });
   const catalogCards = expandProductsByAge(filteredProducts, selectedAge);
   const visibleCount = catalogCards.length;
   const filterSummary = [
@@ -130,7 +155,6 @@ export default function CatalogPage() {
       <main>
         {/* ── Hero Banner ── */}
         <section className="relative overflow-hidden px-4 pb-6 pt-12 md:pt-16">
-          <p className="watermark" aria-hidden="true">SHOP</p>
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -145,7 +169,7 @@ export default function CatalogPage() {
               <em>chosen by age.</em>
             </h1>
             {shopOffer ? (
-              <p className="mt-4 inline-flex min-h-9 items-center rounded-full bg-[#62A848] px-4 text-sm font-semibold uppercase tracking-[0.14em] text-[#122117]">
+              <p className="mt-4 inline-flex min-h-9 items-center rounded-full bg-primary px-4 text-sm font-semibold uppercase tracking-[0.14em] text-primary-foreground">
                 {shopOffer}
               </p>
             ) : null}
@@ -181,6 +205,37 @@ export default function CatalogPage() {
               </div>
 
               {/* Category filter */}
+              <div className="mb-sm grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end">
+                <label className="block min-w-0">
+                  <span className="text-xs font-semibold mb-xs uppercase tracking-wide block" style={{ color: 'hsl(var(--muted-foreground))' }}>
+                    Search
+                  </span>
+                  <input
+                    type="search"
+                    value={query}
+                    onChange={(event) => setFilters(selectedAge, selectedCategory, event.target.value, sort)}
+                    placeholder="Search rompers, sets, sleepwear"
+                    className="h-11 w-full rounded-full border bg-background px-4 text-sm text-foreground"
+                    style={{ borderColor: 'hsl(var(--border))' }}
+                  />
+                </label>
+                <label className="block">
+                  <span className="text-xs font-semibold mb-xs uppercase tracking-wide block" style={{ color: 'hsl(var(--muted-foreground))' }}>
+                    Sort
+                  </span>
+                  <select
+                    value={sort}
+                    onChange={(event) => setFilters(selectedAge, selectedCategory, query, event.target.value)}
+                    className="h-11 w-full rounded-full border bg-background px-4 text-sm font-semibold text-foreground sm:w-auto"
+                    style={{ borderColor: 'hsl(var(--border))' }}
+                  >
+                    {SORTS.map((item) => (
+                      <option key={item.value} value={item.value}>{item.label}</option>
+                    ))}
+                  </select>
+                </label>
+              </div>
+
               <div role="group" aria-label="Filter by category">
                 <p className="text-xs font-semibold mb-xs uppercase tracking-wide" style={{ color: 'hsl(var(--muted-foreground))' }}>
                   Category
@@ -267,7 +322,7 @@ export default function CatalogPage() {
                   No items found
                 </h3>
                 <p className="text-sm mb-lg" style={{ color: 'hsl(var(--muted-foreground))' }}>
-                  Try a different age range or category.
+                  Try a different age, category, or search.
                 </p>
                 <button
                 onClick={clearFilters}

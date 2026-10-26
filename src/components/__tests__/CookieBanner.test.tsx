@@ -260,14 +260,22 @@ describe('CookieBanner', () => {
   })
 
   describe('initTracking', () => {
+    function wake() {
+      act(() => {
+        window.dispatchEvent(new Event('pointerdown'))
+      })
+    }
+
     it('appends SCC script to document.head on first mount', () => {
       render(<CookieBanner />)
+      wake()
       const scripts = document.head.querySelectorAll('script[src*="scc-c2"]')
       expect(scripts.length).toBe(1)
     })
 
     it('initializes _trfd with ap property', () => {
       render(<CookieBanner />)
+      wake()
       expect(window._trfd).toBeDefined()
       expect((window._trfd as Array<{ ap: string }>)[0]).toMatchObject({ ap: 'airo-app-builder' })
     })
@@ -276,6 +284,7 @@ describe('CookieBanner', () => {
       vi.stubEnv('SITE_ID', 'test-site-abc123')
       try {
         render(<CookieBanner />)
+        wake()
         const push: Record<string, unknown> = (window._trfd as Array<Record<string, unknown>>)[0]
         expect(push).toHaveProperty('ap', 'airo-app-builder')
         expect(push).toHaveProperty('websiteId', 'test-site-abc123')
@@ -286,6 +295,7 @@ describe('CookieBanner', () => {
 
     it('omits websiteId from _trfd push when SITE_ID env var is not set', () => {
       render(<CookieBanner />)
+      wake()
       const push: Record<string, unknown> = (window._trfd as Array<Record<string, unknown>>)[0]
       expect(push).toHaveProperty('ap', 'airo-app-builder')
       expect(push).not.toHaveProperty('websiteId')
@@ -301,6 +311,7 @@ describe('CookieBanner', () => {
     it('initializes _signalsDataLayer if not already present', () => {
       delete (window as Partial<Window>)._signalsDataLayer
       render(<CookieBanner />)
+      wake()
       expect(Array.isArray(window._signalsDataLayer)).toBe(true)
     })
   })

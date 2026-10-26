@@ -14,6 +14,7 @@ export function shopifyImageUrl(src: string, width: number, format?: 'webp' | 'j
   const url = new URL(src);
   url.searchParams.set('width', String(Math.round(width)));
   if (format) url.searchParams.set('format', format);
+  url.searchParams.set('quality', '75');
   return url.toString();
 }
 
