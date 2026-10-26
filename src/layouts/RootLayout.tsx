@@ -1,5 +1,5 @@
 import { Helmet } from '@dr.pogodin/react-helmet';
-import { type ReactElement } from 'react';
+import { useEffect, type ReactElement } from 'react';
 import { ScrollRestoration } from 'react-router';
 
 import HomepageSameAsJsonLd from '@/components/HomepageSameAsJsonLd';
@@ -16,6 +16,25 @@ interface RootLayoutProps {
 }
 
 export default function RootLayout({ children }: RootLayoutProps) {
+  useEffect(() => {
+    // Bring the next pages' code down once the homepage has painted, so a
+    // click does not sit there while a chunk downloads.
+    const run = () => {
+      void import('@/pages/catalog');
+      void import('@/pages/product');
+      void import('@/pages/about');
+      void import('@/pages/contact');
+      void import('@/pages/lookbook');
+      void import('@/pages/cart');
+    };
+    if ('requestIdleCallback' in window) {
+      const id = window.requestIdleCallback(run, { timeout: 2000 });
+      return () => window.cancelIdleCallback(id);
+    }
+    const id = window.setTimeout(run, 1200);
+    return () => window.clearTimeout(id);
+  }, []);
+
   return (
     <AuthProvider>
     <CartProvider>

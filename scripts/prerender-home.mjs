@@ -41,7 +41,11 @@ try {
   const stylesheet = page.match(/<link rel="stylesheet"[^>]*>/);
   if (stylesheet) {
     page = page.replace(stylesheet[0], '');
-    page = page.replace('</style>', `</style>\n    ${stylesheet[0]}`);
+    const href = stylesheet[0].match(/href="([^"]+)"/);
+    const early = href
+      ? `<link rel="stylesheet" href="${href[1]}" media="print" data-async-css="1" onload="this.media='all';requestAnimationFrame(function(){document.documentElement.classList.add('css-ready')})" />\n    <noscript>${stylesheet[0]}<style>#app{visibility:visible!important}</style></noscript>`
+      : stylesheet[0];
+    page = page.replace('</style>', `</style>\n    ${early}`);
   }
   if (hydration) {
     page = page.replace('</body>', `${hydration[0]}\n  </body>`);

@@ -1,11 +1,18 @@
 import { useEffect, type ReactNode } from 'react';
-import { bindLenis, whenAwake } from '@/lib/page-scroll';
+import { useLocation } from 'react-router';
+import { bindLenis, scrollToImmediate, whenAwake } from '@/lib/page-scroll';
 
 /**
  * Lenis smooth scroll, kept in step with GSAP ScrollTrigger.
  * Stays off when the visitor has asked for reduced motion.
  */
 export default function SmoothScroll({ children }: { children: ReactNode }) {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    scrollToImmediate(0);
+  }, [pathname]);
+
   useEffect(() => {
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (reduced) return;

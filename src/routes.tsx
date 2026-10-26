@@ -23,6 +23,11 @@ export const routes: RouteObject[] = [
   {
     path: '/catalog',
     loader: catalogLoader,
+    // Age, category, search, and sort only narrow the products already loaded.
+    // Refetching Shopify on each click is what made the filters feel stuck.
+    shouldRevalidate({ currentUrl, nextUrl }) {
+      return currentUrl.pathname !== nextUrl.pathname;
+    },
     lazy: () => import('./pages/catalog').then((m) => ({ Component: m.default })),
   },
   {

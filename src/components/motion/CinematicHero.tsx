@@ -341,7 +341,7 @@ export default function CinematicHero({ eyebrow }: { eyebrow: string }) {
             </Link>
           </div>
         </div>
-        <div className="hero-cube-column relative z-10 mt-8 flex h-[var(--cube)] w-[var(--cube)] max-w-full shrink-0 flex-col items-center justify-center self-center justify-self-center lg:mt-0 lg:h-full lg:w-full lg:max-w-none lg:shrink lg:self-stretch lg:justify-self-stretch">
+        <div className="hero-cube-column relative z-10 mt-8 flex h-[var(--cube)] w-[var(--cube)] max-w-full shrink-0 items-center justify-center self-center justify-self-center lg:mt-0">
           <div data-hero-photo className="hero-cube-scene" aria-hidden="true">
             <div className="hero-cube-tilt">
               <div data-cube-rig className="hero-cube-rig">
