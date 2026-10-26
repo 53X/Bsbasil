@@ -3,6 +3,14 @@
   --cube: min(64vw, calc(100vw - 3.5rem), calc(100svh - 24rem), 17.5rem);
 }
 
+/* The tilted face paints past the square. Keep that paint inside the hero,
+   clear of the trust line, without growing the cube's own box. */
+@media (max-width: 1023px) {
+  .hero-cube-column {
+    margin-bottom: calc(var(--cube) * 0.22 + 1.5rem);
+  }
+}
+
 .hero-cube-link {
   position: absolute;
   z-index: 30;

@@ -1,6 +1,5 @@
 import { Helmet } from '@dr.pogodin/react-helmet';
 import { useLoaderData, useSearchParams } from 'react-router';
-import { motion } from 'motion/react';
 import { X } from 'lucide-react';
 import ProductCard from '@/components/ProductCard';
 import { ageLabel, expandProductsByAge, productMatchesFilters } from '@/lib/shopify/map';
@@ -155,11 +154,7 @@ export default function CatalogPage() {
       <main>
         {/* ── Hero Banner ── */}
         <section className="relative overflow-hidden px-4 pb-6 pt-12 md:pt-16">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, ease: 'easeOut' as const }}
-            className="relative z-10 mx-auto max-w-content">
+          <div className="relative z-10 mx-auto max-w-content">
             <p className="mb-3 text-xs font-semibold uppercase tracking-[0.22em]" style={{ color: 'hsl(var(--brand-ink))' }}>
               The collection · ages 0–3
             </p>
@@ -173,7 +168,7 @@ export default function CatalogPage() {
                 {shopOffer}
               </p>
             ) : null}
-          </motion.div>
+          </div>
         </section>
 
         {/* ── Filters ── */}
@@ -337,19 +332,13 @@ export default function CatalogPage() {
             {/* Grid — one card per product; age filter only limits which products appear */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
               {catalogCards.map(({ product, ageCode }, i) => (
-                  <motion.div
-                    key={product.id}
-                    className="h-full"
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ duration: 0.3, delay: Math.min(i, 8) * 0.04, ease: 'easeOut' as const }}
-                  >
+                  <div key={product.id} className="h-full">
                     <ProductCard
                       product={product}
                       ageHighlight={ageCode || undefined}
                       index={i}
                     />
-                  </motion.div>
+                  </div>
               ))}
             </div>
           </div>

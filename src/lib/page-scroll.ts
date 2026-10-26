@@ -33,6 +33,14 @@ export function bindLenis(next: LenisHandle | null) {
   lenis = next;
 }
 
+export function scrollToImmediate(target: number) {
+  if (lenis) {
+    lenis.scrollTo(target, { immediate: true });
+    return;
+  }
+  window.scrollTo(0, target);
+}
+
 export function scrollPageBy(delta: number, immediate = true) {
   if (!delta) return;
   if (lenis) {

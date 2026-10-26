@@ -174,6 +174,7 @@ interface CartPayload {
 }
 
 let catalogCache: { at: number; value: StoreCatalog } | null = null;
+let catalogFlight: Promise<StoreCatalog> | null = null;
 const CACHE_MS = 60_000;
 
 async function storefront<T>(query: string, variables?: Record<string, unknown>): Promise<T> {
@@ -233,12 +234,26 @@ function emptyCatalog(configured: boolean, error: string | null): StoreCatalog {
   };
 }
 
+function refreshCatalog(): Promise<StoreCatalog> {
+  if (catalogFlight) return catalogFlight;
+  catalogFlight = fetchCatalog().finally(() => {
+    catalogFlight = null;
+  });
+  return catalogFlight;
+}
+
 export async function loadCatalog(force = false): Promise<StoreCatalog> {
   if (!shopifyConfig()) return emptyCatalog(false, null);
-  if (!force && catalogCache && Date.now() - catalogCache.at < CACHE_MS) {
+  if (!force && catalogCache) {
+    // A later visit should open on the products we already have. Refresh
+    // after the minute is up without making the click wait on Shopify.
+    if (Date.now() - catalogCache.at >= CACHE_MS) void refreshCatalog();
     return catalogCache.value;
   }
+  return refreshCatalog();
+}
 
+async function fetchCatalog(): Promise<StoreCatalog> {
   try {
     const products: StoreProduct[] = [];
     let cursor: string | null = null;
@@ -544,8 +559,7 @@ export async function updateCartLine(cartId: string, lineId: string, quantity: n
 }
 
 export async function catalogLoader() {
-  const catalog = await loadCatalog();
-  const promotions = await loadPromotions();
+  const [catalog, promotions] = await Promise.all([loadCatalog(), loadPromotions()]);
   return {
     ...catalog,
     products: applyPromotionOffers(catalog.products, promotions),
@@ -652,8 +666,27 @@ async function applyPromotionDiscountCodes(promotions: StorePromotion[]): Promis
   return next;
 }
 
+let promotionsCache: { at: number; value: StorePromotion[] } | null = null;
+let promotionsFlight: Promise<StorePromotion[]> | null = null;
+
 export async function loadPromotions(): Promise<StorePromotion[]> {
   if (!shopifyConfig()) return [];
+  if (promotionsCache) {
+    if (Date.now() - promotionsCache.at >= CACHE_MS) void refreshPromotions();
+    return promotionsCache.value;
+  }
+  return refreshPromotions();
+}
+
+function refreshPromotions(): Promise<StorePromotion[]> {
+  if (promotionsFlight) return promotionsFlight;
+  promotionsFlight = fetchPromotions().finally(() => {
+    promotionsFlight = null;
+  });
+  return promotionsFlight;
+}
+
+async function fetchPromotions(): Promise<StorePromotion[]> {
   const promotions: StorePromotion[] = [];
   let cursor: string | null = null;
   try {
@@ -691,9 +724,11 @@ export async function loadPromotions(): Promise<StorePromotion[]> {
       if (!data.metaobjects.pageInfo.hasNextPage || !nextCursor || nextCursor === cursor) break;
       cursor = nextCursor;
     }
-    return applyPromotionDiscountCodes(promotions);
+    const value = await applyPromotionDiscountCodes(promotions);
+    promotionsCache = { at: Date.now(), value };
+    return value;
   } catch {
-    return promotions;
+    return promotionsCache?.value ?? promotions;
   }
 }
 
@@ -827,8 +862,10 @@ export async function productLoader({ params }: { params: { handle?: string } })
     const catalog = await catalogLoader();
     return { product: null as StoreProduct | null, catalog };
   }
-  const result = await loadProduct(params.handle);
-  const promotions = await loadPromotions();
+  const [result, promotions] = await Promise.all([
+    loadProduct(params.handle),
+    loadPromotions(),
+  ]);
   const products = applyPromotionOffers(result.catalog.products, promotions);
   const product = result.product ? applyPromotionOffers([result.product], promotions)[0] ?? null : null;
   return { product, catalog: { ...result.catalog, products, promotions } };

@@ -11,7 +11,7 @@
             history.replaceState(null, '', u.toString());
           }
         } catch (e) {}
-        document.documentElement.classList.add('skip-boot');
+        if (location.pathname !== '/') document.documentElement.classList.add('skip-boot');
         if (location.pathname === '/') {
           var hero = document.createElement('link');
           hero.rel = 'preload';
@@ -59,6 +59,7 @@
         pointer-events: auto;
       }
       html.skip-boot #boot { display: none !important; }
+      html:not(.css-ready) #app { visibility: hidden; }
       .boot-mark {
         display: flex;
         flex-direction: row;
@@ -143,9 +144,16 @@
     <script src="/airo-logo-orientation.js" defer></script>
   </head>
   <body class="fs-unmask-airo-app-builder">
+    <script>
+      (function () {
+        if (document.querySelector('link[data-async-css]')) return;
+        document.documentElement.classList.add('css-ready');
+      })();
+    </script>
     <div id="boot" aria-hidden="true">
       <div class="boot-mark">
         <p class="boot-welcome">Welcome to</p>
+        <img class="boot-logo" src="/logo-horizontal.webp" alt="" width="248" height="72" decoding="async" fetchpriority="low" />
       </div>
     </div>
     <script>
@@ -154,8 +162,20 @@
         if (!boot) return;
         var started = performance.now();
         var armed = false;
+        var waitingCss = false;
         function leave() {
           if (armed || !boot) return;
+          if (!document.documentElement.classList.contains('css-ready')) {
+            if (waitingCss) return;
+            waitingCss = true;
+            var waitCss = new MutationObserver(function () {
+              if (!document.documentElement.classList.contains('css-ready')) return;
+              waitCss.disconnect();
+              leave();
+            });
+            waitCss.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+            return;
+          }
           armed = true;
           var wait = Math.max(0, 1400 - (performance.now() - started));
           setTimeout(function () {
