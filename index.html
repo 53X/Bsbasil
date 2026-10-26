@@ -74,7 +74,7 @@
       }
       @media (prefers-reduced-motion: no-preference) {
         .boot-mark {
-          animation: boot-rise 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+          animation: boot-rise 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
         }
       }
       .boot-welcome {
@@ -94,14 +94,14 @@
       }
       #boot.is-leave {
         pointer-events: none;
-        animation: boot-lift 0.85s cubic-bezier(0.76, 0, 0.24, 1) forwards;
+        animation: boot-lift 0.28s ease forwards;
       }
       @keyframes boot-rise {
-        from { opacity: 0; transform: translate3d(0, 1rem, 0); }
-        to { opacity: 1; transform: none; }
+        from { transform: translate3d(0, 0.6rem, 0); }
+        to { transform: none; }
       }
       @keyframes boot-lift {
-        to { transform: translate3d(0, -110%, 0); }
+        to { opacity: 0; }
       }
       .hero-cube-scene {
         --cube: min(64vw, calc(100vw - 3.5rem), calc(100svh - 24rem), 17.5rem);
@@ -177,10 +177,10 @@
             return;
           }
           armed = true;
-          var wait = Math.max(0, 1400 - (performance.now() - started));
+          var wait = Math.max(0, 520 - (performance.now() - started));
           setTimeout(function () {
             boot.classList.add('is-leave');
-            setTimeout(function () { boot.remove(); }, 900);
+            setTimeout(function () { boot.remove(); }, 320);
           }, wait);
         }
         window.addEventListener('bs-boot-ready', leave, { once: true });

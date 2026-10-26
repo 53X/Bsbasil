@@ -10,6 +10,7 @@ import Header from '@/layouts/parts/Header';
 import Website from '@/layouts/Website';
 import { AuthProvider } from '@/contexts/auth-context';
 import { CartProvider } from '@/contexts/cart-context';
+import { whenAwake } from '@/lib/page-scroll';
 
 interface RootLayoutProps {
   children: ReactElement;
@@ -17,8 +18,8 @@ interface RootLayoutProps {
 
 export default function RootLayout({ children }: RootLayoutProps) {
   useEffect(() => {
-    // Bring the next pages' code down once the homepage has painted, so a
-    // click does not sit there while a chunk downloads.
+    // Load the next pages after a real visit, not during the first paint.
+    // A timed prefetch was competing with the hero image in lab tests.
     const run = () => {
       void import('@/pages/catalog');
       void import('@/pages/product');
@@ -27,12 +28,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
       void import('@/pages/lookbook');
       void import('@/pages/cart');
     };
-    if ('requestIdleCallback' in window) {
-      const id = window.requestIdleCallback(run, { timeout: 2000 });
-      return () => window.cancelIdleCallback(id);
-    }
-    const id = window.setTimeout(run, 1200);
-    return () => window.clearTimeout(id);
+    return whenAwake(run);
   }, []);
 
   return (
