@@ -4,6 +4,7 @@ type LenisHandle = {
 };
 
 let lenis: LenisHandle | null = null;
+let ignoreScrollUntil = 0;
 
 /**
  * Runs once the visitor actually interacts. Lab tests never scroll or tap,
@@ -22,10 +23,16 @@ export function whenAwake(run: () => void): () => void {
     start();
     return () => {};
   }
-  const events = ['pointerdown', 'keydown', 'touchstart', 'wheel', 'scroll'] as const;
+  const events = ['pointerdown', 'keydown', 'touchstart', 'wheel'] as const;
+  const onScroll = () => {
+    if (performance.now() < ignoreScrollUntil) return;
+    start();
+  };
   events.forEach((event) => window.addEventListener(event, start, { once: true, passive: true }));
+  window.addEventListener('scroll', onScroll, { passive: true });
   return () => {
     events.forEach((event) => window.removeEventListener(event, start));
+    window.removeEventListener('scroll', onScroll);
   };
 }
 
@@ -34,6 +41,7 @@ export function bindLenis(next: LenisHandle | null) {
 }
 
 export function scrollToImmediate(target: number) {
+  ignoreScrollUntil = performance.now() + 120;
   if (lenis) {
     lenis.scrollTo(target, { immediate: true });
     return;

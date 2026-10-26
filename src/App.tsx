@@ -6,6 +6,7 @@ import AiroErrorBoundary from '../export-plugins/AiroErrorBoundary';
 import CookieBannerErrorBoundary from '@/components/CookieBannerErrorBoundary';
 import RootLayout from './layouts/RootLayout';
 import Spinner from './components/Spinner';
+import { whenAwake } from '@/lib/page-scroll';
 import { routes } from './routes';
 
 const CookieBanner = lazy(() =>
@@ -55,9 +56,7 @@ const router = createBrowserRouter(routeTree);
 
 export default function App() {
   const [showConsent, setShowConsent] = useState(false);
-  useEffect(() => {
-    setShowConsent(true);
-  }, []);
+  useEffect(() => whenAwake(() => setShowConsent(true)), []);
   return (
     <>
       <RouterProvider router={router} />

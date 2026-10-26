@@ -192,7 +192,7 @@ export default function HomePage() {
           <ArrivalRail id="bestsellers" products={bestsellers} lead={bestsellerLead} accent={bestsellerAccent} />
         ) : null}
 
-        <section className="cv-auto py-16">
+        <section className="py-16">
           <div className="mx-auto mb-10 max-w-content px-4">
             <h2 className="text-[clamp(2.53rem,5.75vw,4.83rem)] uppercase leading-[0.9]">{home.featuredSection.title}</h2>
             <p className="italic-accent mt-4 max-w-lg text-[clamp(1.55rem,3vw,2.2rem)] leading-[1.2]">
@@ -243,13 +243,14 @@ function PromotionCard({ promotion, index }: { promotion: StorePromotion; index:
   const flip = index % 2 === 1;
   const actionClass =
     'inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-primary px-6 text-sm font-semibold uppercase tracking-[0.12em] text-primary-foreground sm:w-auto';
+  const actionStyle = { background: 'hsl(var(--primary))', color: 'hsl(var(--primary-foreground))' };
   const action = internal ? (
-    <Link to={to} className={actionClass} data-offer-cta>
+    <Link to={to} className={actionClass} style={actionStyle} data-offer-cta>
       Shop Now
       <ArrowRight size={14} />
     </Link>
   ) : (
-    <a href={to} className={actionClass} data-offer-cta>
+    <a href={to} className={actionClass} style={actionStyle} data-offer-cta>
       Shop Now
       <ArrowRight size={14} />
     </a>
