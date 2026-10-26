@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { whenAwake } from '@/lib/page-scroll';
 import { Link } from 'react-router';
 import ProductCard from '@/components/ProductCard';
 import type { StoreProduct } from '@/lib/shopify/types';
@@ -27,8 +28,10 @@ export default function ArrivalRail({
     const clip = root?.querySelector('[data-arrival-clip]') as HTMLElement | null;
     if (!root || !track || !stage || !clip || products.length === 0) return;
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (reduced) {
+    const desktop = window.matchMedia('(min-width: 1024px)').matches;
+    if (reduced || !desktop) {
       clip.style.overflowX = 'auto';
+      root.style.height = '';
       return;
     }
 
@@ -82,18 +85,11 @@ export default function ArrivalRail({
     });
     };
 
-    let cancelIdle = () => {};
-    if (typeof window.requestIdleCallback === 'function') {
-      const id = window.requestIdleCallback(run, { timeout: 1800 });
-      cancelIdle = () => window.cancelIdleCallback(id);
-    } else {
-      const id = window.setTimeout(run, 1200);
-      cancelIdle = () => window.clearTimeout(id);
-    }
+    const cancelAwake = whenAwake(run);
 
     return () => {
       cancelled = true;
-      cancelIdle();
+      cancelAwake();
       revert();
     };
   }, [products.length]);
@@ -125,7 +121,7 @@ export default function ArrivalRail({
           <div ref={trackRef} className="flex w-max items-stretch gap-4 px-4 pb-8 sm:gap-6 lg:gap-8">
             {products.map((product, index) => (
               <div key={product.id} className="w-[min(72vw,280px)] shrink-0 sm:w-[min(42vw,280px)] lg:w-[min(22vw,280px)]">
-                <ProductCard product={product} index={index} />
+                <ProductCard product={product} index={index} imageSizes="280px" imageWidth={280} />
               </div>
             ))}
           </div>

@@ -48,13 +48,15 @@ export default function Footer() {
       <div className="mx-auto grid max-w-content gap-10 px-4 py-14 md:grid-cols-[1.3fr_1fr_1fr]">
         <div>
           <img
-            src="/logo-horizontal.webp"
+            src="/logo-180.webp"
+            srcSet="/logo-180.webp 180w, /logo-280.webp 280w, /logo-horizontal.webp 360w"
+            sizes="140px"
             loading="lazy"
             decoding="async"
             alt="Bsbasil"
             className="mb-4 block h-auto max-h-10 w-auto object-contain"
             width={140}
-            height={36}
+            height={42}
           />
           <p className="max-w-xs text-sm leading-relaxed text-[#F6F3EA]/80">
             Soft, safe clothes for ages 0–3. Pick an age, choose a size, and we’ll take care of the rest.

@@ -26,9 +26,14 @@ const isBrowser = typeof window !== 'undefined';
 const builder = i18n.use(initReactI18next);
 
 if (isBrowser) {
-  // Dynamic import keeps the browser-only module out of the SSR evaluation path.
-  import('i18next-browser-languagedetector').then(({ default: LanguageDetector }) => {
-    builder.use(LanguageDetector);
+  // The shop ships one language. Load the detector only after a real interaction
+  // so it stays off the first-load trace.
+  void import('@/lib/page-scroll').then(({ whenAwake }) => {
+    whenAwake(() => {
+      void import('i18next-browser-languagedetector').then(({ default: LanguageDetector }) => {
+        builder.use(LanguageDetector);
+      });
+    });
   });
 }
 

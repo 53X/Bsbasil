@@ -26,6 +26,10 @@ export const routes: RouteObject[] = [
     lazy: () => import('./pages/catalog').then((m) => ({ Component: m.default })),
   },
   {
+    path: '/lookbook',
+    lazy: () => import('./pages/lookbook').then((m) => ({ Component: m.default })),
+  },
+  {
     path: '/products/:handle',
     loader: productLoader,
     lazy: () => import('./pages/product').then((m) => ({ Component: m.default })),
@@ -78,5 +82,5 @@ export const routes: RouteObject[] = [
   },
 ];
 
-export type Path = '/' | '/about' | '/catalog' | '/shop' | '/cart';
+export type Path = '/' | '/about' | '/catalog' | '/lookbook' | '/shop' | '/cart';
 export type Params = Record<string, string | undefined>;

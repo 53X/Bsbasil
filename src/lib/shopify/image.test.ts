@@ -8,6 +8,7 @@ describe('shopify image urls', () => {
     const next = new URL(shopifyImageUrl(src, 480, 'webp'));
     expect(next.searchParams.get('width')).toBe('480');
     expect(next.searchParams.get('format')).toBe('webp');
+    expect(next.searchParams.get('quality')).toBe('75');
     expect(next.searchParams.get('v')).toBe('12');
   });
 

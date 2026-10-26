@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { useLocation } from 'react-router';
+import { whenAwake } from '@/lib/page-scroll';
 
 const HEADINGS = 'h1, h2, h3, h4, h5, h6';
 const SUBHEADS = 'p.italic-accent, [data-subhead], [data-hero-sub]';
@@ -18,6 +19,17 @@ export default function HeadlineMotion() {
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (reduced) return;
 
+    let stop = () => {};
+    const cancel = whenAwake(() => {
+      const done = mount(root);
+      if (typeof done === 'function') stop = done;
+    });
+    return () => {
+      cancel();
+      stop();
+    };
+
+    function mount(root: HTMLElement): () => void {
     const armed: HTMLElement[] = [];
     const offerButtons: HTMLElement[] = [];
 
@@ -131,7 +143,15 @@ export default function HeadlineMotion() {
       if (el.dataset.played === '1' && box.top > vh * 0.96) hide(el);
     };
 
+    let initial = true;
     const watch = (el: HTMLElement) => {
+      if (initial) {
+        const box = el.getBoundingClientRect();
+        if (box.bottom > 0 && box.top < window.innerHeight) {
+          el.dataset.played = '1';
+          return;
+        }
+      }
       splitWords(el);
       if (!piecesOf(el).length) return;
       if (!armed.includes(el)) armed.push(el);
@@ -211,6 +231,7 @@ export default function HeadlineMotion() {
     };
 
     scan();
+    initial = false;
     frame = window.requestAnimationFrame(tick);
     const changes = new MutationObserver(scan);
     changes.observe(root, { childList: true, subtree: true });
@@ -228,6 +249,7 @@ export default function HeadlineMotion() {
         delete el.dataset.played;
       });
     };
+    }
   }, [pathname]);
 
   return null;

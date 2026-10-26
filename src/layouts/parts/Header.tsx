@@ -1,6 +1,7 @@
 import { Link, useLocation } from 'react-router';
 import { Menu, X, ShoppingBag } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { useAuth } from '@/contexts/auth-context';
 import { useCart } from '@/contexts/use-cart';
 
@@ -10,10 +11,28 @@ export default function Header() {
   const { cartCount } = useCart();
   const { user, ready, signOut } = useAuth();
 
+  useEffect(() => {
+    setIsMobileMenuOpen(false);
+  }, [location.pathname]);
+
+  useEffect(() => {
+    if (!isMobileMenuOpen) return;
+    const previous = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setIsMobileMenuOpen(false);
+    };
+    window.addEventListener('keydown', onKey);
+    return () => {
+      document.body.style.overflow = previous;
+      window.removeEventListener('keydown', onKey);
+    };
+  }, [isMobileMenuOpen]);
+
   const navItems = [
     { href: '/', label: 'Home' },
     { href: '/catalog', label: 'Shop' },
-    { href: '/#moods', label: 'Lookbook' },
+    { href: '/lookbook', label: 'Lookbook' },
     { href: '/about', label: 'About' },
     { href: '/contact', label: 'Contact' },
   ];
@@ -26,7 +45,7 @@ export default function Header() {
       >
         Skip to content
       </a>
-      <div className="border-b border-[#122117]/15 bg-[#62A848] text-[#122117]">
+      <div className="border-b border-primary-foreground/15 bg-primary text-primary-foreground">
         <p className="mx-auto flex h-8 max-w-content items-center justify-center whitespace-nowrap px-3 text-[9px] font-semibold uppercase tracking-[0.08em] sm:text-[11px] sm:tracking-[0.2em]">
           Soft cotton · Ages 0–3 · Pan-India delivery
         </p>
@@ -35,11 +54,13 @@ export default function Header() {
         <div className="flex h-[4.25rem] items-center justify-between gap-4">
           <Link to="/" className="flex shrink-0 items-center">
             <img
-              src="/logo-horizontal.webp"
+              src="/logo-180.webp"
+              srcSet="/logo-180.webp 180w, /logo-280.webp 280w, /logo-horizontal.webp 360w"
+              sizes="(min-width: 640px) 180px, 152px"
               alt="Bsbasil"
               className="block h-auto max-h-9 w-auto max-w-[9.5rem] object-contain sm:max-h-11 sm:max-w-[180px]"
               width={180}
-              height={48}
+              height={54}
               decoding="async"
             />
           </Link>
@@ -65,7 +86,7 @@ export default function Header() {
               <button
                 type="button"
                 onClick={() => signOut()}
-                className="hidden min-h-11 px-2 text-sm font-medium uppercase tracking-[0.12em] sm:inline"
+                className="inline min-h-11 px-1 text-[11px] font-medium uppercase tracking-[0.08em] sm:px-2 sm:text-sm sm:tracking-[0.12em]"
                 style={{ color: 'hsl(var(--muted-foreground))' }}
               >
                 Sign out
@@ -73,7 +94,7 @@ export default function Header() {
             ) : (
               <Link
                 to="/sign-in"
-                className="hidden min-h-11 items-center px-2 text-sm font-medium uppercase tracking-[0.12em] sm:inline-flex"
+                className="inline-flex min-h-11 items-center px-1 text-[11px] font-medium uppercase tracking-[0.08em] sm:px-2 sm:text-sm sm:tracking-[0.12em]"
               >
                 Sign in
               </Link>
@@ -81,11 +102,10 @@ export default function Header() {
             <Link
               to="/cart"
               className="relative flex h-11 items-center gap-2 px-2 text-sm font-medium tracking-[0.14em]"
-              aria-label={`BAG ${cartCount}`}
             >
               <ShoppingBag size={18} aria-hidden="true" />
-              <span className="hidden sm:inline" aria-hidden="true">BAG</span>
-              <span className="tabular-nums" aria-hidden="true" style={{ color: 'hsl(var(--logo))' }}>
+              <span className="max-sm:sr-only">BAG</span>
+              <span className="tabular-nums" style={{ color: 'hsl(var(--logo))' }}>
                 {cartCount}
               </span>
             </Link>
@@ -100,47 +120,78 @@ export default function Header() {
           </div>
         </div>
 
-        {isMobileMenuOpen && (
-          <nav className="flex flex-col gap-1 border-t border-foreground/10 py-3 lg:hidden" aria-label="Mobile navigation">
-            {navItems.map((item) => (
-              <Link
-                key={item.href}
-                to={item.href}
-                className="rounded-xl px-2 py-3 text-lg font-medium uppercase tracking-[0.14em]"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                {item.label}
-              </Link>
-            ))}
-            {ready && user ? (
-              <button
-                type="button"
-                className="rounded-xl px-2 py-3 text-left text-lg font-medium uppercase tracking-[0.14em]"
-                onClick={() => {
-                  setIsMobileMenuOpen(false);
-                  signOut();
-                }}
-              >
-                Sign out
-              </button>
-            ) : (
-              <Link
-                to="/sign-in"
-                className="rounded-xl px-2 py-3 text-lg font-medium uppercase tracking-[0.14em]"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                Sign in
-              </Link>
-            )}
-            <Link
-              to="/catalog"
-              className="mt-2 flex min-h-12 items-center justify-center rounded-full bg-primary text-sm font-semibold uppercase tracking-[0.16em] text-primary-foreground"
-              onClick={() => setIsMobileMenuOpen(false)}
-            >
-              Explore the collection
-            </Link>
-          </nav>
-        )}
+        {isMobileMenuOpen
+          ? createPortal(
+              <div className="fixed inset-0 z-[80] lg:hidden" role="presentation">
+                <button
+                  type="button"
+                  className="absolute inset-0 bg-foreground/45"
+                  aria-label="Close menu"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                />
+                <nav
+                  className="absolute inset-y-0 right-0 flex w-[min(100%,22rem)] flex-col bg-background px-6 pb-8 pt-6 shadow-lg"
+                  aria-label="Mobile navigation"
+                >
+                  <div className="mb-6 flex items-center justify-between">
+                    <p className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: 'hsl(var(--brand-ink))' }}>
+                      Menu
+                    </p>
+                    <button
+                      type="button"
+                      className="flex h-11 w-11 items-center justify-center"
+                      aria-label="Close menu"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      <X size={20} />
+                    </button>
+                  </div>
+                  <div className="flex flex-1 flex-col gap-1">
+                    {navItems.map((item) => (
+                      <Link
+                        key={item.href}
+                        to={item.href}
+                        className="rounded-xl px-2 py-3 text-lg font-medium uppercase tracking-[0.14em]"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                      >
+                        {item.label}
+                      </Link>
+                    ))}
+                  </div>
+                  {ready && user ? (
+                    <button
+                      type="button"
+                      className="mt-4 min-h-12 rounded-full border px-4 text-sm font-semibold uppercase tracking-[0.14em]"
+                      style={{ borderColor: 'hsl(var(--border))' }}
+                      onClick={() => {
+                        setIsMobileMenuOpen(false);
+                        signOut();
+                      }}
+                    >
+                      Sign out
+                    </button>
+                  ) : (
+                    <Link
+                      to="/sign-in"
+                      className="mt-4 flex min-h-12 items-center justify-center rounded-full border px-4 text-sm font-semibold uppercase tracking-[0.14em]"
+                      style={{ borderColor: 'hsl(var(--border))' }}
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      Sign in
+                    </Link>
+                  )}
+                  <Link
+                    to="/catalog"
+                    className="mt-3 flex min-h-12 items-center justify-center rounded-full bg-primary text-sm font-semibold uppercase tracking-[0.16em] text-primary-foreground"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    Explore the collection
+                  </Link>
+                </nav>
+              </div>,
+              document.body,
+            )
+          : null}
       </div>
     </header>
   );

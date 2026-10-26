@@ -1,6 +1,6 @@
 import { shopifyImageUrl, shopifySrcSet, isShopifyCdn } from '@/lib/shopify/image';
 
-const CARD_WIDTHS = [240, 360, 520, 720, 960, 1200];
+const CARD_WIDTHS = [160, 240, 320, 400, 500, 640, 800, 1000, 1280];
 
 /**
  * Product photos from Shopify are requested as WebP at the widths the layout uses.

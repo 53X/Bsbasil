@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { StoreMedia } from '@/lib/shopify/types';
-import { colourForMedia, photosForColour } from './colour-photos';
+import { colourForMedia, galleryForColour, photosForColour } from './colour-photos';
 
 function photo(alt: string, url = 'https://cdn.example/photo.jpg'): StoreMedia {
   return { kind: 'image', alt, url };
@@ -58,6 +58,22 @@ describe('colour photo matching', () => {
     expect(colourForMedia(photo('Bunny bow checkered romper in mint'), ['Pink', 'Mint'])).toBe('Mint');
     expect(colourForMedia(photo('Bunny bow checkered romper in pink'), ['Pink', 'Mint'])).toBe('Pink');
     expect(colourForMedia(photo('Animal print dungaree romper in blue'), ['Pink', 'Blue'])).toBe('Blue');
+  });
+
+  it('shows the product photos when a colourway has no labelled picture', () => {
+    const media = [
+      photo('Baby Bunny Checkered Romper Set', 'https://cdn.example/bunny.png'),
+    ];
+    expect(photosForColour(media, ['Beige', 'Navy'], 'Beige')).toEqual([]);
+    expect(galleryForColour(media, ['Beige', 'Navy'], 'Beige').map((item) => item.url)).toEqual([
+      'https://cdn.example/bunny.png',
+    ]);
+    expect(
+      galleryForColour([], ['Beige', 'Navy'], 'Beige', {
+        url: 'https://cdn.example/variant.png',
+        alt: 'Beige romper',
+      }).map((item) => item.url),
+    ).toEqual(['https://cdn.example/variant.png']);
   });
 
   it('maps the unlabeled baby bunny photo to navy', () => {
